@@ -9,37 +9,37 @@
 
 ---
 
-## Phase 1 — Foundation (Backend + Database)
+## Phase 1 — Foundation (Backend + Database) ✅ COMPLETE
 
 Goal: A working API with a real database that can store and retrieve food logs.
 
-- [ ] Initialize Express project (TypeScript, ESLint, Prettier)
-- [ ] Set up PostgreSQL (local Docker container for dev)
-- [ ] Write and run database migrations (schema v1)
-- [ ] `GET /foods/search` — basic name search
-- [ ] `POST /log` + `GET /log/:date` — add and retrieve log items
-- [ ] `POST /foods` — create a new food
-- [ ] Macro calculation (calories, protein, carbs, fat from per-100g values + serving size)
-- [ ] `POST /meals` + `GET /meals` — create and list saved meals
-- [ ] `POST /meals/:id/log` — log a whole meal at once
+- [x] Initialize Express project (TypeScript, ESLint, Prettier)
+- [x] Set up PostgreSQL (local Docker container for dev)
+- [x] Write and run database migrations (schema v1)
+- [x] `GET /foods/search` — basic name search
+- [x] `POST /log` + `GET /log/:date` — add and retrieve log items
+- [x] `POST /foods` — create a new food
+- [x] Macro calculation (calories, protein, carbs, fat from per-100g values + serving size)
+- [x] `POST /meals` + `GET /meals` — create and list saved meals
+- [x] `POST /meals/:id/log` — log a whole meal at once
 
-**Milestone:** Can log a meal via API calls (no UI yet). Macros calculate correctly.
+**Milestone:** Can log a meal via API calls (no UI yet). Macros calculate correctly. ✅
 
 ---
 
-## Phase 2 — Basic Frontend
+## Phase 2 — Basic Frontend ✅ COMPLETE
 
 Goal: A working mobile UI for the full core loop.
 
-- [ ] Initialize Expo project (TypeScript)
-- [ ] TodayScreen — show calories, protein, today's log grouped by meal
-- [ ] SearchScreen — search foods, show recent foods on empty state
-- [ ] PortionScreen — select serving size and log
-- [ ] MealsScreen — list saved meals, tap to log
-- [ ] WeightScreen — log and view weight history
-- [ ] Wire up all screens to the live API
+- [x] Initialize Expo project (TypeScript)
+- [x] TodayScreen — show calories, protein, today's log grouped by meal
+- [x] SearchScreen — search foods, show recent foods on empty state
+- [x] PortionScreen — select serving size and log
+- [x] MealsScreen — list saved meals, tap to log
+- [x] WeightScreen — log and view weight history
+- [x] Wire up all screens to the live API
 
-**Milestone:** Full core loop works on device — search food, log it, see it on today's screen.
+**Milestone:** Full core loop works on device — search food, log it, see it on today's screen. ✅
 
 ---
 
