@@ -6,6 +6,10 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ## 2026-03-14
 
+### `fix: downgrade Expo SDK from 55 to 54 for Expo Go compatibility`
+
+- Updated `frontend/package.json` — expo ~54.0.0, react 18.3.1, react-native 0.76.7, TypeScript ~5.5.0, and all compatible SDK 54 peer packages
+
 ### `feat: scaffold Expo frontend with all Phase 2 screens (Phase 2 complete)`
 
 - Initialized `frontend/` — Expo SDK 55, TypeScript, blank template
