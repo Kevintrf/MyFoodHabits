@@ -18,6 +18,11 @@ All changes to the project are documented here. Descriptions are written to be u
 
 - Updated `frontend/package.json` — expo ~54.0.0, react 18.3.1, react-native 0.76.7, TypeScript ~5.5.0, and all compatible SDK 54 peer packages
 
+### `feat: add seed script for default dev user`
+
+- Created `backend/scripts/seed.js` — inserts user id=1 if not present; required because all routes hardcode user_id=1 until auth is implemented
+- Added `seed` npm script to `backend/package.json`
+
 ### `fix: load dotenv before pg Pool is created`
 
 - Updated `backend/src/db/client.ts` — moved `dotenv.config()` here so DATABASE_URL is set before `new Pool()` runs; previously the Pool was constructed before `index.ts` had a chance to call dotenv
