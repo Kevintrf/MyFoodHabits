@@ -20,6 +20,7 @@ erDiagram
         string source
         int version
         int created_by_user_id FK
+        boolean liquid
         float calories_per_100g
         float protein_per_100g
         float carbs_per_100g
@@ -110,19 +111,20 @@ The app user. Stores their calorie and protein targets.
 
 The canonical food item. All nutrition values are stored **per 100g**.
 
-| Column              | Type      | Notes                                            |
-|---------------------|-----------|--------------------------------------------------|
-| id                  | int       | PK                                               |
-| name                | text      |                                                  |
-| barcode             | text      | nullable, unique                                 |
-| source              | enum      | `USER`, `VERIFIED`, `OPENFOODFACTS`              |
-| version             | int       | increments when a food is edited (creates new row) |
-| created_by_user_id  | int       | FK → users, nullable for system/verified foods   |
-| calories_per_100g   | float     |                                                  |
-| protein_per_100g    | float     |                                                  |
-| carbs_per_100g      | float     |                                                  |
-| fat_per_100g        | float     |                                                  |
-| created_at          | timestamp |                                                  |
+| Column             | Type      | Notes                                                        |
+|--------------------|-----------|--------------------------------------------------------------|
+| id                 | int       | PK                                                           |
+| name               | text      |                                                              |
+| barcode            | text      | nullable, unique                                             |
+| source             | enum      | `USER`, `VERIFIED`, `OPENFOODFACTS`                          |
+| version            | int       | increments when a food is edited (creates new row)           |
+| created_by_user_id | int       | FK → users, nullable for system/verified foods               |
+| liquid             | boolean   | true for drinks; UI shows "per 100ml" instead of "per 100g"  |
+| calories_per_100g  | float     |                                                              |
+| protein_per_100g   | float     |                                                              |
+| carbs_per_100g     | float     |                                                              |
+| fat_per_100g       | float     |                                                              |
+| created_at         | timestamp |                                                              |
 
 **Foods are immutable.** Editing a food creates a new row with an incremented version. Old log entries reference their original food row and will never silently change calorie values.
 
