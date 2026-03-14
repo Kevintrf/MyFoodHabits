@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import foodsRouter from './routes/foods';
 import logRouter from './routes/log';
 import mealsRouter from './routes/meals';
+import weightRouter from './routes/weight';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.get('/health', (_req, res) => {
 app.use('/foods', foodsRouter);
 app.use('/log', logRouter);
 app.use('/meals', mealsRouter);
+app.use('/weight', weightRouter);
 
 // Global error handler
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {

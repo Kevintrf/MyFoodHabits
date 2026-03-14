@@ -1,0 +1,227 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { SearchStackParamList } from '../navigation/RootNavigator';
+import { getFoodById, addLogItem, FoodServing, FoodWithServings } from '../services/api';
+import { useApp } from '../context/AppContext';
+
+const MEAL_SLOTS = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
+
+type PortionRoute = RouteProp<SearchStackParamList, 'Portion'>;
+
+export default function PortionScreen() {
+  const route = useRoute<PortionRoute>();
+  const navigation = useNavigation<any>();
+  const { todayDate, refreshTodayLog } = useApp();
+  const { food } = route.params;
+
+  const [foodDetail, setFoodDetail] = useState<FoodWithServings | null>(null);
+  const [selectedServing, setSelectedServing] = useState<FoodServing | null>(null);
+  const [quantity, setQuantity] = useState('1');
+  const [mealSlot, setMealSlot] = useState('BREAKFAST');
+  const [loading, setLoading] = useState(true);
+  const [logging, setLogging] = useState(false);
+
+  useEffect(() => {
+    getFoodById(food.id)
+      .then((f) => {
+        setFoodDetail(f);
+        const def = f.servings.find((s) => s.is_default) ?? f.servings[0] ?? null;
+        setSelectedServing(def);
+      })
+      .finally(() => setLoading(false));
+  }, [food.id]);
+
+  const servingGrams = selectedServing?.grams ?? 100;
+  const qty = parseFloat(quantity) || 0;
+  const multiplier = (servingGrams / 100) * qty;
+  const preview = {
+    calories: Math.round(food.calories_per_100g * multiplier * 10) / 10,
+    protein_g: Math.round(food.protein_per_100g * multiplier * 10) / 10,
+  };
+
+  async function handleLog() {
+    if (!qty || qty <= 0) return Alert.alert('Enter a valid quantity');
+    setLogging(true);
+    try {
+      await addLogItem({
+        date: todayDate,
+        meal_slot: mealSlot,
+        food_id: food.id,
+        serving_id: selectedServing?.id,
+        quantity: qty,
+      });
+      await refreshTodayLog();
+      navigation.navigate('Today');
+    } catch (e) {
+      Alert.alert('Error', e instanceof Error ? e.message : 'Something went wrong');
+    } finally {
+      setLogging(false);
+    }
+  }
+
+  const unitLabel = food.liquid ? 'ml' : 'g';
+
+  if (loading) return <ActivityIndicator style={styles.loader} color="#2D6A4F" />;
+
+  return (
+    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
+      {/* Food header */}
+      <View style={styles.foodHeader}>
+        <Text style={styles.foodName}>{food.name}</Text>
+        <Text style={styles.foodSub}>
+          {food.calories_per_100g} kcal · {food.protein_per_100g}g protein per 100{unitLabel}
+        </Text>
+      </View>
+
+      {/* Serving picker */}
+      {foodDetail && foodDetail.servings.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>SERVING SIZE</Text>
+          <TouchableOpacity
+            style={[styles.servingOption, !selectedServing && styles.servingSelected]}
+            onPress={() => setSelectedServing(null)}
+          >
+            <Text style={styles.servingText}>100{unitLabel}</Text>
+          </TouchableOpacity>
+          {foodDetail.servings.map((s) => (
+            <TouchableOpacity
+              key={s.id}
+              style={[styles.servingOption, selectedServing?.id === s.id && styles.servingSelected]}
+              onPress={() => setSelectedServing(s)}
+            >
+              <Text style={styles.servingText}>
+                {s.name} ({s.grams}g)
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {/* Quantity */}
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>QUANTITY</Text>
+        <TextInput
+          style={styles.quantityInput}
+          value={quantity}
+          onChangeText={setQuantity}
+          keyboardType="decimal-pad"
+          selectTextOnFocus
+        />
+      </View>
+
+      {/* Meal slot */}
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>MEAL</Text>
+        <View style={styles.slotRow}>
+          {MEAL_SLOTS.map((slot) => (
+            <TouchableOpacity
+              key={slot}
+              style={[styles.slotOption, mealSlot === slot && styles.slotSelected]}
+              onPress={() => setMealSlot(slot)}
+            >
+              <Text style={[styles.slotText, mealSlot === slot && styles.slotTextSelected]}>
+                {slot[0] + slot.slice(1).toLowerCase()}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      {/* Live preview */}
+      <View style={styles.preview}>
+        <Text style={styles.previewText}>
+          {preview.calories} kcal · {preview.protein_g}g protein
+        </Text>
+      </View>
+
+      {/* Log button */}
+      <TouchableOpacity style={styles.logButton} onPress={handleLog} disabled={logging}>
+        {logging ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.logButtonText}>Log Food</Text>
+        )}
+      </TouchableOpacity>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  loader: { flex: 1, marginTop: 100 },
+  container: { flex: 1, backgroundColor: '#F9F9F9' },
+  foodHeader: {
+    padding: 20,
+    paddingTop: 24,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderColor: '#E5E5E5',
+  },
+  foodName: { fontSize: 20, fontWeight: '700', color: '#1A1A1A' },
+  foodSub: { fontSize: 14, color: '#666', marginTop: 4 },
+  section: { margin: 16, marginBottom: 0 },
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#999',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
+  servingOption: {
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    marginBottom: 6,
+  },
+  servingSelected: { borderColor: '#2D6A4F', backgroundColor: '#F0FAF4' },
+  servingText: { fontSize: 15, color: '#1A1A1A' },
+  quantityInput: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    padding: 14,
+    fontSize: 22,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  slotRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  slotOption: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    backgroundColor: '#fff',
+  },
+  slotSelected: { borderColor: '#2D6A4F', backgroundColor: '#2D6A4F' },
+  slotText: { fontSize: 14, color: '#1A1A1A' },
+  slotTextSelected: { color: '#fff', fontWeight: '600' },
+  preview: {
+    margin: 16,
+    padding: 14,
+    backgroundColor: '#F0FAF4',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  previewText: { fontSize: 16, fontWeight: '600', color: '#2D6A4F' },
+  logButton: {
+    margin: 16,
+    backgroundColor: '#2D6A4F',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  logButtonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+});

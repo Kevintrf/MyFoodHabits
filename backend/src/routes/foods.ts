@@ -95,4 +95,29 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// GET /foods/:id — returns food with its servings
+router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+
+    const { rows: [food] } = await pool.query(
+      `SELECT id, name, barcode, liquid,
+              calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, created_at
+       FROM foods WHERE id = $1`,
+      [id],
+    );
+
+    if (!food) return res.status(404).json({ error: 'food not found' });
+
+    const { rows: servings } = await pool.query(
+      'SELECT * FROM food_servings WHERE food_id = $1 ORDER BY is_default DESC, id',
+      [id],
+    );
+
+    return res.json({ ...food, servings });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

@@ -6,6 +6,23 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ## 2026-03-14
 
+### `feat: scaffold Expo frontend with all Phase 2 screens (Phase 2 complete)`
+
+- Initialized `frontend/` — Expo SDK 55, TypeScript, blank template
+- Installed `@react-navigation/native`, `bottom-tabs`, `native-stack`, `react-native-screens`, `react-native-safe-area-context`, `@expo/vector-icons`
+- Created `frontend/src/services/api.ts` — typed fetch wrapper for all API endpoints; uses `EXPO_PUBLIC_API_URL`
+- Created `frontend/src/context/AppContext.tsx` — `AppProvider` holding today's date, today's log, and `refreshTodayLog()`
+- Created `frontend/src/navigation/RootNavigator.tsx` — bottom tab navigator (Today / Search / Meals / Weight) with SearchStack (Search → Portion)
+- Created `frontend/src/screens/TodayScreen.tsx` — date header, calorie + protein progress cards, log items grouped by meal slot
+- Created `frontend/src/screens/SearchScreen.tsx` — debounced 250ms search input, taps navigate to PortionScreen
+- Created `frontend/src/screens/PortionScreen.tsx` — serving picker, quantity input, meal slot selector, live macro preview, logs and returns to Today
+- Created `frontend/src/screens/MealsScreen.tsx` — lists saved meals with macros; Alert slot picker to log a whole meal
+- Created `frontend/src/screens/WeightScreen.tsx` — log weight entries, display history
+- Created `frontend/.env.example`, updated `frontend/.gitignore`
+- Added `GET /foods/:id` to `backend/src/routes/foods.ts` — returns food with servings
+- Added `backend/src/routes/weight.ts` — `GET /weight`, `POST /weight`
+- Updated `backend/src/index.ts` — mounts weight router
+
 ### `feat: implement Phase 1 API endpoints with macro calculation`
 
 - Created `backend/src/lib/macros.ts` — `calcMacros` and `sumMacros` utilities, formula: `(per_100g / 100) * serving_grams * quantity`
