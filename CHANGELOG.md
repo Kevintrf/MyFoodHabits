@@ -6,6 +6,14 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ## 2026-03-14
 
+### `feat: implement Phase 1 API endpoints with macro calculation`
+
+- Created `backend/src/lib/macros.ts` — `calcMacros` and `sumMacros` utilities, formula: `(per_100g / 100) * serving_grams * quantity`
+- Created `backend/src/routes/foods.ts` — `GET /foods/search` (name ILIKE + barcode lookup), `POST /foods` (with optional servings, transactional)
+- Created `backend/src/routes/log.ts` — `POST /log` (upserts day_log, calculates macros on response), `GET /log/:date` (returns slots grouped by meal with per-item and total macros)
+- Created `backend/src/routes/meals.ts` — `POST /meals`, `GET /meals`, `POST /meals/:id/log` (logs all meal items in one transaction)
+- Updated `backend/src/index.ts` — mounts all routers, adds global error handler
+
 ### `chore: add docker-compose for local PostgreSQL`
 
 - Created `docker-compose.yml` — PostgreSQL 17 Alpine with named volume, exposed on port 5432
