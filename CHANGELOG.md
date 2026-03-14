@@ -6,6 +6,10 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ## 2026-03-14
 
+### `chore: add docker-compose for local PostgreSQL`
+
+- Created `docker-compose.yml` — PostgreSQL 17 Alpine with named volume, exposed on port 5432
+
 ### `feat: scaffold Express + TypeScript backend (Phase 1 start)`
 
 - Created `backend/package.json` — Express, pg, node-pg-migrate, dotenv, cors; dev deps: TypeScript, ts-node, nodemon, ESLint, Prettier
