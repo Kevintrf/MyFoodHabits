@@ -6,6 +6,21 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ## 2026-03-14
 
+### `feat: scaffold Express + TypeScript backend (Phase 1 start)`
+
+- Created `backend/package.json` — Express, pg, node-pg-migrate, dotenv, cors; dev deps: TypeScript, ts-node, nodemon, ESLint, Prettier
+- Created `backend/tsconfig.json` — targets ES2022/CommonJS, strict mode
+- Created `backend/eslint.config.mjs` — ESLint v9 flat config with typescript-eslint + prettier
+- Created `backend/.prettierrc` — single quotes, trailing commas, 100 print width
+- Created `backend/nodemon.json` — watches `src/`, runs via ts-node
+- Created `backend/.env.example` — DATABASE_URL and PORT
+- Created `backend/.gitignore` — node_modules, dist, .env
+- Created `backend/src/index.ts` — Express app with `/health` endpoint
+- Created `backend/src/db/client.ts` — pg Pool using DATABASE_URL
+- Created `backend/migrations/1773446400000_initial-schema.js` — full schema: enums, all 8 tables, indexes
+
+---
+
 ### `docs: fill out project documentation from brainstorming`
 - Created `docs/overview.md` — app description, target users, MVP vs deferred features, philosophy
 - Created `docs/architecture.md` — system diagram, screens, API routes, design principles
