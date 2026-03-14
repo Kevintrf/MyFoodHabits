@@ -1,0 +1,4 @@
+Decision
+Reasoning
+Alternatives considered
+Consequences
