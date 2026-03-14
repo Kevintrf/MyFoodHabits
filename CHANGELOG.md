@@ -6,6 +6,10 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ## 2026-03-14
 
+### `fix: correct SDK 54 package versions (React 19, RN 0.81.5)`
+
+- Updated `frontend/package.json` — wrong versions were pinned (React 18/RN 0.76); correct SDK 54 versions are React 19.1.0, RN 0.81.5, expo-status-bar ~3.0.9, react-native-screens ~4.16.0, react-native-safe-area-context ~5.6.0
+
 ### `fix: add missing babel.config.js with babel-preset-expo`
 
 - Created `frontend/babel.config.js` — missing from manual SDK downgrade; without it Metro skips Expo's architecture interop layer, causing TurboModule crashes in Expo Go
