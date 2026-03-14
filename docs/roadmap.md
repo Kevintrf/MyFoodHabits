@@ -1,1 +1,85 @@
 # Roadmap
+
+## Guiding Rules
+
+- Always keep the app runnable — never let it sit broken
+- Build the smallest thing that proves the concept, then iterate
+- Delay: AI features, community features, advanced analytics
+- Test the core loop constantly: can I log food in under 5 seconds?
+
+---
+
+## Phase 1 — Foundation (Backend + Database)
+
+Goal: A working API with a real database that can store and retrieve food logs.
+
+- [ ] Initialize Express project (TypeScript, ESLint, Prettier)
+- [ ] Set up PostgreSQL (local Docker container for dev)
+- [ ] Write and run database migrations (schema v1)
+- [ ] `GET /foods/search` — basic name search
+- [ ] `POST /log` + `GET /log/:date` — add and retrieve log items
+- [ ] `POST /foods` — create a new food
+- [ ] Macro calculation (calories, protein, carbs, fat from per-100g values + serving size)
+- [ ] `POST /meals` + `GET /meals` — create and list saved meals
+- [ ] `POST /meals/:id/log` — log a whole meal at once
+
+**Milestone:** Can log a meal via API calls (no UI yet). Macros calculate correctly.
+
+---
+
+## Phase 2 — Basic Frontend
+
+Goal: A working mobile UI for the full core loop.
+
+- [ ] Initialize Expo project (TypeScript)
+- [ ] TodayScreen — show calories, protein, today's log grouped by meal
+- [ ] SearchScreen — search foods, show recent foods on empty state
+- [ ] PortionScreen — select serving size and log
+- [ ] MealsScreen — list saved meals, tap to log
+- [ ] WeightScreen — log and view weight history
+- [ ] Wire up all screens to the live API
+
+**Milestone:** Full core loop works on device — search food, log it, see it on today's screen.
+
+---
+
+## Phase 3 — Reduce Friction
+
+Goal: Make logging fast enough that users actually want to use it daily.
+
+- [ ] Barcode scanning — Open Food Facts integration, local caching
+- [ ] Recently used foods — surface at the top of search and today screen
+- [ ] Custom serving units per food (slice, piece, cup, tbsp)
+- [ ] Meal scaling (0.5x, 1x, 2x) on the log-meal flow
+- [ ] Habit detection v1 — detect repeated morning patterns, prompt "Log your usual breakfast?"
+- [ ] Performance pass — pre-load today's log and recent foods on app open
+
+**Milestone:** User can log a typical day in under 2 minutes. App feels fast.
+
+---
+
+## Phase 4 — Differentiating Features
+
+Goal: Features that make this app meaningfully better than alternatives.
+
+- [ ] Remaining macros view — "You still need 77g protein, here are some options"
+- [ ] Quick add command input — `+2 eggs +coffee with milk`
+- [ ] Day summary — calories, protein, consistency streak
+- [ ] Weekly summary — trend view, weight progress
+- [ ] Habit detection v2 — full day pattern, "Log your usual day?"
+- [ ] Calorie budget mode — plan remaining meals around a target
+
+**Milestone:** App has a clear reason to exist over MyFitnessPal. Ready for real users.
+
+---
+
+## Deferred (Post-Launch)
+
+These get built only after there are real users with real feedback.
+
+- AI photo food detection
+- Natural language food entry
+- Community food verification / voting
+- Premium tier + payment integration
+- Grocery list generation
+- Advanced coaching / AI recommendations
