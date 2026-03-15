@@ -162,13 +162,21 @@ A saved, reusable meal (e.g. "My usual breakfast").
 
 The foods that make up a saved meal, with their quantities.
 
-| Column     | Type  | Notes                                           |
-|------------|-------|-------------------------------------------------|
-| id         | int   | PK                                              |
-| meal_id    | int   | FK → meals                                      |
-| food_id    | int   | FK → foods                                      |
+| Column     | Type  | Notes                                             |
+|------------|-------|---------------------------------------------------|
+| id         | int   | PK                                                |
+| meal_id    | int   | FK → meals                                        |
+| food_id    | int   | FK → foods                                        |
 | serving_id | int   | FK → food_servings, nullable (falls back to 100g) |
-| quantity   | float | number of servings                              |
+| quantity   | float | number of servings                                |
+
+**Planned evolution (Phase 5 — Nested Meal Collections):** Add a nullable `sub_meal_id` column (FK → meals) so a meal item can reference either a food or another meal — never both. This enables composable collections like "Usual breakfast" containing a "2 scrambled eggs" sub-meal plus individual items.
+
+Constraints to enforce when implemented:
+
+- Exactly one of `food_id` or `sub_meal_id` must be non-null (check constraint)
+- Cycle detection required — a meal cannot reference itself directly or transitively; validate the full ancestor chain on insert
+- Macro calculation becomes recursive: sum the resolved macros of all nested items depth-first
 
 ---
 

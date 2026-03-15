@@ -4,6 +4,17 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-15
+
+### `docs: expand roadmap with missing features and nested meal collections`
+
+- Added Phase 4 UI overhaul between Reduce Friction and Differentiating Features
+- Added to Phase 3: edit/delete log items, user-configurable targets, create meals from UI, edit custom food
+- Added to Phase 5: authentication, onboarding, copy previous day, nested meal collections, data export
+- Updated `database/schema.md` — documented planned `sub_meal_id` evolution on `meal_items` with cycle detection and recursive macro calculation constraints noted
+
+---
+
 ## 2026-03-14
 
 ### `fix: correct SDK 54 package versions (React 19, RN 0.81.5)`
