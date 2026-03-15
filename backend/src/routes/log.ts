@@ -134,4 +134,82 @@ router.get('/:date', async (req: Request, res: Response, next: NextFunction) => 
   }
 });
 
+// DELETE /log/items/:id
+router.delete('/items/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // TODO: replace user_id with value from auth middleware
+    const user_id = 1;
+    const { id } = req.params;
+
+    const { rowCount } = await pool.query(
+      `DELETE FROM log_items
+       WHERE id = $1
+         AND day_log_id IN (SELECT id FROM day_logs WHERE user_id = $2)`,
+      [id, user_id],
+    );
+
+    if (rowCount === 0) return res.status(404).json({ error: 'log item not found' });
+    return res.json({ deleted: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PATCH /log/items/:id
+router.patch('/items/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // TODO: replace user_id with value from auth middleware
+    const user_id = 1;
+    const { id } = req.params;
+    const { quantity, meal_slot } = req.body;
+
+    if (quantity === undefined && meal_slot === undefined) {
+      return res.status(400).json({ error: 'quantity or meal_slot required' });
+    }
+
+    const setClauses: string[] = [];
+    const params: unknown[] = [];
+
+    if (quantity !== undefined) {
+      params.push(quantity);
+      setClauses.push(`quantity = $${params.length}`);
+    }
+    if (meal_slot !== undefined) {
+      params.push(meal_slot);
+      setClauses.push(`meal_slot = $${params.length}`);
+    }
+
+    params.push(id);
+    const idIdx = params.length;
+    params.push(user_id);
+    const userIdx = params.length;
+
+    const { rows: [item] } = await pool.query(
+      `UPDATE log_items
+       SET ${setClauses.join(', ')}
+       WHERE id = $${idIdx}
+         AND day_log_id IN (SELECT id FROM day_logs WHERE user_id = $${userIdx})
+       RETURNING *`,
+      params,
+    );
+
+    if (!item) return res.status(404).json({ error: 'log item not found' });
+
+    const { rows: [food] } = await pool.query('SELECT * FROM foods WHERE id = $1', [item.food_id]);
+    let servingGrams = 100;
+    if (item.serving_id) {
+      const { rows: [serving] } = await pool.query(
+        'SELECT grams FROM food_servings WHERE id = $1',
+        [item.serving_id],
+      );
+      if (serving) servingGrams = parseFloat(serving.grams);
+    }
+
+    const macros = calcMacros(food, servingGrams, parseFloat(item.quantity));
+    return res.json({ ...item, macros });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

@@ -116,6 +116,12 @@ export const addLogItem = (item: {
   quantity: number;
 }) => request<LogItem>('/log', { method: 'POST', body: JSON.stringify(item) });
 
+export const deleteLogItem = (id: number) =>
+  request<{ deleted: boolean }>(`/log/items/${id}`, { method: 'DELETE' });
+
+export const updateLogItem = (id: number, data: { quantity?: number; meal_slot?: string }) =>
+  request<LogItem>(`/log/items/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+
 // --- Meals ---
 
 export const getMeals = () => request<Meal[]>('/meals');

@@ -6,6 +6,14 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ## 2026-03-15
 
+### `feat: edit and delete log items`
+
+- Added `DELETE /log/items/:id` and `PATCH /log/items/:id` to `backend/src/routes/log.ts` — both verify item belongs to the requesting user via day_log ownership check
+- Added `deleteLogItem` and `updateLogItem` to `frontend/src/services/api.ts`
+- Updated `frontend/src/screens/TodayScreen.tsx` — log items are now long-pressable; opens a bottom-sheet modal to change quantity or meal slot, or delete with a confirmation alert
+
+---
+
 ### `docs: expand roadmap with missing features and nested meal collections`
 
 - Added Phase 4 UI overhaul between Reduce Friction and Differentiating Features

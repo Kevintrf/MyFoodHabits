@@ -1,13 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Modal,
+  TextInput,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useApp } from '../context/AppContext';
+import { LogItem, deleteLogItem, updateLogItem } from '../services/api';
 
 // TODO: pull from user settings once auth exists
 const TARGETS = { calories: 2000, protein_g: 150 };
@@ -16,10 +20,54 @@ const MEAL_SLOTS = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
 export default function TodayScreen() {
   const { todayLog, todayDate, refreshTodayLog } = useApp();
   const navigation = useNavigation<any>();
+  const [editTarget, setEditTarget] = useState<{ item: LogItem; slot: string } | null>(null);
+  const [editQty, setEditQty] = useState('');
+  const [editSlot, setEditSlot] = useState('');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     refreshTodayLog();
   }, []);
+
+  function openEdit(item: LogItem, slot: string) {
+    setEditTarget({ item, slot });
+    setEditQty(String(item.quantity));
+    setEditSlot(slot);
+  }
+
+  async function handleSave() {
+    if (!editTarget) return;
+    const qty = parseFloat(editQty);
+    if (isNaN(qty) || qty <= 0) return;
+    setSaving(true);
+    try {
+      await updateLogItem(editTarget.item.id, { quantity: qty, meal_slot: editSlot });
+      await refreshTodayLog();
+      setEditTarget(null);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleDelete() {
+    if (!editTarget) return;
+    Alert.alert(
+      'Delete item',
+      `Remove ${editTarget.item.food_name} from your log?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            await deleteLogItem(editTarget.item.id);
+            await refreshTodayLog();
+            setEditTarget(null);
+          },
+        },
+      ],
+    );
+  }
 
   const totals = todayLog?.totals ?? { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 };
   const slots = todayLog?.slots ?? {};
@@ -31,64 +79,121 @@ export default function TodayScreen() {
   });
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.dateLabel}>{dateLabel}</Text>
+    <>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <Text style={styles.dateLabel}>{dateLabel}</Text>
 
-      {/* Macro summary */}
-      <View style={styles.macroRow}>
-        <MacroCard
-          label="Calories"
-          value={Math.round(totals.calories)}
-          target={TARGETS.calories}
-          unit="kcal"
-        />
-        <MacroCard
-          label="Protein"
-          value={Math.round(totals.protein_g)}
-          target={TARGETS.protein_g}
-          unit="g"
-        />
-      </View>
+        {/* Macro summary */}
+        <View style={styles.macroRow}>
+          <MacroCard
+            label="Calories"
+            value={Math.round(totals.calories)}
+            target={TARGETS.calories}
+            unit="kcal"
+          />
+          <MacroCard
+            label="Protein"
+            value={Math.round(totals.protein_g)}
+            target={TARGETS.protein_g}
+            unit="g"
+          />
+        </View>
 
-      {/* Log items grouped by meal slot */}
-      {MEAL_SLOTS.map((slot) => {
-        const items = slots[slot];
-        if (!items?.length) return null;
-        return (
-          <View key={slot} style={styles.section}>
-            <Text style={styles.slotHeader}>{slot}</Text>
-            {items.map((item) => {
-              const portionLabel = item.serving_name
-                ? `${item.quantity} × ${item.serving_name}`
-                : `${item.quantity * item.serving_grams}${item.liquid ? 'ml' : 'g'}`;
-              return (
-                <View key={item.id} style={styles.logItem}>
-                  <View style={styles.logItemLeft}>
-                    <Text style={styles.logItemName}>{item.food_name}</Text>
-                    <Text style={styles.logItemSub}>{portionLabel}</Text>
-                  </View>
-                  <View style={styles.logItemRight}>
-                    <Text style={styles.logItemCal}>{item.macros.calories} kcal</Text>
-                    <Text style={styles.logItemPro}>{item.macros.protein_g}g protein</Text>
-                  </View>
-                </View>
-              );
-            })}
-          </View>
-        );
-      })}
+        {/* Log items grouped by meal slot */}
+        {MEAL_SLOTS.map((slot) => {
+          const items = slots[slot];
+          if (!items?.length) return null;
+          return (
+            <View key={slot} style={styles.section}>
+              <Text style={styles.slotHeader}>{slot}</Text>
+              {items.map((item) => {
+                const portionLabel = item.serving_name
+                  ? `${item.quantity} × ${item.serving_name}`
+                  : `${item.quantity * item.serving_grams}${item.liquid ? 'ml' : 'g'}`;
+                return (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={styles.logItem}
+                    onLongPress={() => openEdit(item, slot)}
+                    delayLongPress={300}
+                  >
+                    <View style={styles.logItemLeft}>
+                      <Text style={styles.logItemName}>{item.food_name}</Text>
+                      <Text style={styles.logItemSub}>{portionLabel}</Text>
+                    </View>
+                    <View style={styles.logItemRight}>
+                      <Text style={styles.logItemCal}>{item.macros.calories} kcal</Text>
+                      <Text style={styles.logItemPro}>{item.macros.protein_g}g protein</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          );
+        })}
 
-      {!todayLog && (
-        <Text style={styles.emptyState}>Nothing logged today yet.</Text>
-      )}
+        {!todayLog && (
+          <Text style={styles.emptyState}>Nothing logged today yet.</Text>
+        )}
 
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate('SearchTab')}
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigation.navigate('SearchTab')}
+        >
+          <Text style={styles.addButtonText}>+ Add Food</Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      {/* Edit / delete modal */}
+      <Modal
+        visible={!!editTarget}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setEditTarget(null)}
       >
-        <Text style={styles.addButtonText}>+ Add Food</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>{editTarget?.item.food_name}</Text>
+
+            <Text style={styles.modalLabel}>QUANTITY</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={editQty}
+              onChangeText={setEditQty}
+              keyboardType="decimal-pad"
+              autoFocus
+            />
+
+            <Text style={styles.modalLabel}>MEAL</Text>
+            <View style={styles.slotRow}>
+              {MEAL_SLOTS.map((s) => (
+                <TouchableOpacity
+                  key={s}
+                  style={[styles.slotBtn, editSlot === s && styles.slotBtnActive]}
+                  onPress={() => setEditSlot(s)}
+                >
+                  <Text style={[styles.slotBtnText, editSlot === s && styles.slotBtnTextActive]}>
+                    {s[0] + s.slice(1).toLowerCase()}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={saving}>
+              <Text style={styles.saveBtnText}>{saving ? 'Saving…' : 'Save changes'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.deleteBtn} onPress={handleDelete}>
+              <Text style={styles.deleteBtnText}>Delete from log</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setEditTarget(null)} style={styles.cancelBtn}>
+              <Text style={styles.cancelBtnText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -177,4 +282,57 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  // Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+  },
+  modalCard: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 24,
+    paddingBottom: 40,
+  },
+  modalTitle: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginBottom: 20 },
+  modalLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#999',
+    letterSpacing: 1,
+    marginBottom: 6,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  slotRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
+  slotBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    alignItems: 'center',
+  },
+  slotBtnActive: { backgroundColor: '#2D6A4F', borderColor: '#2D6A4F' },
+  slotBtnText: { fontSize: 11, fontWeight: '600', color: '#666' },
+  slotBtnTextActive: { color: '#fff' },
+  saveBtn: {
+    backgroundColor: '#2D6A4F',
+    borderRadius: 12,
+    padding: 14,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  deleteBtn: { padding: 14, alignItems: 'center', marginBottom: 4 },
+  deleteBtnText: { color: '#e74c3c', fontSize: 16, fontWeight: '500' },
+  cancelBtn: { padding: 10, alignItems: 'center' },
+  cancelBtnText: { color: '#999', fontSize: 15 },
 });
