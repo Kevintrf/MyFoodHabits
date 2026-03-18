@@ -9,6 +9,7 @@ import SearchScreen from '../screens/SearchScreen';
 import PortionScreen from '../screens/PortionScreen';
 import MealsScreen from '../screens/MealsScreen';
 import WeightScreen from '../screens/WeightScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 import { Food } from '../services/api';
 
 // --- Param list types ---
@@ -23,6 +24,7 @@ type RootTabParamList = {
   SearchTab: undefined;
   Meals: undefined;
   Weight: undefined;
+  Settings: undefined;
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -42,6 +44,7 @@ const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   SearchTab: 'search-outline',
   Meals: 'restaurant-outline',
   Weight: 'scale-outline',
+  Settings: 'settings-outline',
 };
 
 export default function RootNavigator() {
@@ -61,6 +64,7 @@ export default function RootNavigator() {
         <Tab.Screen name="SearchTab" component={SearchStackNavigator} options={{ title: 'Search' }} />
         <Tab.Screen name="Meals" component={MealsScreen} />
         <Tab.Screen name="Weight" component={WeightScreen} />
+        <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );

@@ -13,12 +13,10 @@ import { useNavigation } from '@react-navigation/native';
 import { useApp } from '../context/AppContext';
 import { LogItem, deleteLogItem, updateLogItem } from '../services/api';
 
-// TODO: pull from user settings once auth exists
-const TARGETS = { calories: 2000, protein_g: 150 };
 const MEAL_SLOTS = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
 
 export default function TodayScreen() {
-  const { todayLog, todayDate, refreshTodayLog } = useApp();
+  const { todayLog, todayDate, refreshTodayLog, targets, refreshTargets } = useApp();
   const navigation = useNavigation<any>();
   const [editTarget, setEditTarget] = useState<{ item: LogItem; slot: string } | null>(null);
   const [editQty, setEditQty] = useState('');
@@ -27,6 +25,7 @@ export default function TodayScreen() {
 
   useEffect(() => {
     refreshTodayLog();
+    refreshTargets();
   }, []);
 
   function openEdit(item: LogItem, slot: string) {
@@ -88,13 +87,13 @@ export default function TodayScreen() {
           <MacroCard
             label="Calories"
             value={Math.round(totals.calories)}
-            target={TARGETS.calories}
+            target={targets.target_calories ?? 2000}
             unit="kcal"
           />
           <MacroCard
             label="Protein"
             value={Math.round(totals.protein_g)}
-            target={TARGETS.protein_g}
+            target={targets.target_protein_g ?? 150}
             unit="g"
           />
         </View>

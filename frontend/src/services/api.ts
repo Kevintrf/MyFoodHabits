@@ -129,6 +129,19 @@ export const getMeals = () => request<Meal[]>('/meals');
 export const logMeal = (mealId: number, date: string, meal_slot: string) =>
   request(`/meals/${mealId}/log`, { method: 'POST', body: JSON.stringify({ date, meal_slot }) });
 
+// --- Users ---
+
+export interface UserTargets {
+  target_calories: number | null;
+  target_protein_g: number | null;
+}
+
+export const getTargets = () =>
+  request<UserTargets>('/users/me');
+
+export const updateTargets = (data: { target_calories?: number; target_protein_g?: number }) =>
+  request<UserTargets>('/users/me', { method: 'PATCH', body: JSON.stringify(data) });
+
 // --- Weight ---
 
 export const getWeights = () => request<WeightEntry[]>('/weight');

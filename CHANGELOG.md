@@ -4,6 +4,20 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-18 (2)
+
+### `feat: user-configurable macro targets`
+
+- Added `backend/src/routes/users.ts` — `GET /users/me` returns `target_calories` and `target_protein_g`; `PATCH /users/me` updates them (COALESCE so partial updates work)
+- Mounted `/users` router in `backend/src/index.ts`
+- Added `getTargets` and `updateTargets` to `frontend/src/services/api.ts`
+- Updated `frontend/src/context/AppContext.tsx` — loads targets on app start, exposes `targets` and `refreshTargets`; falls back to 2000kcal / 150g if DB values are null
+- Created `frontend/src/screens/SettingsScreen.tsx` — two numeric inputs for calorie and protein targets, save button calls `PATCH /users/me` then refreshes context
+- Updated `frontend/src/screens/TodayScreen.tsx` — removed hardcoded `TARGETS` constant; MacroCards now read from `targets` in AppContext
+- Added Settings tab (gear icon) to `frontend/src/navigation/RootNavigator.tsx`
+
+---
+
 ## 2026-03-18
 
 ### `docs: sync claude-context with roadmap`

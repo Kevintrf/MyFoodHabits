@@ -50,7 +50,7 @@ See [../../database/schema.md](../../database/schema.md) for the database schema
 ### Phase 3 remaining items (roadmap order)
 
 - [x] Edit/delete log items — long-press on TodayScreen opens bottom-sheet modal; `DELETE /log/items/:id` + `PATCH /log/items/:id`
-- [ ] User-configurable macro targets — settings screen; currently hardcoded to 2000kcal / 150g in TodayScreen
+- [x] User-configurable macro targets — SettingsScreen with calorie + protein inputs; `GET /users/me` + `PATCH /users/me`; targets live in AppContext
 - [ ] Create meals from UI — frontend flow to build a saved meal; `POST /meals` backend exists
 - [ ] Edit a custom food — needs UI + `PATCH /foods/:id`; backend handles immutability via versioning
 - [ ] Barcode scanning — Open Food Facts integration, local caching
@@ -75,6 +75,7 @@ backend/
       foods.ts          GET /foods/search, GET /foods/:id, POST /foods
       log.ts            POST /log, GET /log/:date, DELETE /log/items/:id, PATCH /log/items/:id
       meals.ts          POST /meals, GET /meals, POST /meals/:id/log
+      users.ts          GET /users/me, PATCH /users/me
       weight.ts         GET /weight, POST /weight
   migrations/           node-pg-migrate migration files
   scripts/seed.js       Inserts default dev user (id=1)
@@ -91,6 +92,7 @@ frontend/
       PortionScreen     Serving picker, quantity, meal slot, live preview
       MealsScreen       Lists meals, Alert slot picker to log whole meal
       WeightScreen      Log weight, view history
+      SettingsScreen    Set calorie and protein targets
 ```
 
 ---

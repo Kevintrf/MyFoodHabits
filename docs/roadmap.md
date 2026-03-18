@@ -48,7 +48,7 @@ Goal: A working mobile UI for the full core loop.
 Goal: Make logging fast enough that users actually want to use it daily.
 
 - [x] Edit/delete log items — fix mistakes after logging; requires `DELETE /log/items/:id` and `PATCH /log/items/:id` backend endpoints
-- [ ] User-configurable macro targets — settings screen to set calorie and protein goals (currently hardcoded to 2000kcal / 150g in TodayScreen)
+- [x] User-configurable macro targets — settings screen to set calorie and protein goals (`GET /users/me` + `PATCH /users/me`; targets stored in DB, loaded into AppContext)
 - [ ] Create meals from UI — flow to build a new saved meal by searching and adding foods (`POST /meals` backend exists, no frontend flow yet)
 - [ ] Edit a custom food — correct wrong macros; backend already handles immutability via versioning, needs UI + `PATCH /foods/:id` endpoint
 - [ ] Barcode scanning — Open Food Facts integration, local caching
