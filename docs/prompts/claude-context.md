@@ -151,6 +151,8 @@ cd ../frontend && npx expo start --clear
 
 **Show only what matters.** Calories and protein are the primary metrics. Fat, carbs, sodium are secondary.
 
+**Phase 5 includes offline-first storage** (local SQLite + background sync) — deferred until after auth since it requires a real user identity to be meaningful.
+
 **Delay these until post-launch:**
 
 - AI photo detection, natural language parsing

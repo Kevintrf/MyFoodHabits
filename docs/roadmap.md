@@ -95,6 +95,7 @@ Goal: Features that make this app meaningfully better than alternatives.
 - [ ] Weekly summary — trend view, weight progress
 - [ ] Habit detection v2 — full day pattern, "Log your usual day?"
 - [ ] Calorie budget mode — plan remaining meals around a target
+- [ ] Offline-first storage — local SQLite mirrors server data; writes are instant locally and sync in background; requires auth to be meaningful
 
 **Milestone:** App has a clear reason to exist over MyFitnessPal. Users actively recommend it.
 
