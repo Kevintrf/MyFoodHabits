@@ -45,15 +45,21 @@ See [../../database/schema.md](../../database/schema.md) for the database schema
 
 ## Current Phase
 
-**Phase 1 ✅ and Phase 2 ✅ are complete.** Next is Phase 3 — Reduce Friction.
+**Phase 1 ✅ and Phase 2 ✅ are complete.** Currently in Phase 3 — Reduce Friction.
 
-### Phase 3 priorities (in order)
+### Phase 3 remaining items (roadmap order)
 
-1. Recently used foods (surface in search + today screen)
-2. Barcode scanning — Open Food Facts integration, local caching
-3. Custom serving units per food
-4. Meal scaling (0.5x, 1x, 2x)
-5. Performance pass — pre-load today's log and recent foods on app open
+- [x] Edit/delete log items — long-press on TodayScreen opens bottom-sheet modal; `DELETE /log/items/:id` + `PATCH /log/items/:id`
+- [ ] User-configurable macro targets — settings screen; currently hardcoded to 2000kcal / 150g in TodayScreen
+- [ ] Create meals from UI — frontend flow to build a saved meal; `POST /meals` backend exists
+- [ ] Edit a custom food — needs UI + `PATCH /foods/:id`; backend handles immutability via versioning
+- [ ] Barcode scanning — Open Food Facts integration, local caching
+- [ ] Recently used foods — surface at the top of search and today screen
+- [ ] Custom serving units per food (slice, piece, cup, tbsp)
+- [ ] Meal scaling (0.5x, 1x, 2x) on the log-meal flow
+- [ ] Habit detection v1 — detect repeated morning patterns, prompt "Log your usual breakfast?"
+- [ ] Manual food creation — form UI; `POST /foods` backend already exists
+- [ ] Performance pass — pre-load today's log and recent foods on app open
 
 ---
 
@@ -67,7 +73,7 @@ backend/
     lib/macros.ts       calcMacros() and sumMacros() utilities
     routes/
       foods.ts          GET /foods/search, GET /foods/:id, POST /foods
-      log.ts            POST /log, GET /log/:date
+      log.ts            POST /log, GET /log/:date, DELETE /log/items/:id, PATCH /log/items/:id
       meals.ts          POST /meals, GET /meals, POST /meals/:id/log
       weight.ts         GET /weight, POST /weight
   migrations/           node-pg-migrate migration files

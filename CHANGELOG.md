@@ -4,6 +4,15 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-18
+
+### `docs: sync claude-context with roadmap`
+
+- Updated `docs/prompts/claude-context.md` — Phase 3 section now matches `docs/roadmap.md` exactly: edit/delete log items marked complete, all 10 remaining items listed in roadmap order with matching descriptions
+- Updated project structure comment in claude-context.md — `log.ts` now lists all four endpoints including `DELETE /log/items/:id` and `PATCH /log/items/:id`
+
+---
+
 ## 2026-03-15
 
 ### `feat: edit and delete log items`
