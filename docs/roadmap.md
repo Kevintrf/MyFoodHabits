@@ -56,7 +56,7 @@ Goal: Make logging fast enough that users actually want to use it daily.
 - [ ] Custom serving units per food (slice, piece, cup, tbsp)
 - [ ] Meal scaling (0.5x, 1x, 2x) on the log-meal flow
 - [ ] Habit detection v1 — detect repeated morning patterns, prompt "Log your usual breakfast?"
-- [ ] Manual food creation — form to define name, calories, protein, carbs, fat per 100g (backend `POST /foods` already exists, frontend UI needed)
+- [x] Manual food creation — form to define name, calories, protein, carbs, fat per 100g; liquid toggle; accessible via SearchScreen; navigates to PortionScreen on save
 - [ ] Performance pass — pre-load today's log and recent foods on app open
 
 **Milestone:** User can log a typical day in under 2 minutes. App feels fast.

@@ -45,6 +45,8 @@ export default function SearchScreen() {
     };
   }, [query]);
 
+  const noResults = !loading && query.trim() !== '' && results.length === 0;
+
   return (
     <View style={styles.container}>
       <View style={styles.searchBar}>
@@ -61,7 +63,7 @@ export default function SearchScreen() {
 
       {loading && <ActivityIndicator style={styles.spinner} color="#2D6A4F" />}
 
-      {!loading && query.trim() !== '' && results.length === 0 && (
+      {noResults && (
         <Text style={styles.empty}>No results for "{query}"</Text>
       )}
 
@@ -88,7 +90,26 @@ export default function SearchScreen() {
             <Text style={styles.chevron}>›</Text>
           </TouchableOpacity>
         )}
+        ListFooterComponent={
+          results.length > 0 ? (
+            <TouchableOpacity
+              style={styles.createBtn}
+              onPress={() => navigation.navigate('CreateFood', { initialName: query.trim() })}
+            >
+              <Text style={styles.createBtnText}>+ Create new food</Text>
+            </TouchableOpacity>
+          ) : null
+        }
       />
+
+      {noResults && (
+        <TouchableOpacity
+          style={styles.createBtnProminent}
+          onPress={() => navigation.navigate('CreateFood', { initialName: query.trim() })}
+        >
+          <Text style={styles.createBtnProminentText}>+ Create "{query.trim()}"</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -120,4 +141,22 @@ const styles = StyleSheet.create({
   resultName: { fontSize: 16, fontWeight: '500', color: '#1A1A1A' },
   resultSub: { fontSize: 13, color: '#999', marginTop: 3 },
   chevron: { fontSize: 22, color: '#ccc', marginLeft: 8 },
+  createBtn: {
+    margin: 12,
+    marginTop: 6,
+    padding: 14,
+    alignItems: 'center',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#2D6A4F',
+  },
+  createBtnText: { color: '#2D6A4F', fontSize: 15, fontWeight: '600' },
+  createBtnProminent: {
+    margin: 16,
+    backgroundColor: '#2D6A4F',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  createBtnProminentText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });

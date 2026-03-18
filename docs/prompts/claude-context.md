@@ -58,7 +58,7 @@ See [../../database/schema.md](../../database/schema.md) for the database schema
 - [ ] Custom serving units per food (slice, piece, cup, tbsp)
 - [ ] Meal scaling (0.5x, 1x, 2x) on the log-meal flow
 - [ ] Habit detection v1 — detect repeated morning patterns, prompt "Log your usual breakfast?"
-- [ ] Manual food creation — form UI; `POST /foods` backend already exists
+- [x] Manual food creation — CreateFoodScreen with name, macros per 100g, liquid toggle; entry point in SearchScreen; navigates to PortionScreen on save
 - [ ] Performance pass — pre-load today's log and recent foods on app open
 
 ---
@@ -93,6 +93,7 @@ frontend/
       MealsScreen       Lists meals, Alert slot picker to log whole meal
       WeightScreen      Log weight, view history
       SettingsScreen    Set calorie and protein targets
+      CreateFoodScreen  Form to create a custom food (name, macros, liquid flag)
 ```
 
 ---

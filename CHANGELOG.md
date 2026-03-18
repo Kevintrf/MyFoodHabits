@@ -4,6 +4,17 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-18 (3)
+
+### `feat: manual food creation`
+
+- Added `createFood` to `frontend/src/services/api.ts` — typed wrapper for `POST /foods`
+- Created `frontend/src/screens/CreateFoodScreen.tsx` — form with name, calories/protein/carbs/fat per 100g, and a liquid toggle; on save navigates directly to PortionScreen so the food can be logged immediately; name is pre-filled from the search query
+- Updated `frontend/src/screens/SearchScreen.tsx` — when results exist, a subtle "Create new food" button appears at the bottom of the list; when no results are found, a prominent green "Create [query]" button is shown
+- Added `CreateFood` route to `SearchStackParamList` and `SearchStack.Navigator` in `RootNavigator.tsx`
+
+---
+
 ## 2026-03-18 (2)
 
 ### `feat: user-configurable macro targets`

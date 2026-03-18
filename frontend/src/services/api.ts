@@ -103,6 +103,15 @@ export const searchFoods = (q: string) =>
 export const getFoodById = (id: number) =>
   request<FoodWithServings>(`/foods/${id}`);
 
+export const createFood = (data: {
+  name: string;
+  calories_per_100g: number;
+  protein_per_100g?: number;
+  carbs_per_100g?: number;
+  fat_per_100g?: number;
+  liquid?: boolean;
+}) => request<Food>('/foods', { method: 'POST', body: JSON.stringify(data) });
+
 // --- Log ---
 
 export const getLog = (date: string) =>
