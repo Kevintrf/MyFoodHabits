@@ -4,6 +4,17 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-18 (4)
+
+### `feat: create meals from UI`
+
+- Added `createMeal` to `frontend/src/services/api.ts` — typed wrapper for `POST /meals`
+- Created `frontend/src/screens/CreateMealScreen.tsx` — meal name input, debounced food search, draft items list with ±quantity controls and remove button, save button calls `POST /meals` and returns to MealsScreen
+- Wrapped Meals tab in `MealsStack` in `RootNavigator.tsx` — added `MealsStackParamList`, `MealsStackNavigator`, and a native header + button that navigates to `CreateMealScreen`
+- Removed custom header text from `MealsScreen.tsx` — replaced by the stack navigator's native header
+
+---
+
 ## 2026-03-18 (3)
 
 ### `feat: manual food creation`

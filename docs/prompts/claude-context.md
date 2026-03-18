@@ -51,7 +51,7 @@ See [../../database/schema.md](../../database/schema.md) for the database schema
 
 - [x] Edit/delete log items — long-press on TodayScreen opens bottom-sheet modal; `DELETE /log/items/:id` + `PATCH /log/items/:id`
 - [x] User-configurable macro targets — SettingsScreen with calorie + protein inputs; `GET /users/me` + `PATCH /users/me`; targets live in AppContext
-- [ ] Create meals from UI — frontend flow to build a saved meal; `POST /meals` backend exists
+- [x] Create meals from UI — CreateMealScreen with name input, food search, ±quantity draft list; + button in Meals tab header
 - [ ] Edit a custom food — needs UI + `PATCH /foods/:id`; backend handles immutability via versioning
 - [ ] Barcode scanning — Open Food Facts integration, local caching
 - [ ] Recently used foods — surface at the top of search and today screen
@@ -85,15 +85,16 @@ frontend/
   src/
     services/api.ts     All typed API calls (no fetch in components)
     context/AppContext  userId, todayDate, todayLog, refreshTodayLog()
-    navigation/RootNavigator.tsx  Bottom tabs + SearchStack
+    navigation/RootNavigator.tsx  Bottom tabs + SearchStack + MealsStack
     screens/
-      TodayScreen       Date, macro progress bars, log items by slot
-      SearchScreen      Debounced search (250ms), navigates to Portion
-      PortionScreen     Serving picker, quantity, meal slot, live preview
-      MealsScreen       Lists meals, Alert slot picker to log whole meal
-      WeightScreen      Log weight, view history
-      SettingsScreen    Set calorie and protein targets
-      CreateFoodScreen  Form to create a custom food (name, macros, liquid flag)
+      TodayScreen         Date, macro progress bars, log items by slot
+      SearchScreen        Debounced search (250ms), navigates to Portion
+      PortionScreen       Serving picker, quantity, meal slot, live preview
+      MealsScreen         Lists meals, Alert slot picker to log whole meal
+      CreateMealScreen    Name input, food search, ±quantity draft list, saves via POST /meals
+      WeightScreen        Log weight, view history
+      SettingsScreen      Set calorie and protein targets
+      CreateFoodScreen    Form to create a custom food (name, macros, liquid flag)
 ```
 
 ---

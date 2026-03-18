@@ -135,6 +135,12 @@ export const updateLogItem = (id: number, data: { quantity?: number; meal_slot?:
 
 export const getMeals = () => request<Meal[]>('/meals');
 
+export const createMeal = (data: {
+  name: string;
+  category?: string;
+  items: { food_id: number; serving_id?: number; quantity: number }[];
+}) => request<Meal>('/meals', { method: 'POST', body: JSON.stringify(data) });
+
 export const logMeal = (mealId: number, date: string, meal_slot: string) =>
   request(`/meals/${mealId}/log`, { method: 'POST', body: JSON.stringify({ date, meal_slot }) });
 

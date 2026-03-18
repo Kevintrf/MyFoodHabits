@@ -70,7 +70,6 @@ export default function MealsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Saved Meals</Text>
       <FlatList
         data={meals}
         keyExtractor={(item) => String(item.id)}
@@ -109,7 +108,6 @@ export default function MealsScreen() {
 const styles = StyleSheet.create({
   loader: { flex: 1, marginTop: 100 },
   container: { flex: 1, backgroundColor: '#F9F9F9' },
-  header: { fontSize: 22, fontWeight: '700', color: '#1A1A1A', padding: 20, paddingTop: 56 },
   empty: { textAlign: 'center', color: '#999', marginTop: 60, fontSize: 15 },
   mealCard: {
     flexDirection: 'row',

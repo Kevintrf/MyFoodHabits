@@ -8,6 +8,7 @@ import TodayScreen from '../screens/TodayScreen';
 import SearchScreen from '../screens/SearchScreen';
 import PortionScreen from '../screens/PortionScreen';
 import MealsScreen from '../screens/MealsScreen';
+import CreateMealScreen from '../screens/CreateMealScreen';
 import WeightScreen from '../screens/WeightScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import CreateFoodScreen from '../screens/CreateFoodScreen';
@@ -21,16 +22,22 @@ export type SearchStackParamList = {
   CreateFood: { initialName?: string };
 };
 
+export type MealsStackParamList = {
+  MealsList: undefined;
+  CreateMeal: undefined;
+};
+
 type RootTabParamList = {
   Today: undefined;
   SearchTab: undefined;
-  Meals: undefined;
+  MealsTab: undefined;
   Weight: undefined;
   Settings: undefined;
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const SearchStack = createNativeStackNavigator<SearchStackParamList>();
+const MealsStack = createNativeStackNavigator<MealsStackParamList>();
 
 function SearchStackNavigator() {
   return (
@@ -42,10 +49,33 @@ function SearchStackNavigator() {
   );
 }
 
+function MealsStackNavigator() {
+  return (
+    <MealsStack.Navigator>
+      <MealsStack.Screen
+        name="MealsList"
+        component={MealsScreen}
+        options={({ navigation }) => ({
+          title: 'Saved Meals',
+          headerRight: () => (
+            <Ionicons
+              name="add"
+              size={26}
+              color="#2D6A4F"
+              onPress={() => navigation.navigate('CreateMeal')}
+            />
+          ),
+        })}
+      />
+      <MealsStack.Screen name="CreateMeal" component={CreateMealScreen} options={{ title: 'New Meal' }} />
+    </MealsStack.Navigator>
+  );
+}
+
 const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   Today: 'today-outline',
   SearchTab: 'search-outline',
-  Meals: 'restaurant-outline',
+  MealsTab: 'restaurant-outline',
   Weight: 'scale-outline',
   Settings: 'settings-outline',
 };
@@ -65,7 +95,7 @@ export default function RootNavigator() {
       >
         <Tab.Screen name="Today" component={TodayScreen} options={{ title: 'Today' }} />
         <Tab.Screen name="SearchTab" component={SearchStackNavigator} options={{ title: 'Search' }} />
-        <Tab.Screen name="Meals" component={MealsScreen} />
+        <Tab.Screen name="MealsTab" component={MealsStackNavigator} options={{ title: 'Meals' }} />
         <Tab.Screen name="Weight" component={WeightScreen} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
