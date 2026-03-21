@@ -107,6 +107,12 @@ export const getFoodById = (id: number) =>
 export const getFoodByBarcode = (barcode: string) =>
   request<Food>(`/foods/barcode/${encodeURIComponent(barcode)}`);
 
+export interface ServingDraft {
+  name: string;
+  grams: number;
+  is_default: boolean;
+}
+
 export const createFood = (data: {
   name: string;
   calories_per_100g: number;
@@ -114,6 +120,7 @@ export const createFood = (data: {
   carbs_per_100g?: number;
   fat_per_100g?: number;
   liquid?: boolean;
+  servings?: ServingDraft[];
 }) => request<Food>('/foods', { method: 'POST', body: JSON.stringify(data) });
 
 export const editFood = (id: number, data: {
@@ -123,6 +130,7 @@ export const editFood = (id: number, data: {
   carbs_per_100g?: number;
   fat_per_100g?: number;
   liquid?: boolean;
+  servings?: ServingDraft[];
 }) => request<Food>(`/foods/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
 
 // --- Log ---

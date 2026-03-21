@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { editFood } from '../services/api';
+import { editFood, getFoodById, ServingDraft } from '../services/api';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 
 type NavProp = NativeStackNavigationProp<SearchStackParamList, 'EditFood'>;
@@ -29,7 +29,45 @@ export default function EditFoodScreen() {
   const [carbs, setCarbs] = useState(String(food.carbs_per_100g));
   const [fat, setFat] = useState(String(food.fat_per_100g));
   const [liquid, setLiquid] = useState(food.liquid);
+  const [servings, setServings] = useState<ServingDraft[]>([]);
+  const [servingName, setServingName] = useState('');
+  const [servingGrams, setServingGrams] = useState('');
+  const [loadingServings, setLoadingServings] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    getFoodById(food.id)
+      .then((f) => {
+        setServings(f.servings.map((s) => ({ name: s.name, grams: s.grams, is_default: s.is_default })));
+      })
+      .finally(() => setLoadingServings(false));
+  }, [food.id]);
+
+  function addServing() {
+    const grams = parseFloat(servingGrams);
+    if (!servingName.trim()) {
+      Alert.alert('Name required', 'Enter a name for this serving (e.g. slice, cup).');
+      return;
+    }
+    if (isNaN(grams) || grams <= 0) {
+      Alert.alert('Invalid grams', 'Enter how many grams this serving equals.');
+      return;
+    }
+    setServings((prev) => [
+      ...prev,
+      { name: servingName.trim(), grams, is_default: prev.length === 0 },
+    ]);
+    setServingName('');
+    setServingGrams('');
+  }
+
+  function removeServing(index: number) {
+    setServings((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      if (next.length > 0) next[0] = { ...next[0], is_default: true };
+      return next;
+    });
+  }
 
   async function handleSave() {
     const cal = parseFloat(calories);
@@ -51,6 +89,7 @@ export default function EditFoodScreen() {
         carbs_per_100g: parseFloat(carbs) || 0,
         fat_per_100g: parseFloat(fat) || 0,
         liquid,
+        servings,
       });
       navigation.replace('Portion', { food: updated });
     } catch {
@@ -123,12 +162,47 @@ export default function EditFoodScreen() {
 
       <View style={styles.toggleRow}>
         <Text style={styles.toggleLabel}>Liquid (store per 100ml)</Text>
-        <Switch
-          value={liquid}
-          onValueChange={setLiquid}
-          trackColor={{ true: '#2D6A4F' }}
-        />
+        <Switch value={liquid} onValueChange={setLiquid} trackColor={{ true: '#2D6A4F' }} />
       </View>
+
+      {/* Servings */}
+      <Text style={styles.label}>SERVINGS (optional)</Text>
+      {loadingServings ? (
+        <ActivityIndicator color="#2D6A4F" style={{ marginBottom: 12 }} />
+      ) : (
+        <>
+          {servings.map((s, i) => (
+            <View key={i} style={styles.servingRow}>
+              <Text style={styles.servingText}>
+                {s.name} — {s.grams}g{s.is_default ? ' (default)' : ''}
+              </Text>
+              <TouchableOpacity onPress={() => removeServing(i)}>
+                <Text style={styles.removeBtn}>Remove</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+          <View style={styles.row}>
+            <TextInput
+              style={[styles.input, styles.fieldHalf]}
+              value={servingName}
+              onChangeText={setServingName}
+              placeholder="e.g. slice"
+              placeholderTextColor="#bbb"
+            />
+            <TextInput
+              style={[styles.input, styles.fieldHalf]}
+              value={servingGrams}
+              onChangeText={setServingGrams}
+              placeholder="grams"
+              placeholderTextColor="#bbb"
+              keyboardType="decimal-pad"
+            />
+          </View>
+          <TouchableOpacity style={styles.addServingBtn} onPress={addServing}>
+            <Text style={styles.addServingBtnText}>+ Add serving</Text>
+          </TouchableOpacity>
+        </>
+      )}
 
       <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={saving}>
         {saving ? (
@@ -147,7 +221,7 @@ const styles = StyleSheet.create({
   sectionNote: { fontSize: 12, color: '#999', marginBottom: 12, marginTop: 4 },
   field: { marginBottom: 16 },
   fieldHalf: { flex: 1 },
-  row: { flexDirection: 'row', gap: 12 },
+  row: { flexDirection: 'row', gap: 12, marginBottom: 16 },
   label: { fontSize: 11, fontWeight: '700', color: '#999', letterSpacing: 1, marginBottom: 6 },
   input: {
     backgroundColor: '#fff',
@@ -170,11 +244,28 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5E5',
   },
   toggleLabel: { fontSize: 15, color: '#1A1A1A' },
-  saveBtn: {
-    backgroundColor: '#2D6A4F',
-    borderRadius: 12,
-    padding: 16,
+  servingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
   },
+  servingText: { fontSize: 14, color: '#1A1A1A' },
+  removeBtn: { fontSize: 13, color: '#e74c3c' },
+  addServingBtn: {
+    borderWidth: 1,
+    borderColor: '#2D6A4F',
+    borderRadius: 10,
+    padding: 12,
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  addServingBtnText: { color: '#2D6A4F', fontSize: 15, fontWeight: '600' },
+  saveBtn: { backgroundColor: '#2D6A4F', borderRadius: 12, padding: 16, alignItems: 'center' },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });

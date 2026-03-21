@@ -177,18 +177,37 @@ router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => 
       protein_per_100g = existing.protein_per_100g,
       carbs_per_100g = existing.carbs_per_100g,
       fat_per_100g = existing.fat_per_100g,
+      servings = [],
     } = req.body;
 
-    const { rows: [newFood] } = await pool.query(
-      `INSERT INTO foods
-         (name, barcode, liquid, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, created_by_user_id, version)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-       RETURNING id, name, barcode, liquid, created_by_user_id,
-                 calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g`,
-      [name, existing.barcode, liquid, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, user_id, existing.version + 1],
-    );
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    return res.json(newFood);
+      const { rows: [newFood] } = await client.query(
+        `INSERT INTO foods
+           (name, barcode, liquid, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, created_by_user_id, version)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         RETURNING id, name, barcode, liquid, created_by_user_id,
+                   calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g`,
+        [name, existing.barcode, liquid, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, user_id, existing.version + 1],
+      );
+
+      for (const serving of servings as { name: string; grams: number; is_default?: boolean }[]) {
+        await client.query(
+          `INSERT INTO food_servings (food_id, name, grams, is_default) VALUES ($1, $2, $3, $4)`,
+          [newFood.id, serving.name, serving.grams, serving.is_default ?? false],
+        );
+      }
+
+      await client.query('COMMIT');
+      return res.json(newFood);
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
   } catch (err) {
     next(err);
   }

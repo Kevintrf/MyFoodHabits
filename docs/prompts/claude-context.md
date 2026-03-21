@@ -55,7 +55,7 @@ See [../../database/schema.md](../../database/schema.md) for the database schema
 - [x] Edit a custom food — `PATCH /foods/:id` inserts new versioned row; EditFoodScreen pre-fills existing values; Edit link on PortionScreen for user-created foods only
 - [x] Barcode scanning — `GET /foods/barcode/:barcode` checks DB cache then Open Food Facts; barcode icon on SearchScreen opens CameraView scanner modal
 - [ ] Recently used foods — surface at the top of search and today screen
-- [ ] Custom serving units per food (slice, piece, cup, tbsp)
+- [x] Custom serving units per food — `ServingDraft` type in api.ts; name+grams editor in CreateFoodScreen and EditFoodScreen; `PATCH /foods/:id` also accepts and inserts servings for new version
 - [x] Meal scaling (0.5x, 1x, 2x) — `POST /meals/:id/log` accepts `scale` param; MealsScreen bottom-sheet shows scale picker + live macro preview before logging
 - [x] Manual food creation — CreateFoodScreen with name, macros per 100g, liquid toggle; entry point in SearchScreen; navigates to PortionScreen on save
 

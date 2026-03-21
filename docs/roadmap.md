@@ -53,7 +53,7 @@ Goal: Make logging fast enough that users actually want to use it daily.
 - [x] Edit a custom food — correct wrong macros; `PATCH /foods/:id` creates a new versioned row; EditFoodScreen pre-fills form; Edit link shown on PortionScreen for user-created foods
 - [x] Barcode scanning — Open Food Facts integration, local caching; barcode icon on SearchScreen opens full-screen scanner; results cached in DB
 - [ ] Recently used foods — surface at the top of search and today screen
-- [ ] Custom serving units per food (slice, piece, cup, tbsp)
+- [x] Custom serving units per food — name + grams editor in CreateFoodScreen and EditFoodScreen; first added serving is default; backend stores in food_servings and PortionScreen already surfaces them
 - [x] Meal scaling (0.5x, 1x, 2x) on the log-meal flow — bottom-sheet modal replaces Alert picker; shows scale buttons, live macro preview, and slot selector before logging
 - [x] Manual food creation — form to define name, calories, protein, carbs, fat per 100g; liquid toggle; accessible via SearchScreen; navigates to PortionScreen on save
 

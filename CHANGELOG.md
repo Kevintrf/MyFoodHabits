@@ -4,6 +4,17 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-21 (7)
+
+### `feat: custom serving units`
+
+- Added `ServingDraft` interface to `frontend/src/services/api.ts`; added `servings` param to `createFood` and `editFood`
+- Updated `PATCH /foods/:id` in `backend/src/routes/foods.ts` — now accepts `servings` array and inserts them for the new food version within the same transaction
+- Updated `frontend/src/screens/CreateFoodScreen.tsx` — servings editor below macros: name + grams inputs, "Add serving" button, list of added servings with remove; first serving is automatically marked as default
+- Updated `frontend/src/screens/EditFoodScreen.tsx` — same editor, but pre-populated by calling `getFoodById` on mount to load existing servings
+
+---
+
 ## 2026-03-21 (6)
 
 ### `feat: meal scaling`
