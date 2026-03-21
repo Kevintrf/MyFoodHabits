@@ -71,6 +71,7 @@ Goal: Before touching the UI, make sure everything that exists actually works co
 - [x] Review all docs against the codebase — anything in the docs that wasn't implemented, anything in the code that isn't documented
 - [x] Audit CHANGELOG, roadmap, and claude-context for gaps or stale entries
 - [ ] Remove or flag any features that didn't work as intended
+- [ ] Fix weight dot timezone edge case — `logged_at.startsWith(todayDate)` compares UTC strings; for users in UTC+ timezones, a weight logged late at night may have tomorrow's UTC date and the dot won't clear until midnight UTC
 
 **Milestone:** Every existing feature works correctly on device. Docs and code are fully in sync.
 

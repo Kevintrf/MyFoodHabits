@@ -4,6 +4,17 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-21 (11)
+
+### `fix: today empty state and meals item spacing`
+
+- Fixed `frontend/src/screens/TodayScreen.tsx` — "Nothing logged today yet." now uses `Object.keys(slots).length === 0` instead of `!todayLog`; the previous check only showed the message before the first data load, never after
+- Fixed `frontend/src/screens/MealsScreen.tsx` — meal item line was missing a space before `×` in the no-serving-name branch (`× 100g` → ` × 100g`)
+- Added `docs/testing-checklist.md` — full manual testing checklist for the Phase 3.5 walkthrough
+- Added weight dot timezone edge case to Phase 3.5 in `docs/roadmap.md` — to be fixed after walkthrough
+
+---
+
 ## 2026-03-21 (10)
 
 ### `docs: mark doc audit items complete in roadmap`

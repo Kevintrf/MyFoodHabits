@@ -131,7 +131,7 @@ export default function TodayScreen() {
           );
         })}
 
-        {!todayLog && (
+        {Object.keys(slots).length === 0 && (
           <Text style={styles.emptyState}>Nothing logged today yet.</Text>
         )}
 
