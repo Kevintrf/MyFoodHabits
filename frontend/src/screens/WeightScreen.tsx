@@ -11,8 +11,10 @@ import {
   RefreshControl,
 } from 'react-native';
 import { getWeights, logWeight, WeightEntry } from '../services/api';
+import { useApp } from '../context/AppContext';
 
 export default function WeightScreen() {
+  const { refreshWeightToday } = useApp();
   const [entries, setEntries] = useState<WeightEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -41,6 +43,7 @@ export default function WeightScreen() {
       const entry = await logWeight(kg);
       setEntries((prev) => [entry, ...prev]);
       setInput('');
+      await refreshWeightToday();
     } catch (e) {
       Alert.alert('Error', e instanceof Error ? e.message : 'Something went wrong');
     } finally {

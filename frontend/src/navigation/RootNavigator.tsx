@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+import { useApp } from '../context/AppContext';
 
 import TodayScreen from '../screens/TodayScreen';
 import SearchScreen from '../screens/SearchScreen';
@@ -83,14 +85,40 @@ const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   Settings: 'settings-outline',
 };
 
+function WeightTabIcon({ color, size }: { color: string; size: number }) {
+  const { loggedWeightToday, refreshWeightToday } = useApp();
+  useEffect(() => { refreshWeightToday(); }, []);
+  return (
+    <View>
+      <Ionicons name="scale-outline" size={size} color={color} />
+      {!loggedWeightToday && <View style={navStyles.dot} />}
+    </View>
+  );
+}
+
+const navStyles = StyleSheet.create({
+  dot: {
+    position: 'absolute',
+    top: 0,
+    right: -2,
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: '#e74c3c',
+  },
+});
+
 export default function RootNavigator() {
   return (
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name={TAB_ICONS[route.name]} size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) =>
+            route.name === 'Weight' ? (
+              <WeightTabIcon color={color} size={size} />
+            ) : (
+              <Ionicons name={TAB_ICONS[route.name]} size={size} color={color} />
+            ),
           tabBarActiveTintColor: '#2D6A4F',
           tabBarInactiveTintColor: '#999',
           headerShown: false,

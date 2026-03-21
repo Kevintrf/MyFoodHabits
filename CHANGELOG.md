@@ -4,6 +4,16 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-21 (3)
+
+### `feat: weight tab reminder dot`
+
+- Added `loggedWeightToday` and `refreshWeightToday` to `AppContext` — calls `GET /weight`, checks if the most recent entry's `logged_at` matches today's date
+- Updated `RootNavigator.tsx` — Weight tab uses a custom `WeightTabIcon` component that overlays a small red dot when `loggedWeightToday` is false; dot disappears as soon as weight is logged
+- Updated `WeightScreen.tsx` — calls `refreshWeightToday` after successfully logging weight so the dot clears immediately
+
+---
+
 ## 2026-03-21 (2)
 
 ### `feat: barcode scanning`
