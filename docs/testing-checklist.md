@@ -30,26 +30,28 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 ---
 
 ## Search Screen
-- [ ] Search input auto-focuses on open
-- [ ] Typing shows a spinner then results after ~250ms debounce
-- [ ] Results show food name, kcal and protein per 100g/ml
-- [ ] Tapping a result navigates to PortionScreen
-- [ ] Clearing the search input returns to the empty state
-- [ ] **Recent foods**: on empty state, shows RECENT section header and up to 10 foods if any have been logged before
-- [ ] **Recent foods**: tapping a recent food navigates to PortionScreen
-- [ ] **Recent foods**: placeholder text "Search for a food to log it" shows only when there are no recents
-- [ ] **No results**: "No results for X" message appears
-- [ ] **No results**: prominent green "+ Create 'X'" button appears and pre-fills name in CreateFoodScreen
-- [ ] **Has results**: subtle "+ Create new food" button appears at bottom of list
-- [ ] Barcode icon is visible next to search input
-- [ ] Tapping barcode icon requests camera permission if not granted
-- [ ] Denying permission shows an alert
-- [ ] Granting permission opens the full-screen scanner with frame overlay and hint text
-- [ ] Close (✕) button dismisses the scanner
-- [ ] Scanning a known barcode closes scanner and navigates to PortionScreen
-- [ ] Scanning an unknown barcode shows "Not found" alert with three options: Create manually, Try again, Cancel
-- [ ] "Try again" re-opens the scanner
-- [ ] "Create manually" navigates to CreateFoodScreen with blank name
+- [ ] Search input auto-focuses on open — *not tested*
+- [x] Typing shows a spinner then results after ~250ms debounce
+- [x] Results show food name, kcal and protein per 100g/ml
+- [x] Tapping a result navigates to PortionScreen
+- [x] Clearing the search input returns to the recent foods state
+- [x] **Recent foods**: on empty state, shows RECENT section header with previously logged foods
+- [ ] **Recent foods**: tapping a recent food navigates to PortionScreen — *not tested*
+- [ ] **Recent foods**: placeholder text shows only when there are no recents — *not tested*
+- [x] **No results**: "No results for X" message appears
+- [x] **No results**: prominent green "+ Create 'X'" button appears and pre-fills name in CreateFoodScreen
+- [x] **Has results**: subtle "+ Create new food" button appears at bottom of list
+- [ ] Barcode icon is visible next to search input — *not tested*
+- [ ] Tapping barcode icon requests camera permission if not granted — *not tested*
+- [ ] Denying permission shows an alert — *not tested*
+- [ ] Granting permission opens the full-screen scanner with frame overlay and hint text — *not tested*
+- [ ] Close (✕) button dismisses the scanner — *not tested*
+- [ ] Scanning a known barcode closes scanner and navigates to PortionScreen — *not tested*
+- [ ] Scanning an unknown barcode shows "Not found" alert — *not tested*
+- [ ] "Try again" re-opens the scanner — *not tested*
+- [ ] "Create manually" navigates to CreateFoodScreen with blank name — *not tested*
+- **UX question — duplicate foods:** users can create identical food entries; need to decide how to handle (prevent duplicates on creation? show a warning? deduplicate in search results?)
+- **UX question — two create buttons:** the subtle "Create new food" button (when results exist) and the prominent "+ Create X" button (when no results) serve the same purpose but at different points; consider whether the subtle button adds value or just adds noise — could be removed and only show the prominent one on no-results
 
 ---
 
