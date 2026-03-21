@@ -63,6 +63,20 @@ Goal: Make logging fast enough that users actually want to use it daily.
 
 ---
 
+## Phase 3.5 — Stabilise
+
+Goal: Before touching the UI, make sure everything that exists actually works correctly and is properly documented.
+
+- [ ] End-to-end walkthrough on a real device — test every feature in every screen, note anything broken or awkward
+- [ ] Bug fixes and UX rough edges found during walkthrough
+- [ ] Review all docs against the codebase — anything in the docs that wasn't implemented, anything in the code that isn't documented
+- [ ] Audit CHANGELOG, roadmap, and claude-context for gaps or stale entries
+- [ ] Remove or flag any features that didn't work as intended
+
+**Milestone:** Every existing feature works correctly on device. Docs and code are fully in sync.
+
+---
+
 ## Phase 4 — UI Overhaul
 
 Goal: Replace the functional-but-rough Phase 2 UI with a polished, opinionated design that feels good to use daily.

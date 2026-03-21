@@ -45,7 +45,7 @@ See [../../database/schema.md](../../database/schema.md) for the database schema
 
 ## Current Phase
 
-**Phase 1 ✅ and Phase 2 ✅ are complete.** Currently in Phase 3 — Reduce Friction.
+**Phase 1 ✅ and Phase 2 ✅ are complete.** Currently in Phase 3 — Reduce Friction. After Phase 3 comes Phase 3.5 — Stabilise (end-to-end testing, bug fixes, docs/code audit) before the Phase 4 UI overhaul.
 
 ### Phase 3 remaining items (roadmap order)
 

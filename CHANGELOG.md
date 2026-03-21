@@ -4,6 +4,15 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-21 (4)
+
+### `docs: add Phase 3.5 Stabilise to roadmap`
+
+- Added Phase 3.5 between Phase 3 and Phase 4 — end-to-end device walkthrough, bug fixes, docs/code audit, and removal of anything that didn't work as intended
+- Updated claude-context.md to note Phase 3.5 exists between Phase 3 and the UI overhaul
+
+---
+
 ## 2026-03-21 (3)
 
 ### `feat: weight tab reminder dot`
