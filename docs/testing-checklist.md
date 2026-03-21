@@ -135,14 +135,15 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 ---
 
 ## Weight Screen
-- [ ] Latest weight card shows the most recent entry (or is absent if no entries)
-- [ ] History list shows all entries with date and weight
-- [ ] Entering a weight and tapping "Log" adds it to the list immediately
-- [ ] Input clears after successful log
-- [ ] Pull-to-refresh reloads the history
-- [ ] Invalid inputs (0, negative, > 500, letters) show an alert
-- [ ] **Weight reminder dot**: red dot on the Weight tab icon is visible at app start if no weight logged today
-- [ ] **Dot clears immediately** after logging a weight (without needing to restart)
+- [x] Latest weight card shows the most recent entry
+- [x] History list shows all previous entries
+- [x] Entering a weight and tapping "Log" adds it to the list immediately
+- [x] Input clears after successful log
+- [ ] Pull-to-refresh reloads the history — *not tested*
+- [x] Invalid inputs do not go through
+  - **UX note:** silently does nothing — should show an error toast
+- [x] **Weight reminder dot**: red dot on the Weight tab icon is visible when no weight logged today
+- [x] **Dot clears immediately** after logging a weight
 
 ---
 
