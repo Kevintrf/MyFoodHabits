@@ -16,17 +16,21 @@ The system is a standard client-server architecture. The Expo mobile app communi
 
 ### Screens
 
-| Screen          | Purpose                                           |
-|-----------------|---------------------------------------------------|
-| TodayScreen     | Main dashboard — calories, macros, today's log    |
-| SearchScreen    | Food search with recent/popular foods             |
-| PortionScreen   | Portion selection after choosing a food           |
-| MealsScreen     | Saved meals — create, view, log whole meals       |
-| WeightScreen    | Log and view body weight history                  |
+| Screen            | Purpose                                                            |
+|-------------------|--------------------------------------------------------------------|
+| TodayScreen       | Main dashboard — calories, macros, today's log                     |
+| SearchScreen      | Food search with recent foods, barcode scanner                     |
+| PortionScreen     | Portion selection after choosing a food                            |
+| MealsScreen       | Saved meals — view and log whole meals with scale picker           |
+| CreateMealScreen  | Create a new saved meal with food search and ±quantity draft list  |
+| WeightScreen      | Log and view body weight history                                   |
+| SettingsScreen    | Set calorie and protein targets                                    |
+| CreateFoodScreen  | Create a custom food (name, macros per 100g, liquid flag, servings)|
+| EditFoodScreen    | Edit a user-created food; saves as a new versioned row             |
 
 ### State Management
 
-- React Context API for global state (current user, today's log)
+- React Context API for global state (current user, today's log, macro targets, weight logged today)
 - Local component state for everything else
 - No Redux — keep it simple until complexity demands otherwise
 
@@ -46,18 +50,26 @@ The system is a standard client-server architecture. The Expo mobile app communi
 ```text
 /foods
   GET  /search?q=        Search foods by name
-  POST /                 Create a new food
-  GET  /barcode/:code    Look up food by barcode (checks DB first, then Open Food Facts)
+  GET  /recent           Top 10 most recently logged distinct foods for the user
+  GET  /barcode/:barcode Look up food by barcode (checks DB first, then Open Food Facts)
+  GET  /:id              Get a single food with its servings
+  POST /                 Create a new food (with optional custom servings)
+  PATCH /:id             Edit a food — inserts a new versioned row (immutability)
 
 /log
   GET  /:date            Get all log items for a given date (YYYY-MM-DD)
   POST /                 Add a food to today's log
+  DELETE /items/:id      Delete a log item
+  PATCH /items/:id       Update a log item's quantity or meal slot
 
 /meals
   GET  /                 List all saved meals for the user
-  POST /                 Create a new meal
-  POST /:id/add-food     Add a food to a saved meal
-  POST /:id/log          Log an entire meal to today's log
+  POST /                 Create a new meal (items included in body)
+  POST /:id/log          Log an entire meal; accepts optional scale param (0.5, 1, 2)
+
+/users
+  GET  /me               Get the current user's macro targets
+  PATCH /me              Update macro targets (partial update supported)
 
 /weight
   GET  /                 Get weight history

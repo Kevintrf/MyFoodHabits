@@ -82,7 +82,7 @@ frontend/
   App.tsx               Wraps AppProvider + RootNavigator
   src/
     services/api.ts     All typed API calls (no fetch in components)
-    context/AppContext  userId, todayDate, todayLog, refreshTodayLog()
+    context/AppContext  userId, todayDate, todayLog, refreshTodayLog(), targets, refreshTargets(), loggedWeightToday, refreshWeightToday()
     navigation/RootNavigator.tsx  Bottom tabs + SearchStack + MealsStack
     screens/
       TodayScreen         Date, macro progress bars, log items by slot

@@ -4,6 +4,16 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-21 (9)
+
+### `fix: docs/code audit — sync architecture.md and fix POST /foods response`
+
+- Updated `docs/architecture.md` — added all missing API routes (`GET /foods/recent`, `GET /foods/:id`, `PATCH /foods/:id`, `DELETE /log/items/:id`, `PATCH /log/items/:id`, `GET /users/me`, `PATCH /users/me`); removed non-existent `POST /meals/:id/add-food`; added missing screens (SettingsScreen, CreateFoodScreen, EditFoodScreen, CreateMealScreen); updated State Management description to include targets and loggedWeightToday
+- Updated `docs/prompts/claude-context.md` — AppContext description now includes `targets`, `refreshTargets()`, `loggedWeightToday`, `refreshWeightToday()`
+- Fixed `backend/src/routes/foods.ts` — `POST /foods` RETURNING clause now includes `created_by_user_id` (was missing; all other endpoints already returned it)
+
+---
+
 ## 2026-03-21 (8)
 
 ### `feat: recently used foods`

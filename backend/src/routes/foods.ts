@@ -67,7 +67,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
         `INSERT INTO foods
            (name, barcode, liquid, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, created_by_user_id)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-         RETURNING id, name, barcode, liquid,
+         RETURNING id, name, barcode, liquid, created_by_user_id,
                    calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, created_at`,
         [name, barcode ?? null, liquid, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, user_id],
       );
