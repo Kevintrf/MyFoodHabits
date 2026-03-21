@@ -4,6 +4,14 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-21 (10)
+
+### `docs: mark doc audit items complete in roadmap`
+
+- Checked off "Review all docs against the codebase" and "Audit CHANGELOG, roadmap, and claude-context for gaps" in Phase 3.5
+
+---
+
 ## 2026-03-21 (9)
 
 ### `fix: docs/code audit — sync architecture.md and fix POST /foods response`

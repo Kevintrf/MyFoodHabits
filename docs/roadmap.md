@@ -68,8 +68,8 @@ Goal: Before touching the UI, make sure everything that exists actually works co
 - [ ] End-to-end walkthrough on a real device — test every feature in every screen, note anything broken or awkward
 - [ ] Bug fixes and UX rough edges found during walkthrough
 - [ ] Performance pass — pre-load today's log and recent foods on app open; optimise anything that felt slow during walkthrough
-- [ ] Review all docs against the codebase — anything in the docs that wasn't implemented, anything in the code that isn't documented
-- [ ] Audit CHANGELOG, roadmap, and claude-context for gaps or stale entries
+- [x] Review all docs against the codebase — anything in the docs that wasn't implemented, anything in the code that isn't documented
+- [x] Audit CHANGELOG, roadmap, and claude-context for gaps or stale entries
 - [ ] Remove or flag any features that didn't work as intended
 
 **Milestone:** Every existing feature works correctly on device. Docs and code are fully in sync.
