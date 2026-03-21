@@ -7,6 +7,7 @@ export interface Food {
   name: string;
   barcode: string | null;
   liquid: boolean;
+  created_by_user_id: number | null;
   calories_per_100g: number;
   protein_per_100g: number;
   carbs_per_100g: number;
@@ -111,6 +112,15 @@ export const createFood = (data: {
   fat_per_100g?: number;
   liquid?: boolean;
 }) => request<Food>('/foods', { method: 'POST', body: JSON.stringify(data) });
+
+export const editFood = (id: number, data: {
+  name: string;
+  calories_per_100g: number;
+  protein_per_100g?: number;
+  carbs_per_100g?: number;
+  fat_per_100g?: number;
+  liquid?: boolean;
+}) => request<Food>(`/foods/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
 
 // --- Log ---
 

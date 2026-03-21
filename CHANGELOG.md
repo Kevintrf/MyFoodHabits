@@ -4,6 +4,20 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-21
+
+### `feat: edit a custom food`
+
+- Added `PATCH /foods/:id` to `backend/src/routes/foods.ts` — inserts a new row with `version + 1`, preserving the original for existing log entries; returns 403 if the food was not created by the requesting user
+- Exposed `created_by_user_id` on all food responses (search, get by id, post, patch)
+- Added `created_by_user_id` field to `Food` interface in `frontend/src/services/api.ts`
+- Added `editFood` API call to `frontend/src/services/api.ts`
+- Created `frontend/src/screens/EditFoodScreen.tsx` — form pre-filled with existing values; on save navigates to PortionScreen with the new food version
+- Added `EditFood` route to `SearchStackParamList` and `SearchStack.Navigator` in `RootNavigator.tsx`
+- Updated `frontend/src/screens/PortionScreen.tsx` — shows "Edit food" link below the food name when `created_by_user_id === 1`
+
+---
+
 ## 2026-03-18 (4)
 
 ### `feat: create meals from UI`

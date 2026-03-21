@@ -81,6 +81,11 @@ export default function PortionScreen() {
         <Text style={styles.foodSub}>
           {food.calories_per_100g} kcal · {food.protein_per_100g}g protein per 100{unitLabel}
         </Text>
+        {food.created_by_user_id === 1 && (
+          <TouchableOpacity onPress={() => navigation.navigate('EditFood', { food })}>
+            <Text style={styles.editLink}>Edit food</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Serving picker */}
@@ -168,6 +173,7 @@ const styles = StyleSheet.create({
   },
   foodName: { fontSize: 20, fontWeight: '700', color: '#1A1A1A' },
   foodSub: { fontSize: 14, color: '#666', marginTop: 4 },
+  editLink: { fontSize: 13, color: '#2D6A4F', marginTop: 8 },
   section: { margin: 16, marginBottom: 0 },
   sectionLabel: {
     fontSize: 11,

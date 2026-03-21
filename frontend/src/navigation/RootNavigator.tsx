@@ -12,6 +12,7 @@ import CreateMealScreen from '../screens/CreateMealScreen';
 import WeightScreen from '../screens/WeightScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import CreateFoodScreen from '../screens/CreateFoodScreen';
+import EditFoodScreen from '../screens/EditFoodScreen';
 import { Food } from '../services/api';
 
 // --- Param list types ---
@@ -20,6 +21,7 @@ export type SearchStackParamList = {
   Search: undefined;
   Portion: { food: Food };
   CreateFood: { initialName?: string };
+  EditFood: { food: Food };
 };
 
 export type MealsStackParamList = {
@@ -45,6 +47,7 @@ function SearchStackNavigator() {
       <SearchStack.Screen name="Search" component={SearchScreen} options={{ title: 'Search Foods' }} />
       <SearchStack.Screen name="Portion" component={PortionScreen} options={{ title: 'Log Food' }} />
       <SearchStack.Screen name="CreateFood" component={CreateFoodScreen} options={{ title: 'New Food' }} />
+      <SearchStack.Screen name="EditFood" component={EditFoodScreen} options={{ title: 'Edit Food' }} />
     </SearchStack.Navigator>
   );
 }

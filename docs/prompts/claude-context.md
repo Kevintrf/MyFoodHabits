@@ -52,7 +52,7 @@ See [../../database/schema.md](../../database/schema.md) for the database schema
 - [x] Edit/delete log items — long-press on TodayScreen opens bottom-sheet modal; `DELETE /log/items/:id` + `PATCH /log/items/:id`
 - [x] User-configurable macro targets — SettingsScreen with calorie + protein inputs; `GET /users/me` + `PATCH /users/me`; targets live in AppContext
 - [x] Create meals from UI — CreateMealScreen with name input, food search, ±quantity draft list; + button in Meals tab header
-- [ ] Edit a custom food — needs UI + `PATCH /foods/:id`; backend handles immutability via versioning
+- [x] Edit a custom food — `PATCH /foods/:id` inserts new versioned row; EditFoodScreen pre-fills existing values; Edit link on PortionScreen for user-created foods only
 - [ ] Barcode scanning — Open Food Facts integration, local caching
 - [ ] Recently used foods — surface at the top of search and today screen
 - [ ] Custom serving units per food (slice, piece, cup, tbsp)
@@ -72,7 +72,7 @@ backend/
     db/client.ts        pg Pool (dotenv loaded here before Pool creation)
     lib/macros.ts       calcMacros() and sumMacros() utilities
     routes/
-      foods.ts          GET /foods/search, GET /foods/:id, POST /foods
+      foods.ts          GET /foods/search, GET /foods/:id, POST /foods, PATCH /foods/:id
       log.ts            POST /log, GET /log/:date, DELETE /log/items/:id, PATCH /log/items/:id
       meals.ts          POST /meals, GET /meals, POST /meals/:id/log
       users.ts          GET /users/me, PATCH /users/me
@@ -95,6 +95,7 @@ frontend/
       WeightScreen        Log weight, view history
       SettingsScreen      Set calorie and protein targets
       CreateFoodScreen    Form to create a custom food (name, macros, liquid flag)
+      EditFoodScreen      Pre-filled form to edit a user-created food; saves as new versioned row
 ```
 
 ---

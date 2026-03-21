@@ -50,7 +50,7 @@ Goal: Make logging fast enough that users actually want to use it daily.
 - [x] Edit/delete log items — fix mistakes after logging; requires `DELETE /log/items/:id` and `PATCH /log/items/:id` backend endpoints
 - [x] User-configurable macro targets — settings screen to set calorie and protein goals (`GET /users/me` + `PATCH /users/me`; targets stored in DB, loaded into AppContext)
 - [x] Create meals from UI — CreateMealScreen with name input, food search, ±quantity draft list; + button in Meals tab header; saves via `POST /meals`
-- [ ] Edit a custom food — correct wrong macros; backend already handles immutability via versioning, needs UI + `PATCH /foods/:id` endpoint
+- [x] Edit a custom food — correct wrong macros; `PATCH /foods/:id` creates a new versioned row; EditFoodScreen pre-fills form; Edit link shown on PortionScreen for user-created foods
 - [ ] Barcode scanning — Open Food Facts integration, local caching
 - [ ] Recently used foods — surface at the top of search and today screen
 - [ ] Custom serving units per food (slice, piece, cup, tbsp)

@@ -11,7 +11,7 @@ router.get('/search', async (req: Request, res: Response, next: NextFunction) =>
 
     if (barcode) {
       const { rows } = await pool.query(
-        `SELECT id, name, barcode, liquid,
+        `SELECT id, name, barcode, liquid, created_by_user_id,
                 calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
          FROM foods WHERE barcode = $1 LIMIT 1`,
         [barcode],
@@ -24,7 +24,7 @@ router.get('/search', async (req: Request, res: Response, next: NextFunction) =>
     }
 
     const { rows } = await pool.query(
-      `SELECT id, name, barcode, liquid,
+      `SELECT id, name, barcode, liquid, created_by_user_id,
               calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
        FROM foods
        WHERE name ILIKE $1
@@ -95,13 +95,54 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// PATCH /foods/:id — creates a new food version with updated fields (immutability)
+router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    // TODO: replace with auth middleware
+    const user_id = 1;
+
+    const { rows: [existing] } = await pool.query(
+      'SELECT * FROM foods WHERE id = $1',
+      [id],
+    );
+
+    if (!existing) return res.status(404).json({ error: 'food not found' });
+    if (existing.created_by_user_id !== user_id) {
+      return res.status(403).json({ error: 'cannot edit a food you did not create' });
+    }
+
+    const {
+      name = existing.name,
+      liquid = existing.liquid,
+      calories_per_100g = existing.calories_per_100g,
+      protein_per_100g = existing.protein_per_100g,
+      carbs_per_100g = existing.carbs_per_100g,
+      fat_per_100g = existing.fat_per_100g,
+    } = req.body;
+
+    const { rows: [newFood] } = await pool.query(
+      `INSERT INTO foods
+         (name, barcode, liquid, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, created_by_user_id, version)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       RETURNING id, name, barcode, liquid, created_by_user_id,
+                 calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g`,
+      [name, existing.barcode, liquid, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, user_id, existing.version + 1],
+    );
+
+    return res.json(newFood);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /foods/:id — returns food with its servings
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
 
     const { rows: [food] } = await pool.query(
-      `SELECT id, name, barcode, liquid,
+      `SELECT id, name, barcode, liquid, created_by_user_id,
               calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, created_at
        FROM foods WHERE id = $1`,
       [id],
