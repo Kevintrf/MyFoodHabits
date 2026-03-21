@@ -84,10 +84,13 @@ router.post('/:id/log', async (req: Request, res: Response, next: NextFunction) 
   try {
     // TODO: replace user_id with value from auth middleware
     const { id } = req.params;
-    const { user_id = 1, date, meal_slot } = req.body;
+    const { user_id = 1, date, meal_slot, scale = 1 } = req.body;
 
     if (!date || !meal_slot) {
       return res.status(400).json({ error: 'date and meal_slot required' });
+    }
+    if (typeof scale !== 'number' || scale <= 0) {
+      return res.status(400).json({ error: 'scale must be a positive number' });
     }
 
     const client = await pool.connect();
@@ -117,7 +120,7 @@ router.post('/:id/log', async (req: Request, res: Response, next: NextFunction) 
         const { rows: [item] } = await client.query(
           `INSERT INTO log_items (day_log_id, food_id, serving_id, quantity, meal_slot)
            VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-          [dayLog.id, mi.food_id, mi.serving_id, mi.quantity, meal_slot],
+          [dayLog.id, mi.food_id, mi.serving_id, mi.quantity * scale, meal_slot],
         );
         loggedItems.push(item);
       }

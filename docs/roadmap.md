@@ -54,7 +54,7 @@ Goal: Make logging fast enough that users actually want to use it daily.
 - [x] Barcode scanning — Open Food Facts integration, local caching; barcode icon on SearchScreen opens full-screen scanner; results cached in DB
 - [ ] Recently used foods — surface at the top of search and today screen
 - [ ] Custom serving units per food (slice, piece, cup, tbsp)
-- [ ] Meal scaling (0.5x, 1x, 2x) on the log-meal flow
+- [x] Meal scaling (0.5x, 1x, 2x) on the log-meal flow — bottom-sheet modal replaces Alert picker; shows scale buttons, live macro preview, and slot selector before logging
 - [x] Manual food creation — form to define name, calories, protein, carbs, fat per 100g; liquid toggle; accessible via SearchScreen; navigates to PortionScreen on save
 
 **Milestone:** User can log a typical day in under 2 minutes. App feels fast.

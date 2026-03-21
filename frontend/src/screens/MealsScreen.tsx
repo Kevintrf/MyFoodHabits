@@ -8,17 +8,19 @@ import {
   ActivityIndicator,
   Alert,
   RefreshControl,
+  Modal,
 } from 'react-native';
 import { getMeals, logMeal, Meal, MealItem } from '../services/api';
 import { useApp } from '../context/AppContext';
 
 const MEAL_SLOTS = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'] as const;
+const SCALES = [0.5, 1, 2] as const;
 
-function calcMealMacros(items: MealItem[]) {
+function calcMealMacros(items: MealItem[], scale: number) {
   return items.reduce(
     (acc, item) => {
       const grams = item.serving_grams ?? 100;
-      const mult = (grams / 100) * item.quantity;
+      const mult = (grams / 100) * item.quantity * scale;
       return {
         calories: acc.calories + item.calories_per_100g * mult,
         protein_g: acc.protein_g + item.protein_per_100g * mult,
@@ -33,6 +35,10 @@ export default function MealsScreen() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [logTarget, setLogTarget] = useState<Meal | null>(null);
+  const [slot, setSlot] = useState<string>('BREAKFAST');
+  const [scale, setScale] = useState<number>(1);
+  const [logging, setLogging] = useState(false);
 
   const fetchMeals = useCallback(async () => {
     const data = await getMeals();
@@ -48,25 +54,29 @@ export default function MealsScreen() {
     await fetchMeals().finally(() => setRefreshing(false));
   }
 
-  function handleLogMeal(meal: Meal) {
-    Alert.alert(`Log "${meal.name}"`, 'Choose a meal slot', [
-      ...MEAL_SLOTS.map((slot) => ({
-        text: slot[0] + slot.slice(1).toLowerCase(),
-        onPress: async () => {
-          try {
-            await logMeal(meal.id, todayDate, slot);
-            await refreshTodayLog();
-            Alert.alert('Logged!', `"${meal.name}" added to ${slot.toLowerCase()}.`);
-          } catch (e) {
-            Alert.alert('Error', e instanceof Error ? e.message : 'Something went wrong');
-          }
-        },
-      })),
-      { text: 'Cancel', style: 'cancel' },
-    ]);
+  function openLogModal(meal: Meal) {
+    setLogTarget(meal);
+    setSlot('BREAKFAST');
+    setScale(1);
+  }
+
+  async function handleLog() {
+    if (!logTarget) return;
+    setLogging(true);
+    try {
+      await logMeal(logTarget.id, todayDate, slot, scale);
+      await refreshTodayLog();
+      setLogTarget(null);
+    } catch (e) {
+      Alert.alert('Error', e instanceof Error ? e.message : 'Something went wrong');
+    } finally {
+      setLogging(false);
+    }
   }
 
   if (loading) return <ActivityIndicator style={styles.loader} color="#2D6A4F" />;
+
+  const previewMacros = logTarget ? calcMealMacros(logTarget.items, scale) : null;
 
   return (
     <View style={styles.container}>
@@ -74,11 +84,9 @@ export default function MealsScreen() {
         data={meals}
         keyExtractor={(item) => String(item.id)}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        ListEmptyComponent={
-          <Text style={styles.empty}>No saved meals yet.</Text>
-        }
+        ListEmptyComponent={<Text style={styles.empty}>No saved meals yet.</Text>}
         renderItem={({ item }) => {
-          const macros = calcMealMacros(item.items);
+          const macros = calcMealMacros(item.items, 1);
           return (
             <View style={styles.mealCard}>
               <View style={styles.mealInfo}>
@@ -94,13 +102,72 @@ export default function MealsScreen() {
                   </Text>
                 ))}
               </View>
-              <TouchableOpacity style={styles.logBtn} onPress={() => handleLogMeal(item)}>
+              <TouchableOpacity style={styles.logBtn} onPress={() => openLogModal(item)}>
                 <Text style={styles.logBtnText}>Log</Text>
               </TouchableOpacity>
             </View>
           );
         }}
       />
+
+      <Modal
+        visible={!!logTarget}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setLogTarget(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>{logTarget?.name}</Text>
+
+            <Text style={styles.sectionLabel}>SCALE</Text>
+            <View style={styles.scaleRow}>
+              {SCALES.map((s) => (
+                <TouchableOpacity
+                  key={s}
+                  style={[styles.scaleBtn, scale === s && styles.scaleBtnActive]}
+                  onPress={() => setScale(s)}
+                >
+                  <Text style={[styles.scaleBtnText, scale === s && styles.scaleBtnTextActive]}>
+                    {s}×
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {previewMacros && (
+              <View style={styles.preview}>
+                <Text style={styles.previewText}>
+                  {Math.round(previewMacros.calories)} kcal · {Math.round(previewMacros.protein_g)}g protein
+                </Text>
+              </View>
+            )}
+
+            <Text style={styles.sectionLabel}>MEAL</Text>
+            <View style={styles.slotRow}>
+              {MEAL_SLOTS.map((s) => (
+                <TouchableOpacity
+                  key={s}
+                  style={[styles.slotBtn, slot === s && styles.slotBtnActive]}
+                  onPress={() => setSlot(s)}
+                >
+                  <Text style={[styles.slotBtnText, slot === s && styles.slotBtnTextActive]}>
+                    {s[0] + s.slice(1).toLowerCase()}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TouchableOpacity style={styles.confirmBtn} onPress={handleLog} disabled={logging}>
+              <Text style={styles.confirmBtnText}>{logging ? 'Logging…' : 'Log Meal'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setLogTarget(null)} style={styles.cancelBtn}>
+              <Text style={styles.cancelBtnText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -130,4 +197,57 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   logBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
+  // Modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  modalCard: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 24,
+    paddingBottom: 40,
+  },
+  modalTitle: { fontSize: 17, fontWeight: '700', color: '#1A1A1A', marginBottom: 20 },
+  sectionLabel: { fontSize: 11, fontWeight: '700', color: '#999', letterSpacing: 1, marginBottom: 8 },
+  scaleRow: { flexDirection: 'row', gap: 10, marginBottom: 16 },
+  scaleBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    alignItems: 'center',
+  },
+  scaleBtnActive: { backgroundColor: '#2D6A4F', borderColor: '#2D6A4F' },
+  scaleBtnText: { fontSize: 16, fontWeight: '700', color: '#666' },
+  scaleBtnTextActive: { color: '#fff' },
+  preview: {
+    backgroundColor: '#F0FAF4',
+    borderRadius: 10,
+    padding: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  previewText: { fontSize: 15, fontWeight: '600', color: '#2D6A4F' },
+  slotRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
+  slotBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    alignItems: 'center',
+  },
+  slotBtnActive: { backgroundColor: '#2D6A4F', borderColor: '#2D6A4F' },
+  slotBtnText: { fontSize: 11, fontWeight: '600', color: '#666' },
+  slotBtnTextActive: { color: '#fff' },
+  confirmBtn: {
+    backgroundColor: '#2D6A4F',
+    borderRadius: 12,
+    padding: 14,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  confirmBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  cancelBtn: { padding: 10, alignItems: 'center' },
+  cancelBtnText: { color: '#999', fontSize: 15 },
 });

@@ -56,7 +56,7 @@ See [../../database/schema.md](../../database/schema.md) for the database schema
 - [x] Barcode scanning — `GET /foods/barcode/:barcode` checks DB cache then Open Food Facts; barcode icon on SearchScreen opens CameraView scanner modal
 - [ ] Recently used foods — surface at the top of search and today screen
 - [ ] Custom serving units per food (slice, piece, cup, tbsp)
-- [ ] Meal scaling (0.5x, 1x, 2x) on the log-meal flow
+- [x] Meal scaling (0.5x, 1x, 2x) — `POST /meals/:id/log` accepts `scale` param; MealsScreen bottom-sheet shows scale picker + live macro preview before logging
 - [x] Manual food creation — CreateFoodScreen with name, macros per 100g, liquid toggle; entry point in SearchScreen; navigates to PortionScreen on save
 
 ---

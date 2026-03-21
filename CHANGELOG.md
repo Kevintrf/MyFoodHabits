@@ -4,6 +4,16 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-21 (6)
+
+### `feat: meal scaling`
+
+- Updated `POST /meals/:id/log` in `backend/src/routes/meals.ts` — accepts optional `scale` param (default 1); multiplies each item's quantity by scale before inserting log entries
+- Updated `logMeal` in `frontend/src/services/api.ts` — added `scale` parameter
+- Rewrote `frontend/src/screens/MealsScreen.tsx` — replaced Alert slot picker with a bottom-sheet modal; modal shows 0.5×/1×/2× scale buttons, a live macro preview that updates with scale, and a slot selector before confirming
+
+---
+
 ## 2026-03-21 (5)
 
 ### `docs: restructure roadmap phases for habit detection and performance pass`
