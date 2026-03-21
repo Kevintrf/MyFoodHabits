@@ -4,6 +4,17 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-21 (2)
+
+### `feat: barcode scanning`
+
+- Added `GET /foods/barcode/:barcode` to `backend/src/routes/foods.ts` — checks DB cache first; on miss fetches from Open Food Facts API, parses nutriments (with kJ fallback for calories, liquid detection via `categories_tags`), caches result with `source = 'OPENFOODFACTS'` using `ON CONFLICT DO UPDATE`
+- Added `getFoodByBarcode` to `frontend/src/services/api.ts`
+- Installed `expo-camera` (SDK 54 compatible)
+- Updated `frontend/src/screens/SearchScreen.tsx` — barcode icon button next to search input; tapping requests camera permission then opens a full-screen `CameraView` modal with a frame overlay; on scan calls backend and navigates to PortionScreen; on not-found prompts to create manually or try again
+
+---
+
 ## 2026-03-21
 
 ### `feat: edit a custom food`

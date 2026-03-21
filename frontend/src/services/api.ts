@@ -104,6 +104,9 @@ export const searchFoods = (q: string) =>
 export const getFoodById = (id: number) =>
   request<FoodWithServings>(`/foods/${id}`);
 
+export const getFoodByBarcode = (barcode: string) =>
+  request<Food>(`/foods/barcode/${encodeURIComponent(barcode)}`);
+
 export const createFood = (data: {
   name: string;
   calories_per_100g: number;

@@ -95,6 +95,64 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// GET /foods/barcode/:barcode — checks DB cache first, then fetches from Open Food Facts
+router.get('/barcode/:barcode', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { barcode } = req.params;
+
+    // Return cached row if we already have this barcode
+    const { rows } = await pool.query(
+      `SELECT id, name, barcode, liquid, created_by_user_id,
+              calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
+       FROM foods WHERE barcode = $1 LIMIT 1`,
+      [barcode],
+    );
+    if (rows[0]) return res.json(rows[0]);
+
+    // Fetch from Open Food Facts
+    const offRes = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const offData = await offRes.json() as any;
+
+    if (offData.status !== 1 || !offData.product) {
+      return res.status(404).json({ error: 'barcode not found' });
+    }
+
+    const p = offData.product;
+    const n = p.nutriments ?? {};
+
+    const name = (p.product_name || p.product_name_en || '').trim();
+    if (!name) return res.status(404).json({ error: 'product has no name' });
+
+    const categories: string[] = p.categories_tags ?? [];
+    const liquid = categories.some((c) =>
+      ['en:beverages', 'en:drinks', 'en:waters', 'en:sodas', 'en:juices'].includes(c),
+    );
+
+    // Prefer energy-kcal_100g; fall back to kJ ÷ 4.184; default 0
+    const rawKcal = n['energy-kcal_100g'] ?? (n['energy_100g'] ? n['energy_100g'] / 4.184 : 0);
+    const calories_per_100g = Math.round(rawKcal * 10) / 10;
+    const protein_per_100g  = Math.round((n['proteins_100g']       ?? 0) * 10) / 10;
+    const carbs_per_100g    = Math.round((n['carbohydrates_100g']  ?? 0) * 10) / 10;
+    const fat_per_100g      = Math.round((n['fat_100g']            ?? 0) * 10) / 10;
+
+    // Cache in DB — if another request raced us, just return the existing row
+    const { rows: [food] } = await pool.query(
+      `INSERT INTO foods
+         (name, barcode, liquid, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, source)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'OPENFOODFACTS')
+       ON CONFLICT (barcode) DO UPDATE SET barcode = EXCLUDED.barcode
+       RETURNING id, name, barcode, liquid, created_by_user_id,
+                 calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g`,
+      [name, barcode, liquid, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g],
+    );
+
+    return res.json(food);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PATCH /foods/:id — creates a new food version with updated fields (immutability)
 router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {

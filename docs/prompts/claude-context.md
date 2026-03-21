@@ -53,7 +53,7 @@ See [../../database/schema.md](../../database/schema.md) for the database schema
 - [x] User-configurable macro targets — SettingsScreen with calorie + protein inputs; `GET /users/me` + `PATCH /users/me`; targets live in AppContext
 - [x] Create meals from UI — CreateMealScreen with name input, food search, ±quantity draft list; + button in Meals tab header
 - [x] Edit a custom food — `PATCH /foods/:id` inserts new versioned row; EditFoodScreen pre-fills existing values; Edit link on PortionScreen for user-created foods only
-- [ ] Barcode scanning — Open Food Facts integration, local caching
+- [x] Barcode scanning — `GET /foods/barcode/:barcode` checks DB cache then Open Food Facts; barcode icon on SearchScreen opens CameraView scanner modal
 - [ ] Recently used foods — surface at the top of search and today screen
 - [ ] Custom serving units per food (slice, piece, cup, tbsp)
 - [ ] Meal scaling (0.5x, 1x, 2x) on the log-meal flow
@@ -72,7 +72,7 @@ backend/
     db/client.ts        pg Pool (dotenv loaded here before Pool creation)
     lib/macros.ts       calcMacros() and sumMacros() utilities
     routes/
-      foods.ts          GET /foods/search, GET /foods/:id, POST /foods, PATCH /foods/:id
+      foods.ts          GET /foods/search, GET /foods/barcode/:barcode, GET /foods/:id, POST /foods, PATCH /foods/:id
       log.ts            POST /log, GET /log/:date, DELETE /log/items/:id, PATCH /log/items/:id
       meals.ts          POST /meals, GET /meals, POST /meals/:id/log
       users.ts          GET /users/me, PATCH /users/me
