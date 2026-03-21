@@ -5,24 +5,27 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 ---
 
 ## Today Screen
-- [ ] Opens to today's date with correct day/date label
-- [ ] Macro cards show 0/target on a fresh day with nothing logged
-- [ ] Calorie and protein targets reflect what's set in Settings (not hardcoded 2000/150)
-- [ ] Progress bars fill correctly as food is logged
-- [ ] Progress bar turns red when target is exceeded
-- [ ] Log items appear grouped under the correct meal slot (Breakfast, Lunch, Dinner, Snack)
-- [ ] Each log item shows correct food name, portion label, calories, and protein
-- [ ] Portion label: shows `1.5 × slice` format when a named serving is used; shows `150g` / `150ml` when using 100g base
-- [ ] "Nothing logged today yet." text shows before anything is logged (and disappears after)
-- [ ] "+ Add Food" button navigates to Search tab
-- [ ] Long-pressing a log item opens the edit/delete bottom sheet
-- [ ] Edit modal shows correct food name, current quantity, and current meal slot pre-selected
-- [ ] Changing quantity and saving updates the item and refreshes totals
-- [ ] Changing meal slot and saving moves the item to the correct section
-- [ ] Delete button shows confirmation alert with food name
-- [ ] Confirming delete removes the item and refreshes totals
-- [ ] Cancel button dismisses the modal without changes
-- [ ] Saving an invalid quantity (empty, 0, letters) does not submit
+- [x] Opens to today's date with correct day/date label
+- [x] Macro cards show 0/target on a fresh day with nothing logged
+- [x] Calorie and protein targets reflect what's set in Settings (not hardcoded 2000/150)
+- [x] Progress bars fill correctly as food is logged
+- [x] Progress bar turns red when target is exceeded
+- [x] Log items appear grouped under the correct meal slot (Breakfast, Lunch, Dinner, Snack)
+- [x] Each log item shows correct food name, portion label, calories, and protein
+- [x] Portion label: shows `1.5 × slice` format when a named serving is used; shows `150g` / `150ml` when using 100g base
+  - **UX note:** should also show the grams per serving (e.g. `1.5 × slice (45g)`)
+- [ ] "Nothing logged today yet." text shows before anything is logged (and disappears after) — *not yet tested*
+- [x] "+ Add Food" button navigates to Search tab
+- [x] Long-pressing a log item opens the edit/delete bottom sheet
+  - **UX note:** consider also adding a visible tap button so it's discoverable without knowing about long-press
+- [x] Edit modal shows correct food name, current quantity, and current meal slot pre-selected
+- [x] Changing quantity and saving updates the item and refreshes totals
+- [x] Changing meal slot and saving moves the item to the correct section
+- [x] Cancel button dismisses the modal without changes
+- [x] Saving an invalid quantity (empty, 0, letters) does not submit
+  - **UX note:** silently does nothing — should show a small error message or toast
+- [ ] **BUG:** Delete button does NOT show confirmation alert — deletes nothing, item stays in log
+- [ ] Confirming delete removes the item and refreshes totals — *blocked by bug above*
 
 ---
 
