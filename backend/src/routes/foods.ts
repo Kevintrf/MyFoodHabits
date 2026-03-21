@@ -153,6 +153,34 @@ router.get('/barcode/:barcode', async (req: Request, res: Response, next: NextFu
   }
 });
 
+// GET /foods/recent — returns the 10 most recently logged distinct foods for the user
+router.get('/recent', async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    // TODO: replace with auth middleware
+    const user_id = 1;
+
+    const { rows } = await pool.query(
+      `SELECT f.id, f.name, f.barcode, f.liquid, f.created_by_user_id,
+              f.calories_per_100g, f.protein_per_100g, f.carbs_per_100g, f.fat_per_100g
+       FROM foods f
+       JOIN (
+         SELECT li.food_id, MAX(li.logged_at) AS last_logged
+         FROM log_items li
+         JOIN day_logs dl ON li.day_log_id = dl.id
+         WHERE dl.user_id = $1
+         GROUP BY li.food_id
+       ) recent ON recent.food_id = f.id
+       ORDER BY recent.last_logged DESC
+       LIMIT 10`,
+      [user_id],
+    );
+
+    return res.json(rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PATCH /foods/:id — creates a new food version with updated fields (immutability)
 router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {

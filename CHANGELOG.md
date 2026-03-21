@@ -4,6 +4,16 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-21 (8)
+
+### `feat: recently used foods`
+
+- Added `GET /foods/recent` to `backend/src/routes/foods.ts` — joins `log_items` → `day_logs` → `foods`, groups by food, orders by most recent `logged_at`, returns top 10
+- Added `getRecentFoods` to `frontend/src/services/api.ts`
+- Updated `frontend/src/screens/SearchScreen.tsx` — loads recent foods on mount; when query is empty and recents exist, shows them under a RECENT section header instead of the placeholder text
+
+---
+
 ## 2026-03-21 (7)
 
 ### `feat: custom serving units`

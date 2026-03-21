@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
-import { searchFoods, getFoodByBarcode, Food } from '../services/api';
+import { searchFoods, getFoodByBarcode, getRecentFoods, Food } from '../services/api';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 
 type NavProp = NativeStackNavigationProp<SearchStackParamList, 'Search'>;
@@ -22,12 +22,17 @@ type NavProp = NativeStackNavigationProp<SearchStackParamList, 'Search'>;
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Food[]>([]);
+  const [recentFoods, setRecentFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [scannerBusy, setScannerBusy] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigation = useNavigation<NavProp>();
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+
+  useEffect(() => {
+    getRecentFoods().then(setRecentFoods).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -110,8 +115,30 @@ export default function SearchScreen() {
         <Text style={styles.empty}>No results for "{query}"</Text>
       )}
 
-      {query.trim() === '' && (
+      {query.trim() === '' && recentFoods.length === 0 && (
         <Text style={styles.placeholder}>Search for a food to log it</Text>
+      )}
+
+      {query.trim() === '' && recentFoods.length > 0 && (
+        <>
+          <Text style={styles.sectionHeader}>RECENT</Text>
+          {recentFoods.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.result}
+              onPress={() => navigation.navigate('Portion', { food: item })}
+            >
+              <View style={styles.resultLeft}>
+                <Text style={styles.resultName}>{item.name}</Text>
+                <Text style={styles.resultSub}>
+                  {item.calories_per_100g} kcal · {item.protein_per_100g}g protein per 100
+                  {item.liquid ? 'ml' : 'g'}
+                </Text>
+              </View>
+              <Text style={styles.chevron}>›</Text>
+            </TouchableOpacity>
+          ))}
+        </>
       )}
 
       <FlatList
@@ -196,6 +223,15 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   spinner: { marginTop: 20 },
+  sectionHeader: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#999',
+    letterSpacing: 1,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    marginTop: 4,
+  },
   empty: { textAlign: 'center', color: '#999', marginTop: 40, fontSize: 15 },
   placeholder: { textAlign: 'center', color: '#bbb', marginTop: 60, fontSize: 15 },
   result: {

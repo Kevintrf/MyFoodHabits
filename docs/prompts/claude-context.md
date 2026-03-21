@@ -54,7 +54,7 @@ See [../../database/schema.md](../../database/schema.md) for the database schema
 - [x] Create meals from UI — CreateMealScreen with name input, food search, ±quantity draft list; + button in Meals tab header
 - [x] Edit a custom food — `PATCH /foods/:id` inserts new versioned row; EditFoodScreen pre-fills existing values; Edit link on PortionScreen for user-created foods only
 - [x] Barcode scanning — `GET /foods/barcode/:barcode` checks DB cache then Open Food Facts; barcode icon on SearchScreen opens CameraView scanner modal
-- [ ] Recently used foods — surface at the top of search and today screen
+- [x] Recently used foods — `GET /foods/recent` (top 10 by last logged_at); shown in SearchScreen empty state under RECENT header
 - [x] Custom serving units per food — `ServingDraft` type in api.ts; name+grams editor in CreateFoodScreen and EditFoodScreen; `PATCH /foods/:id` also accepts and inserts servings for new version
 - [x] Meal scaling (0.5x, 1x, 2x) — `POST /meals/:id/log` accepts `scale` param; MealsScreen bottom-sheet shows scale picker + live macro preview before logging
 - [x] Manual food creation — CreateFoodScreen with name, macros per 100g, liquid toggle; entry point in SearchScreen; navigates to PortionScreen on save
@@ -70,7 +70,7 @@ backend/
     db/client.ts        pg Pool (dotenv loaded here before Pool creation)
     lib/macros.ts       calcMacros() and sumMacros() utilities
     routes/
-      foods.ts          GET /foods/search, GET /foods/barcode/:barcode, GET /foods/:id, POST /foods, PATCH /foods/:id
+      foods.ts          GET /foods/search, GET /foods/recent, GET /foods/barcode/:barcode, GET /foods/:id, POST /foods, PATCH /foods/:id
       log.ts            POST /log, GET /log/:date, DELETE /log/items/:id, PATCH /log/items/:id
       meals.ts          POST /meals, GET /meals, POST /meals/:id/log
       users.ts          GET /users/me, PATCH /users/me

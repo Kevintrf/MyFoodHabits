@@ -107,6 +107,9 @@ export const getFoodById = (id: number) =>
 export const getFoodByBarcode = (barcode: string) =>
   request<Food>(`/foods/barcode/${encodeURIComponent(barcode)}`);
 
+export const getRecentFoods = () =>
+  request<Food[]>('/foods/recent');
+
 export interface ServingDraft {
   name: string;
   grams: number;
