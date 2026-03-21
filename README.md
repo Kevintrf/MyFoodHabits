@@ -8,6 +8,48 @@ The app should work quickly and do expected tasks and load thigns in advance so 
 
 The app should follow the SLC model "Simple, Loveable, Complete" and focus on doing it's core features well rather than doing many features poorly.
 
+## Getting Started
+
+### Prerequisites
+
+- Docker (for the local PostgreSQL database)
+- Node.js
+- Expo Go app on your phone
+
+### First-time setup
+
+```bash
+# 1. Start the database
+docker compose up -d
+
+# 2. Apply schema migrations
+cd backend && npm run migrate:up
+
+# 3. Seed the default dev user
+npm run seed
+
+# 4. Set your machine's LAN IP in the frontend env
+cp frontend/.env.example frontend/.env
+# Edit frontend/.env and set: EXPO_PUBLIC_API_URL=http://<your-machine-ip>:3000
+```
+
+### Starting the app
+
+```bash
+# Terminal 1 — make sure the database is running
+docker compose up -d
+
+# Terminal 2 — start the backend
+cd backend && npm run dev
+
+# Terminal 3 — start the frontend
+cd frontend && npx expo start --clear
+```
+
+Scan the QR code with Expo Go on your phone.
+
+---
+
 ## Technology stack
 
 ### Frontend
