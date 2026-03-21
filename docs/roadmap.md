@@ -55,9 +55,7 @@ Goal: Make logging fast enough that users actually want to use it daily.
 - [ ] Recently used foods — surface at the top of search and today screen
 - [ ] Custom serving units per food (slice, piece, cup, tbsp)
 - [ ] Meal scaling (0.5x, 1x, 2x) on the log-meal flow
-- [ ] Habit detection v1 — detect repeated morning patterns, prompt "Log your usual breakfast?"
 - [x] Manual food creation — form to define name, calories, protein, carbs, fat per 100g; liquid toggle; accessible via SearchScreen; navigates to PortionScreen on save
-- [ ] Performance pass — pre-load today's log and recent foods on app open
 
 **Milestone:** User can log a typical day in under 2 minutes. App feels fast.
 
@@ -69,6 +67,7 @@ Goal: Before touching the UI, make sure everything that exists actually works co
 
 - [ ] End-to-end walkthrough on a real device — test every feature in every screen, note anything broken or awkward
 - [ ] Bug fixes and UX rough edges found during walkthrough
+- [ ] Performance pass — pre-load today's log and recent foods on app open; optimise anything that felt slow during walkthrough
 - [ ] Review all docs against the codebase — anything in the docs that wasn't implemented, anything in the code that isn't documented
 - [ ] Audit CHANGELOG, roadmap, and claude-context for gaps or stale entries
 - [ ] Remove or flag any features that didn't work as intended
@@ -107,6 +106,7 @@ Goal: Features that make this app meaningfully better than alternatives.
 - [ ] Quick add command input — `+2 eggs +coffee with milk`
 - [ ] Day summary — calories, protein, consistency streak
 - [ ] Weekly summary — trend view, weight progress
+- [ ] Habit detection v1 — detect repeated morning patterns, prompt "Log your usual breakfast?"
 - [ ] Habit detection v2 — full day pattern, "Log your usual day?"
 - [ ] Calorie budget mode — plan remaining meals around a target
 - [ ] Offline-first storage — local SQLite mirrors server data; writes are instant locally and sync in background; requires auth to be meaningful

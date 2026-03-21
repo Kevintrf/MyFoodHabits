@@ -4,6 +4,16 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-03-21 (5)
+
+### `docs: restructure roadmap phases for habit detection and performance pass`
+
+- Removed habit detection v1 from Phase 3 — moved to Phase 5 alongside v2; needs real usage data to be useful
+- Removed performance pass from Phase 3 — moved to Phase 3.5; better to optimise based on what actually feels slow during the walkthrough
+- Phase 3 now ends after recently used foods, custom serving units, and meal scaling
+
+---
+
 ## 2026-03-21 (4)
 
 ### `docs: add Phase 3.5 Stabilise to roadmap`
