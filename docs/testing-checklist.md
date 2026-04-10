@@ -14,7 +14,7 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 - [x] Each log item shows correct food name, portion label, calories, and protein
 - [x] Portion label: shows `1.5 × slice` format when a named serving is used; shows `150g` / `150ml` when using 100g base
   - **UX note:** should also show the grams per serving (e.g. `1.5 × slice (45g)`)
-- [ ] "Nothing logged today yet." text shows before anything is logged (and disappears after) — *not yet tested*
+- [x] "Nothing logged today yet." text shows before anything is logged (and disappears after)
 - [x] "+ Add Food" button navigates to Search tab
 - [x] Long-pressing a log item opens the edit/delete bottom sheet
   - **UX note:** consider also adding a visible tap button so it's discoverable without knowing about long-press
@@ -30,26 +30,23 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 ---
 
 ## Search Screen
-- [ ] Search input auto-focuses on open — *not tested*
+- [~] Search input auto-focuses on open — works on first open only; should auto-focus every time the tab is visited
 - [x] Typing shows a spinner then results after ~250ms debounce
 - [x] Results show food name, kcal and protein per 100g/ml
 - [x] Tapping a result navigates to PortionScreen
 - [x] Clearing the search input returns to the recent foods state
 - [x] **Recent foods**: on empty state, shows RECENT section header with previously logged foods
-- [ ] **Recent foods**: tapping a recent food navigates to PortionScreen — *not tested*
-- [ ] **Recent foods**: placeholder text shows only when there are no recents — *not tested*
+- [x] **Recent foods**: tapping a recent food navigates to PortionScreen
+- [x] **Recent foods**: placeholder text shows only when there are no recents
 - [x] **No results**: "No results for X" message appears
 - [x] **No results**: prominent green "+ Create 'X'" button appears and pre-fills name in CreateFoodScreen
 - [x] **Has results**: subtle "+ Create new food" button appears at bottom of list
-- [ ] Barcode icon is visible next to search input — *not tested*
-- [ ] Tapping barcode icon requests camera permission if not granted — *not tested*
-- [ ] Denying permission shows an alert — *not tested*
-- [ ] Granting permission opens the full-screen scanner with frame overlay and hint text — *not tested*
-- [ ] Close (✕) button dismisses the scanner — *not tested*
-- [ ] Scanning a known barcode closes scanner and navigates to PortionScreen — *not tested*
-- [ ] Scanning an unknown barcode shows "Not found" alert — *not tested*
-- [ ] "Try again" re-opens the scanner — *not tested*
-- [ ] "Create manually" navigates to CreateFoodScreen with blank name — *not tested*
+- [x] Barcode icon is visible next to search input
+- [x] Tapping barcode icon requests camera permission if not granted
+- [x] Denying permission shows an alert
+- [x] Granting permission opens the full-screen scanner with frame overlay and hint text
+- [x] Close (✕) button dismisses the scanner
+- [ ] **BUG:** Barcode scanner has no backend communication — all barcodes navigate directly to PortionScreen without checking the DB or Open Food Facts. Likely caused by the phone being unable to reach the backend API when using tunnel mode (the bundle loads via tunnel but API calls still target the local IP). The "Not found" alert, "Try again", and "Create manually" flows are therefore untested.
 - **UX question — duplicate foods:** users can create identical food entries; need to decide how to handle (prevent duplicates on creation? show a warning? deduplicate in search results?)
 - **UX question — two create buttons:** the subtle "Create new food" button (when results exist) and the prominent "+ Create X" button (when no results) serve the same purpose but at different points; consider whether the subtle button adds value or just adds noise — could be removed and only show the prominent one on no-results
 
