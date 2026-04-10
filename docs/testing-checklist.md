@@ -95,13 +95,15 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 ---
 
 ## Edit Food Screen
-- [ ] All fields pre-filled with existing food values
-- [ ] Existing servings load (spinner shows while loading) and appear pre-populated
-- [ ] Can remove existing servings, add new ones
-- [ ] Saving navigates to PortionScreen with the new food version
-- [ ] Old log entries on Today screen still show the original food name/macros (immutability)
-- [ ] The new version of the food appears in search results
-- [ ] "Edit food" link is NOT visible on a barcode-scanned or verified food
+- [x] All fields pre-filled with existing food values
+- [x] Existing servings load (spinner shows while loading) and appear pre-populated
+- [x] Can remove existing servings, add new ones
+- [x] Saving navigates to PortionScreen with the new food version
+- [x] Old log entries on Today screen still show the original food name/macros (immutability)
+  - **Design question:** food immutability (edits create a new version) is technically correct but may be surprising to users who expect an edit to update the food globally. Consider whether to communicate this in the UI (e.g. "Changes won't affect previous log entries") or reconsider the approach in Phase 3.5.
+- [x] The new version of the food appears in search results as a separate entry
+  - **Related to above:** this will cause duplicates in search over time if users edit foods repeatedly. May want to only show the latest version per food name/barcode.
+- [ ] "Edit food" link is NOT visible on a barcode-scanned or verified food — *needs re-test once barcode backend is working*
 
 ---
 
