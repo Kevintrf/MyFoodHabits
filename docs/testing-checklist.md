@@ -57,19 +57,19 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 ---
 
 ## Portion Screen
-- [ ] Food name and macros per 100g/ml shown in header
-- [ ] "Edit food" link visible only for user-created foods (not for Open Food Facts / verified foods)
-- [ ] "Edit food" link navigates to EditFoodScreen
-- [ ] If food has no custom servings, serving picker section is hidden
-- [ ] If food has custom servings, they are listed; default serving is pre-selected
-- [ ] "100g" / "100ml" option is always available in the picker
-- [ ] Tapping a serving option selects it (highlights) and deselects the previous one
-- [ ] Live macro preview updates correctly when serving or quantity changes
-- [ ] Quantity defaults to 1; editing it updates the preview immediately
-- [ ] Meal slot defaults to Breakfast; selecting another highlights it
-- [ ] Tapping "Log Food" adds the item and navigates back to Today
-- [ ] Today screen immediately shows the new item with correct macros
-- [ ] Entering 0 or empty quantity shows an alert and does not log
+- [x] Food name and macros per 100g/ml shown in header
+- [ ] "Edit food" link visible only for user-created foods (not for Open Food Facts / verified foods) — *needs re-test with a barcode-scanned food*
+- [x] "Edit food" link navigates to EditFoodScreen
+- [x] If food has no custom servings, serving picker section is hidden
+- [x] If food has custom servings, they are listed; default serving is pre-selected
+- [x] "100g" / "100ml" option is always available in the picker
+- [x] Tapping a serving option selects it (highlights) and deselects the previous one
+- [x] Live macro preview updates correctly when serving or quantity changes
+- [x] Quantity defaults to 1; editing it updates the preview immediately
+- [x] Meal slot defaults to Breakfast; selecting another highlights it
+- [x] Tapping "Log Food" adds the item and navigates back to Today
+- [x] Today screen immediately shows the new item with correct macros
+- [ ] Entering 0 or empty quantity — silently does nothing; **design decision: allow logging 0g** (e.g. to track that you had something without knowing the exact amount) — currently blocked; needs code change to permit it
 
 ---
 
