@@ -74,20 +74,23 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 ---
 
 ## Create Food Screen
-- [ ] Name field auto-focuses; pre-filled with search query if navigated from "+ Create X" button
-- [ ] Name field is empty if navigated from "+ Create new food" (no initial name passed)
-- [ ] "Per 100g" label switches to "Per 100ml" when the liquid toggle is enabled
-- [ ] Saving with empty name shows alert
-- [ ] Saving with missing or invalid calories shows alert
-- [ ] Protein/carbs/fat default to 0 if left blank
-- [ ] Liquid toggle saves correctly (PortionScreen shows "per 100ml" for liquid foods)
-- [ ] Adding a serving: entering name and grams then tapping "+ Add serving" adds it to the list
-- [ ] First serving is marked "(default)" in the list
-- [ ] Removing a serving: tapping Remove removes it; next serving becomes default
-- [ ] Adding a serving with empty name shows alert
-- [ ] Adding a serving with invalid grams shows alert
-- [ ] Saving navigates directly to PortionScreen with the new food (not back to Search)
-- [ ] Saved food appears in search results immediately
+- [x] Name field auto-focuses; pre-filled with search query if navigated from "+ Create X" button
+- [ ] Name field is empty if navigated from "+ Create new food" — **UX issue:** the subtle "+ Create new food" button at the bottom of search results does not appear; needs a more accessible entry point — add a "+" button in the Search screen header (same pattern as Meals)
+- [x] "Per 100g" label switches to "Per 100ml" when the liquid toggle is enabled in the form
+  - **BUG:** PortionScreen and serving picker still show "g" instead of "ml" for liquid foods
+- [x] Saving with empty name does not save
+  - **Note:** alerts work on phone but not in browser — investigate alert compatibility separately
+- [x] Saving with missing or invalid calories does not save
+  - **Design decision:** allow saving with 0 or negative calories (creative use cases), but warn the user before proceeding
+- [x] Protein/carbs/fat default to 0 if left blank
+  - **Design decision:** saving with 0 macros should be allowed (tied to above)
+- [x] Adding a serving works; first serving is marked "(default)"
+  - **UX improvement:** add ability to change which serving is default without removing and re-adding
+  - **UX improvement:** always show a non-removable 100g/ml base option in PortionScreen, or auto-restore it if all custom servings are removed
+- [x] Removing a serving removes it; next serving becomes default
+- [x] Adding a serving with invalid grams shows alert
+- [x] Saving navigates directly to PortionScreen with the new food
+- [x] Saved food appears in search results immediately
 
 ---
 
