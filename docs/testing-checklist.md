@@ -46,7 +46,11 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 - [x] Denying permission shows an alert
 - [x] Granting permission opens the full-screen scanner with frame overlay and hint text
 - [x] Close (✕) button dismisses the scanner
-- [ ] **BUG:** Barcode scanner has no backend communication — all barcodes navigate directly to PortionScreen without checking the DB or Open Food Facts. Likely caused by the phone being unable to reach the backend API when using tunnel mode (the bundle loads via tunnel but API calls still target the local IP). The "Not found" alert, "Try again", and "Create manually" flows are therefore untested.
+- [ ] **Needs re-test on same WiFi (no tunnel):** Barcode scanner backend communication — scanning a known barcode should look up DB / Open Food Facts and navigate to PortionScreen with the correct food
+- [ ] **Needs re-test on same WiFi (no tunnel):** Scanning an unknown barcode shows "Not found" alert with three options: Create manually, Try again, Cancel
+- [ ] **Needs re-test on same WiFi (no tunnel):** "Try again" re-opens the scanner
+- [ ] **Needs re-test on same WiFi (no tunnel):** "Create manually" navigates to CreateFoodScreen with blank name
+  - *Root cause: tunnel mode serves the bundle via ngrok but API calls still target the local IP, which the phone can't reach from outside the network*
 - **UX question — duplicate foods:** users can create identical food entries; need to decide how to handle (prevent duplicates on creation? show a warning? deduplicate in search results?)
 - **UX question — two create buttons:** the subtle "Create new food" button (when results exist) and the prominent "+ Create X" button (when no results) serve the same purpose but at different points; consider whether the subtle button adds value or just adds noise — could be removed and only show the prominent one on no-results
 
