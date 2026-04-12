@@ -38,6 +38,7 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 
 - [x] **Barcode scanner backend flow** — all flows confirmed working on same WiFi: known barcode lookup, unknown barcode alert, Try again, Create manually
 - [x] **"Edit food" link correctly hidden for non-user foods** ✓
+- [ ] **Keyboard avoiding view** — `KeyboardAvoidingView` added to all screens and `softwareKeyboardLayoutMode: "resize"` added to app.json for Android, but `app.json` changes only take effect after a native build (not in Expo Go). Test in a built APK and fix any screens where the keyboard still covers inputs.
 
 ---
 
