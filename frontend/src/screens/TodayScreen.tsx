@@ -9,6 +9,7 @@ import {
   TextInput,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
 import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
 import { LogItem, deleteLogItem, updateLogItem } from '../services/api';
@@ -139,7 +140,20 @@ export default function TodayScreen() {
 
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => navigation.navigate('SearchTab', { screen: 'Search' })}
+          onPress={() => {
+            navigation.dispatch((state) => {
+              const routes = state.routes.map((r) =>
+                r.name === 'SearchTab'
+                  ? { ...r, state: { index: 0, routes: [{ name: 'Search' }] } }
+                  : r,
+              );
+              return CommonActions.reset({
+                ...state,
+                routes,
+                index: routes.findIndex((r) => r.name === 'SearchTab'),
+              });
+            });
+          }}
         >
           <Text style={styles.addButtonText}>+ Add Food</Text>
         </TouchableOpacity>
