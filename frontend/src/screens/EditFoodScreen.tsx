@@ -38,7 +38,11 @@ export default function EditFoodScreen() {
   useEffect(() => {
     getFoodById(food.id)
       .then((f) => {
-        setServings(f.servings.map((s) => ({ name: s.name, grams: s.grams, is_default: s.is_default })));
+        setServings(
+          f.servings
+            .map((s) => ({ name: s.name, grams: s.grams, is_default: s.is_default }))
+            .sort((a, b) => b.grams - a.grams),
+        );
       })
       .finally(() => setLoadingServings(false));
   }, [food.id]);
@@ -53,20 +57,25 @@ export default function EditFoodScreen() {
       showAlert('Invalid grams', 'Enter how many grams this serving equals.');
       return;
     }
-    setServings((prev) => [
-      ...prev,
-      { name: servingName.trim(), grams, is_default: prev.length === 0 },
-    ]);
+    setServings((prev) => {
+      const next = [...prev, { name: servingName.trim(), grams, is_default: prev.length === 0 }];
+      return next.sort((a, b) => b.grams - a.grams);
+    });
     setServingName('');
     setServingGrams('');
   }
 
   function removeServing(index: number) {
     setServings((prev) => {
+      const removedWasDefault = prev[index].is_default;
       const next = prev.filter((_, i) => i !== index);
-      if (next.length > 0) next[0] = { ...next[0], is_default: true };
+      if (removedWasDefault && next.length > 0) next[0] = { ...next[0], is_default: true };
       return next;
     });
+  }
+
+  function setDefault(index: number) {
+    setServings((prev) => prev.map((s, i) => ({ ...s, is_default: i === index })));
   }
 
   async function handleSave() {
@@ -192,11 +201,20 @@ export default function EditFoodScreen() {
           {servings.map((s, i) => (
             <View key={i} style={styles.servingRow}>
               <Text style={styles.servingText}>
-                {s.name} — {s.grams}{liquid ? 'ml' : 'g'}{s.is_default ? ' (default)' : ''}
+                {s.name} — {s.grams}{liquid ? 'ml' : 'g'}
               </Text>
-              <TouchableOpacity onPress={() => removeServing(i)}>
-                <Text style={styles.removeBtn}>Remove</Text>
-              </TouchableOpacity>
+              <View style={styles.servingActions}>
+                {s.is_default ? (
+                  <Text style={styles.defaultBadge}>Default</Text>
+                ) : (
+                  <TouchableOpacity onPress={() => setDefault(i)}>
+                    <Text style={styles.setDefaultBtn}>Set default</Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity onPress={() => removeServing(i)}>
+                  <Text style={styles.removeBtn}>Remove</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           ))}
           <View style={styles.row}>
@@ -273,7 +291,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E5E5',
   },
-  servingText: { fontSize: 14, color: '#1A1A1A' },
+  servingText: { fontSize: 14, color: '#1A1A1A', flex: 1 },
+  servingActions: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  defaultBadge: { fontSize: 12, color: '#2D6A4F', fontWeight: '600' },
+  setDefaultBtn: { fontSize: 12, color: '#999' },
   removeBtn: { fontSize: 13, color: '#e74c3c' },
   addServingBtn: {
     borderWidth: 1,

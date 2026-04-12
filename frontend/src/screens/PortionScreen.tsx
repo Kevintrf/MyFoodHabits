@@ -127,7 +127,7 @@ export default function PortionScreen() {
           >
             <Text style={styles.servingText}>100{unitLabel}</Text>
           </TouchableOpacity>
-          {foodDetail.servings.map((s) => (
+          {[...foodDetail.servings].sort((a, b) => b.grams - a.grams).map((s) => (
             <TouchableOpacity
               key={s.id}
               style={[styles.servingOption, selectedServing?.id === s.id && styles.servingSelected]}

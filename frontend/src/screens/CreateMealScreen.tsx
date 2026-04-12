@@ -231,7 +231,7 @@ export default function CreateMealScreen() {
                     100{item.food.liquid ? 'ml' : 'g'}
                   </Text>
                 </TouchableOpacity>
-                {item.servings.map((s) => (
+                {[...item.servings].sort((a, b) => b.grams - a.grams).map((s) => (
                   <TouchableOpacity
                     key={s.id}
                     style={[styles.chip, item.selectedServing?.id === s.id && styles.chipActive]}
