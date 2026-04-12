@@ -65,8 +65,8 @@ Goal: Make logging fast enough that users actually want to use it daily.
 
 Goal: Before touching the UI, make sure everything that exists actually works correctly and is properly documented.
 
-- [ ] End-to-end walkthrough on a real device — test every feature in every screen, note anything broken or awkward
-- [ ] Bug fixes and UX rough edges found during walkthrough
+- [x] End-to-end walkthrough on a real device — test every feature in every screen, note anything broken or awkward (see docs/issues.md)
+- [ ] Bug fixes and UX rough edges found during walkthrough (tracked in docs/issues.md)
 - [ ] Performance pass — pre-load today's log and recent foods on app open; optimise anything that felt slow during walkthrough
 - [x] Review all docs against the codebase — anything in the docs that wasn't implemented, anything in the code that isn't documented
 - [x] Audit CHANGELOG, roadmap, and claude-context for gaps or stale entries

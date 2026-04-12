@@ -1,6 +1,6 @@
 # Manual Testing Checklist
 
-Work through this during the Phase 3.5 end-to-end walkthrough. Check off items as you go and note anything broken or awkward.
+> **Walkthrough completed** — Phase 3.5, 2026-04-12. All actionable findings have been moved to [issues.md](issues.md). This file is kept as a record of what was tested and what the results were.
 
 ---
 
