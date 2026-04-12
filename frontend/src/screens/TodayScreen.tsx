@@ -106,9 +106,11 @@ export default function TodayScreen() {
             <View key={slot} style={styles.section}>
               <Text style={styles.slotHeader}>{slot}</Text>
               {items.map((item) => {
+                const unit = item.liquid ? 'ml' : 'g';
+                const totalGrams = item.quantity * item.serving_grams;
                 const portionLabel = item.serving_name
-                  ? `${item.quantity} × ${item.serving_name}`
-                  : `${item.quantity * item.serving_grams}${item.liquid ? 'ml' : 'g'}`;
+                  ? `${item.quantity} × ${item.serving_name} (${totalGrams}${unit})`
+                  : `${totalGrams}${unit}`;
                 return (
                   <TouchableOpacity
                     key={item.id}

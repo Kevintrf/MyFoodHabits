@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (5)
+
+### fix: show total grams in serving label on Today screen
+Serving labels now show the total gram/ml amount in parentheses, e.g. `1.5 × slice (45g)` instead of just `1.5 × slice`.
+
+---
+
 ## 2026-04-12 (4)
 
 ### fix: liquid foods showing "g" instead of "ml"
