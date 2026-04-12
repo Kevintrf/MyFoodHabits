@@ -66,11 +66,29 @@ export default function CreateFoodScreen() {
       showAlert('Name required', 'Please enter a name for this food.');
       return;
     }
-    if (isNaN(cal) || cal < 0) {
+    if (isNaN(cal)) {
       showAlert('Invalid calories', 'Calories per 100g must be a valid number.');
       return;
     }
+    const pro = parseFloat(protein) || 0;
+    const carb = parseFloat(carbs) || 0;
+    const fat_ = parseFloat(fat) || 0;
+    if (cal < 0 || pro < 0 || carb < 0 || fat_ < 0) {
+      showAlert(
+        'Negative values?',
+        'One or more values are negative. Are you sure?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Save anyway', onPress: doSave },
+        ],
+      );
+      return;
+    }
+    doSave();
+  }
 
+  async function doSave() {
+    const cal = parseFloat(calories);
     setSaving(true);
     try {
       const food = await createFood({

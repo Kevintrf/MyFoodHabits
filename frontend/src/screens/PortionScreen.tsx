@@ -84,6 +84,17 @@ export default function PortionScreen() {
       );
       return;
     }
+    if (qty < 0) {
+      showAlert(
+        'Log negative quantity?',
+        'This will subtract macros from your daily total.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Log anyway', onPress: doLog },
+        ],
+      );
+      return;
+    }
     doLog();
   }
 
