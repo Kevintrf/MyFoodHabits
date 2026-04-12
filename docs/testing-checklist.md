@@ -132,16 +132,16 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 ---
 
 ## Create Meal Screen
-- [ ] Meal name input is present and required
-- [ ] Food search is debounced; results appear with name, kcal, protein
-- [ ] Tapping a search result adds it to the draft list and clears the search input
-- [ ] Adding the same food twice increments its quantity instead of adding a duplicate
-- [ ] − button decrements quantity (minimum 1); + button increments
-- [ ] ✕ button removes the food from the draft
-- [ ] "Save Meal" is disabled (greyed out) when no foods have been added
-- [ ] Tapping "Save Meal" with no meal name shows alert
-- [ ] Tapping "Save Meal" with a name but no foods shows alert
-- [ ] Valid save navigates back to MealsScreen and the new meal appears in the list
+- [x] Meal name input is present and required
+- [x] Food search is debounced; results appear with name, kcal, protein
+- [x] Tapping a search result adds it to the draft list and clears the search input
+- [x] Adding the same food twice increments its quantity instead of adding a duplicate
+- [x] − button decrements quantity (minimum 1); + button increments
+- [x] ✕ button removes the food from the draft
+- [x] "Save Meal" is disabled (greyed out) when no foods have been added
+- [x] Tapping "Save Meal" with no meal name shows alert
+- [x] "Save Meal" with a name but no foods — button is disabled so never reached; working correctly
+- [x] Valid save navigates back to MealsScreen and the new meal appears in the list
 
 ---
 
