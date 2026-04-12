@@ -6,7 +6,7 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 
 ## Bugs (broken behaviour)
 
-- [ ] **Delete log item does nothing** — long-press edit modal has a Delete button that shows no confirmation and does not remove the item from the log
+- [x] **Delete log item** — confirmed working on device; was failing in browser due to Alert not working on web (fixed by cross-platform alert wrapper)
 - [ ] **Meals list does not auto-refresh after creating a meal** — must pull-to-refresh manually to see the new meal
 - [ ] **Liquid foods show "g" instead of "ml" in multiple places:**
   - Create Food Screen: serving input hint text still says "grams" when liquid toggle is on
