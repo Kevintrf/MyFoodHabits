@@ -115,8 +115,7 @@ export default function TodayScreen() {
                   <TouchableOpacity
                     key={item.id}
                     style={styles.logItem}
-                    onLongPress={() => openEdit(item, slot)}
-                    delayLongPress={300}
+                    onPress={() => openEdit(item, slot)}
                   >
                     <View style={styles.logItemLeft}>
                       <Text style={styles.logItemName}>{item.food_name}</Text>

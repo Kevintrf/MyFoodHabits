@@ -4,6 +4,12 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (9)
+
+### fix: tap log item to edit instead of long press
+
+---
+
 ## 2026-04-12 (8)
 
 ### feat: allow logging 0 quantity with confirmation
