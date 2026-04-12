@@ -15,11 +15,22 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
-import { searchFoods, getFoodByBarcode, getRecentFoods, Food } from '../services/api';
+import { searchFoods, getFoodByBarcode, getRecentFoods, Food, FoodSource } from '../services/api';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 import { fmtNum } from '../utils/format';
 
 type NavProp = NativeStackNavigationProp<SearchStackParamList, 'Search'>;
+
+const SOURCE_LABEL: Record<FoodSource, string> = {
+  USER: 'My food',
+  OPENFOODFACTS: 'Open Food Facts',
+  VERIFIED: 'Verified',
+};
+const SOURCE_COLOR: Record<FoodSource, string> = {
+  USER: '#2D6A4F',
+  OPENFOODFACTS: '#888',
+  VERIFIED: '#2563EB',
+};
 
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
@@ -141,7 +152,12 @@ export default function SearchScreen() {
             onPress={() => navigation.navigate('Portion', { food: item })}
           >
             <View style={styles.resultLeft}>
-              <Text style={styles.resultName}>{item.name}</Text>
+              <View style={styles.resultNameRow}>
+                <Text style={styles.resultName}>{item.name}</Text>
+                <Text style={[styles.sourceBadge, { color: SOURCE_COLOR[item.source] }]}>
+                  {SOURCE_LABEL[item.source]}
+                </Text>
+              </View>
               <Text style={styles.resultSub}>
                 {fmtNum(item.calories_per_100g)} kcal per 100{item.liquid ? 'ml' : 'g'}
               </Text>
@@ -227,7 +243,9 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   resultLeft: { flex: 1 },
+  resultNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
   resultName: { fontSize: 16, fontWeight: '500', color: '#1A1A1A' },
+  sourceBadge: { fontSize: 11, fontWeight: '600' },
   resultSub: { fontSize: 13, color: '#999', marginTop: 3 },
   chevron: { fontSize: 22, color: '#ccc', marginLeft: 8 },
   // Scanner

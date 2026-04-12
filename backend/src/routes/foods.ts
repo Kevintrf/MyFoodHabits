@@ -11,7 +11,7 @@ router.get('/search', async (req: Request, res: Response, next: NextFunction) =>
 
     if (barcode) {
       const { rows } = await pool.query(
-        `SELECT id, name, barcode, liquid, created_by_user_id,
+        `SELECT id, name, barcode, liquid, source, created_by_user_id,
                 calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
          FROM foods WHERE barcode = $1 LIMIT 1`,
         [barcode],
@@ -24,7 +24,7 @@ router.get('/search', async (req: Request, res: Response, next: NextFunction) =>
     }
 
     const { rows } = await pool.query(
-      `SELECT id, name, barcode, liquid, created_by_user_id,
+      `SELECT id, name, barcode, liquid, source, created_by_user_id,
               calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
        FROM foods
        WHERE name ILIKE $1
@@ -102,7 +102,7 @@ router.get('/barcode/:barcode', async (req: Request, res: Response, next: NextFu
 
     // Return cached row if we already have this barcode
     const { rows } = await pool.query(
-      `SELECT id, name, barcode, liquid, created_by_user_id,
+      `SELECT id, name, barcode, liquid, source, created_by_user_id,
               calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
        FROM foods WHERE barcode = $1 LIMIT 1`,
       [barcode],
@@ -160,7 +160,7 @@ router.get('/recent', async (_req: Request, res: Response, next: NextFunction) =
     const user_id = 1;
 
     const { rows } = await pool.query(
-      `SELECT f.id, f.name, f.barcode, f.liquid, f.created_by_user_id,
+      `SELECT f.id, f.name, f.barcode, f.liquid, f.source, f.created_by_user_id,
               f.calories_per_100g, f.protein_per_100g, f.carbs_per_100g, f.fat_per_100g
        FROM foods f
        JOIN (
@@ -247,7 +247,7 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     const { rows: [food] } = await pool.query(
-      `SELECT id, name, barcode, liquid, created_by_user_id,
+      `SELECT id, name, barcode, liquid, source, created_by_user_id,
               calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, created_at
        FROM foods WHERE id = $1`,
       [id],

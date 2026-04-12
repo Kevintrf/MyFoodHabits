@@ -110,10 +110,13 @@ export default function PortionScreen() {
       {/* Food header */}
       <View style={styles.foodHeader}>
         <Text style={styles.foodName}>{food.name}</Text>
+        <Text style={styles.foodSourceLabel}>
+          {food.source === 'USER' ? 'My food' : food.source === 'OPENFOODFACTS' ? 'Open Food Facts' : 'Verified'}
+        </Text>
         <Text style={styles.foodSub}>
           {fmtNum(food.calories_per_100g)} kcal · {fmtNum(food.protein_per_100g)}g Protein · {fmtNum(food.carbs_per_100g)}g Carbs · {fmtNum(food.fat_per_100g)}g Fat per 100{unitLabel}
         </Text>
-        {food.created_by_user_id === 1 && (
+        {food.source === 'USER' && (
           <TouchableOpacity onPress={() => navigation.navigate('EditFood', { food })}>
             <Text style={styles.editLink}>Edit food</Text>
           </TouchableOpacity>
@@ -205,6 +208,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E5E5',
   },
   foodName: { fontSize: 20, fontWeight: '700', color: '#1A1A1A' },
+  foodSourceLabel: { fontSize: 11, fontWeight: '600', color: '#999', marginTop: 3 },
   foodSub: { fontSize: 14, color: '#666', marginTop: 4 },
   editLink: { fontSize: 13, color: '#2D6A4F', marginTop: 8 },
   section: { margin: 16, marginBottom: 0 },

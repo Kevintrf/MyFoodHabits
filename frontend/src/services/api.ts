@@ -2,11 +2,14 @@ const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
 
 // --- Types ---
 
+export type FoodSource = 'USER' | 'VERIFIED' | 'OPENFOODFACTS';
+
 export interface Food {
   id: number;
   name: string;
   barcode: string | null;
   liquid: boolean;
+  source: FoodSource;
   created_by_user_id: number | null;
   calories_per_100g: number;
   protein_per_100g: number;

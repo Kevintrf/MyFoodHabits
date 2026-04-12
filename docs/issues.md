@@ -72,4 +72,4 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 ## New Issues Found During Barcode Re-test
 
 - [x] **Manually created food is not matched when its barcode is later scanned** — when "Create manually" is chosen after a not-found scan, the scanned barcode is now passed to CreateFoodScreen and stored with the food, so the next scan of the same barcode returns the manually created entry
-- [ ] **No food source indicator in the UI** — Portion Screen and search results don't show where a food came from (user-created, Open Food Facts, verified); should show the source and make clear that non-user foods are not editable
+- [x] **No food source indicator in the UI** — search results now show "My food" / "Open Food Facts" / "Verified" next to the food name; Portion Screen shows the source below the name and only shows the "Edit food" link for user-created foods
