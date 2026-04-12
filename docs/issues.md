@@ -55,6 +55,12 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 
 ## Phase 4 Features
 
+- [ ] **Edit barcode on existing foods** — make it easy to add or change the barcode on a manually created food without going through a full edit. Ideas:
+  - "Edit barcode" option in Edit Food screen that opens the scanner so you can scan the correct barcode in
+  - Or a food management screen (see Deferred above) where you can pick a food from a list and assign/reassign its barcode
+
+
+
 - [ ] **History / calendar view** — a calendar screen where each day is tappable to view that day's full log
   - Day colour: green if kcal goal was met, red if logged but goal not met, grey if nothing was logged
   - Tapping a day opens a read-only view of that day's log (slots + items + totals), same layout as Today
