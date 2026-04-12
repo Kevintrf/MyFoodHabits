@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 
 import TodayScreen from '../screens/TodayScreen';
+import CalendarScreen from '../screens/CalendarScreen';
 import SearchScreen from '../screens/SearchScreen';
 import PortionScreen from '../screens/PortionScreen';
 import MealsScreen from '../screens/MealsScreen';
@@ -19,6 +20,11 @@ import EditFoodScreen from '../screens/EditFoodScreen';
 import { Food, Meal } from '../services/api';
 
 // --- Param list types ---
+
+export type TodayStackParamList = {
+  TodayHome: undefined;
+  Calendar: undefined;
+};
 
 export type SearchStackParamList = {
   Search: undefined;
@@ -42,8 +48,32 @@ type RootTabParamList = {
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
+const TodayStack = createNativeStackNavigator<TodayStackParamList>();
 const SearchStack = createNativeStackNavigator<SearchStackParamList>();
 const MealsStack = createNativeStackNavigator<MealsStackParamList>();
+
+function TodayStackNavigator() {
+  return (
+    <TodayStack.Navigator>
+      <TodayStack.Screen
+        name="TodayHome"
+        component={TodayScreen}
+        options={({ navigation }) => ({
+          title: 'Today',
+          headerRight: () => (
+            <Ionicons
+              name="calendar-outline"
+              size={24}
+              color="#2D6A4F"
+              onPress={() => navigation.navigate('Calendar')}
+            />
+          ),
+        })}
+      />
+      <TodayStack.Screen name="Calendar" component={CalendarScreen} options={{ title: 'Calendar' }} />
+    </TodayStack.Navigator>
+  );
+}
 
 function SearchStackNavigator() {
   return (
@@ -141,7 +171,7 @@ export default function RootNavigator() {
           headerShown: false,
         })}
       >
-        <Tab.Screen name="Today" component={TodayScreen} options={{ title: 'Today' }} />
+        <Tab.Screen name="Today" component={TodayStackNavigator} options={{ title: 'Today', headerShown: false }} />
         <Tab.Screen name="SearchTab" component={SearchStackNavigator} options={{ title: 'Search' }} />
         <Tab.Screen name="MealsTab" component={MealsStackNavigator} options={{ title: 'Meals' }} />
         <Tab.Screen name="Weight" component={WeightScreen} />

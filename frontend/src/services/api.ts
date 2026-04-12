@@ -55,6 +55,11 @@ export interface DayLog {
   slots: Record<string, LogItem[]>;
 }
 
+export interface DaySummary {
+  date: string;
+  calories: number;
+}
+
 export interface MealItem {
   id: number;
   meal_id: number;
@@ -145,6 +150,9 @@ export const editFood = (id: number, data: {
 
 export const getLog = (date: string) =>
   request<DayLog>(`/log/${date}`);
+
+export const getMonthSummary = (year: number, month: number) =>
+  request<DaySummary[]>(`/log/month/${year}/${month}`);
 
 export const addLogItem = (item: {
   date: string;

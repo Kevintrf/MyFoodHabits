@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { getLog, DayLog, getTargets, UserTargets, getWeights } from '../services/api';
 
 // TODO: replace with real user from auth
@@ -9,8 +9,10 @@ const DEFAULT_TARGETS: UserTargets = { target_calories: 2000, target_protein_g: 
 interface AppContextType {
   userId: number;
   todayDate: string;
-  todayLog: DayLog | null;
-  refreshTodayLog: () => Promise<void>;
+  viewingDate: string;
+  setViewingDate: (date: string) => void;
+  viewingLog: DayLog | null;
+  refreshViewingLog: () => Promise<void>;
   targets: UserTargets;
   refreshTargets: () => Promise<void>;
   loggedWeightToday: boolean;
@@ -25,14 +27,19 @@ function getTodayDate(): string {
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const todayDate = getTodayDate();
-  const [todayLog, setTodayLog] = useState<DayLog | null>(null);
+  const [viewingDate, setViewingDate] = useState(todayDate);
+  const [viewingLog, setViewingLog] = useState<DayLog | null>(null);
   const [targets, setTargets] = useState<UserTargets>(DEFAULT_TARGETS);
   const [loggedWeightToday, setLoggedWeightToday] = useState(false);
 
-  const refreshTodayLog = useCallback(async () => {
-    const log = await getLog(todayDate);
-    setTodayLog(log);
-  }, [todayDate]);
+  const refreshViewingLog = useCallback(async () => {
+    const log = await getLog(viewingDate);
+    setViewingLog(log);
+  }, [viewingDate]);
+
+  useEffect(() => {
+    refreshViewingLog();
+  }, [refreshViewingLog]);
 
   const refreshTargets = useCallback(async () => {
     const t = await getTargets();
@@ -50,7 +57,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [todayDate]);
 
   return (
-    <AppContext.Provider value={{ userId: USER_ID, todayDate, todayLog, refreshTodayLog, targets, refreshTargets, loggedWeightToday, refreshWeightToday }}>
+    <AppContext.Provider value={{
+      userId: USER_ID,
+      todayDate,
+      viewingDate,
+      setViewingDate,
+      viewingLog,
+      refreshViewingLog,
+      targets,
+      refreshTargets,
+      loggedWeightToday,
+      refreshWeightToday,
+    }}>
       {children}
     </AppContext.Provider>
   );

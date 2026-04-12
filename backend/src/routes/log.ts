@@ -66,6 +66,45 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// GET /log/month/:year/:month — returns calories per logged day for calendar colouring
+router.get('/month/:year/:month', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user_id = 1;
+    const year = parseInt(req.params.year, 10);
+    const month = parseInt(req.params.month, 10);
+
+    if (isNaN(year) || isNaN(month) || month < 1 || month > 12) {
+      return res.status(400).json({ error: 'invalid year or month' });
+    }
+
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${lastDay}`;
+
+    const { rows } = await pool.query(
+      `SELECT dl.date::text AS date,
+              ROUND(SUM(
+                f.calories_per_100g
+                * COALESCE(fs.grams, 100)
+                / 100
+                * li.quantity
+              ))::int AS calories
+       FROM day_logs dl
+       JOIN log_items li ON li.day_log_id = dl.id
+       JOIN foods f ON li.food_id = f.id
+       LEFT JOIN food_servings fs ON li.serving_id = fs.id
+       WHERE dl.user_id = $1 AND dl.date BETWEEN $2 AND $3
+       GROUP BY dl.date
+       ORDER BY dl.date`,
+      [user_id, startDate, endDate],
+    );
+
+    return res.json(rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /log/:date?user_id=1
 router.get('/:date', async (req: Request, res: Response, next: NextFunction) => {
   try {

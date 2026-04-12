@@ -20,15 +20,17 @@ import { fmtNum } from '../utils/format';
 const MEAL_SLOTS = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
 
 export default function TodayScreen() {
-  const { todayLog, todayDate, refreshTodayLog, targets, refreshTargets } = useApp();
+  const { viewingLog, viewingDate, todayDate, setViewingDate, refreshViewingLog, targets, refreshTargets } = useApp();
   const navigation = useNavigation<any>();
   const [editTarget, setEditTarget] = useState<{ item: LogItem; slot: string } | null>(null);
   const [editQty, setEditQty] = useState('');
   const [editSlot, setEditSlot] = useState('');
   const [saving, setSaving] = useState(false);
 
+  const isViewingToday = viewingDate === todayDate;
+
   useEffect(() => {
-    refreshTodayLog();
+    refreshViewingLog();
     refreshTargets();
   }, []);
 
@@ -45,7 +47,7 @@ export default function TodayScreen() {
     setSaving(true);
     try {
       await updateLogItem(editTarget.item.id, { quantity: qty, meal_slot: editSlot });
-      await refreshTodayLog();
+      await refreshViewingLog();
       setEditTarget(null);
     } finally {
       setSaving(false);
@@ -64,7 +66,7 @@ export default function TodayScreen() {
           style: 'destructive',
           onPress: async () => {
             await deleteLogItem(editTarget.item.id);
-            await refreshTodayLog();
+            await refreshViewingLog();
             setEditTarget(null);
           },
         },
@@ -72,10 +74,10 @@ export default function TodayScreen() {
     );
   }
 
-  const totals = todayLog?.totals ?? { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 };
-  const slots = todayLog?.slots ?? {};
+  const totals = viewingLog?.totals ?? { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 };
+  const slots = viewingLog?.slots ?? {};
 
-  const dateLabel = new Date(todayDate + 'T00:00:00').toLocaleDateString('en-US', {
+  const dateLabel = new Date(viewingDate + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -84,6 +86,14 @@ export default function TodayScreen() {
   return (
     <>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+
+        {/* Past-date banner */}
+        {!isViewingToday && (
+          <TouchableOpacity style={styles.pastBanner} onPress={() => setViewingDate(todayDate)}>
+            <Text style={styles.pastBannerText}>Viewing {dateLabel} — tap to return to today</Text>
+          </TouchableOpacity>
+        )}
+
         <Text style={styles.dateLabel}>{dateLabel}</Text>
 
         {/* Macro summary */}
@@ -137,14 +147,14 @@ export default function TodayScreen() {
         })}
 
         {Object.keys(slots).length === 0 && (
-          <Text style={styles.emptyState}>Nothing logged today yet.</Text>
+          <Text style={styles.emptyState}>Nothing logged{isViewingToday ? ' today' : ' this day'} yet.</Text>
         )}
 
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => {
-            navigation.dispatch((state) => {
-              const routes = state.routes.map((r) =>
+            navigation.dispatch((state: any) => {
+              const routes = state.routes.map((r: any) =>
                 r.name === 'SearchTab'
                   ? { ...r, state: { index: 0, routes: [{ name: 'Search' }] } }
                   : r,
@@ -152,7 +162,7 @@ export default function TodayScreen() {
               return CommonActions.reset({
                 ...state,
                 routes,
-                index: routes.findIndex((r) => r.name === 'SearchTab'),
+                index: routes.findIndex((r: any) => r.name === 'SearchTab'),
               });
             });
           }}
@@ -257,7 +267,15 @@ function MacroCard({
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9F9F9' },
   content: { paddingBottom: 40 },
-  dateLabel: { fontSize: 22, fontWeight: '700', color: '#1A1A1A', padding: 20, paddingTop: 56 },
+  pastBanner: {
+    backgroundColor: '#FFF3CD',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#FFE08A',
+  },
+  pastBannerText: { fontSize: 13, color: '#856404', textAlign: 'center', fontWeight: '500' },
+  dateLabel: { fontSize: 22, fontWeight: '700', color: '#1A1A1A', padding: 20, paddingTop: 24 },
   macroRow: { flexDirection: 'row', paddingHorizontal: 16, gap: 12, marginBottom: 8 },
   macroCard: {
     flex: 1,

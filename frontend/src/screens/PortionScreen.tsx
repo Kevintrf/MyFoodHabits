@@ -24,7 +24,7 @@ type PortionRoute = RouteProp<SearchStackParamList, 'Portion'>;
 export default function PortionScreen() {
   const route = useRoute<PortionRoute>();
   const navigation = useNavigation<any>();
-  const { todayDate, refreshTodayLog } = useApp();
+  const { viewingDate, refreshViewingLog } = useApp();
   const { food } = route.params;
 
   const [foodDetail, setFoodDetail] = useState<FoodWithServings | null>(null);
@@ -58,13 +58,13 @@ export default function PortionScreen() {
     setLogging(true);
     try {
       await addLogItem({
-        date: todayDate,
+        date: viewingDate,
         meal_slot: mealSlot,
         food_id: food.id,
         serving_id: selectedServing?.id,
         quantity: qty,
       });
-      await refreshTodayLog();
+      await refreshViewingLog();
       navigation.navigate('Today');
     } catch (e) {
       showAlert('Error', e instanceof Error ? e.message : 'Something went wrong');

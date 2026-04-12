@@ -61,11 +61,7 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 
 
 
-- [ ] **History / calendar view** — a calendar screen where each day is tappable to view that day's full log
-  - Day colour: green if kcal goal was met, red if logged but goal not met, grey if nothing was logged
-  - Tapping a day opens a read-only view of that day's log (slots + items + totals), same layout as Today
-  - Backend needs an endpoint to fetch a day log by date (may already exist via the today endpoint generalised to accept a date param)
-  - Consider where to put it in the tab bar — could replace or sit alongside the Today tab
+- [x] **History / calendar view** — calendar icon in Today header opens a month view; days are green (goal met), red (logged but under goal), or uncoloured (nothing logged); tapping a day sets it as the active viewing date and returns to Today which shows that day's log with a yellow "Viewing [date]" banner; tapping the banner returns to today. Editing/adding food to past days works the same as today — the Add Food button and Portion screen use the active viewing date.
 
 ---
 
