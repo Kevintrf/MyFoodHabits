@@ -90,61 +90,38 @@ export default function SearchScreen() {
     }
   }
 
-  const noResults = !loading && query.trim() !== '' && results.length === 0;
+  const isSearching = query.trim() !== '';
+  const noResults = !loading && isSearching && results.length === 0;
+  const listData: Food[] = isSearching ? results : recentFoods;
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchBar}>
-        <TextInput
-          style={styles.input}
-          placeholder="Search foods..."
-          value={query}
-          onChangeText={setQuery}
-          autoFocus
-          clearButtonMode="while-editing"
-          returnKeyType="search"
-        />
-        <TouchableOpacity style={styles.cameraBtn} onPress={openScanner}>
-          <Ionicons name="barcode-outline" size={26} color="#2D6A4F" />
-        </TouchableOpacity>
-      </View>
-
-      {loading && <ActivityIndicator style={styles.spinner} color="#2D6A4F" />}
-
-      {noResults && (
-        <Text style={styles.empty}>No results for "{query}"</Text>
-      )}
-
-      {query.trim() === '' && recentFoods.length === 0 && (
-        <Text style={styles.placeholder}>Search for a food to log it</Text>
-      )}
-
-      {query.trim() === '' && recentFoods.length > 0 && (
-        <>
-          <Text style={styles.sectionHeader}>RECENT</Text>
-          {recentFoods.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.result}
-              onPress={() => navigation.navigate('Portion', { food: item })}
-            >
-              <View style={styles.resultLeft}>
-                <Text style={styles.resultName}>{item.name}</Text>
-                <Text style={styles.resultSub}>
-                  {item.calories_per_100g} kcal · {item.protein_per_100g}g protein per 100
-                  {item.liquid ? 'ml' : 'g'}
-                </Text>
-              </View>
-              <Text style={styles.chevron}>›</Text>
-            </TouchableOpacity>
-          ))}
-        </>
-      )}
-
       <FlatList
-        data={results}
+        data={listData}
         keyExtractor={(item) => String(item.id)}
         keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={
+          <View>
+            <View style={styles.searchBar}>
+              <TextInput
+                style={styles.input}
+                placeholder="Search foods..."
+                value={query}
+                onChangeText={setQuery}
+                autoFocus
+                clearButtonMode="while-editing"
+                returnKeyType="search"
+              />
+              <TouchableOpacity style={styles.cameraBtn} onPress={openScanner}>
+                <Ionicons name="barcode-outline" size={26} color="#2D6A4F" />
+              </TouchableOpacity>
+            </View>
+            {loading && <ActivityIndicator style={styles.spinner} color="#2D6A4F" />}
+            {!isSearching && recentFoods.length > 0 && (
+              <Text style={styles.sectionHeader}>RECENT</Text>
+            )}
+          </View>
+        }
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.result}
@@ -160,8 +137,24 @@ export default function SearchScreen() {
             <Text style={styles.chevron}>›</Text>
           </TouchableOpacity>
         )}
+        ListEmptyComponent={
+          !loading ? (
+            isSearching ? (
+              <Text style={styles.empty}>No results for "{query}"</Text>
+            ) : (
+              <Text style={styles.placeholder}>Search for a food to log it</Text>
+            )
+          ) : null
+        }
         ListFooterComponent={
-          results.length > 0 ? (
+          noResults ? (
+            <TouchableOpacity
+              style={styles.createBtnProminent}
+              onPress={() => navigation.navigate('CreateFood', { initialName: query.trim() })}
+            >
+              <Text style={styles.createBtnProminentText}>+ Create "{query.trim()}"</Text>
+            </TouchableOpacity>
+          ) : results.length > 0 ? (
             <TouchableOpacity
               style={styles.createBtn}
               onPress={() => navigation.navigate('CreateFood', { initialName: query.trim() })}
@@ -171,15 +164,6 @@ export default function SearchScreen() {
           ) : null
         }
       />
-
-      {noResults && (
-        <TouchableOpacity
-          style={styles.createBtnProminent}
-          onPress={() => navigation.navigate('CreateFood', { initialName: query.trim() })}
-        >
-          <Text style={styles.createBtnProminentText}>+ Create "{query.trim()}"</Text>
-        </TouchableOpacity>
-      )}
 
       {/* Barcode scanner modal */}
       <Modal visible={scannerOpen} animationType="slide" onRequestClose={() => setScannerOpen(false)}>

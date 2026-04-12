@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (6)
+
+### fix: search screen not scrollable
+Consolidated recent foods and search results into a single FlatList so the whole screen scrolls. Search bar and section header moved to ListHeaderComponent.
+
+---
+
 ## 2026-04-12 (5)
 
 ### fix: show total grams in serving label on Today screen
