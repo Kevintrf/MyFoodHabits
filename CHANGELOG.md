@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (14)
+
+### feat: barcode scanning in Create Meal and Edit Meal screens
+Added a barcode scanner button to the food search row in CreateMealScreen and EditMealScreen. Scanning a known barcode adds the food directly to the meal draft. If the barcode is not found, an alert offers "Try again" or "Cancel" (no "Create manually" option since that would navigate away from the draft). Also fixed MealsScreen using the renamed `refreshViewingLog` context method.
+
+---
+
 ## 2026-04-12 (13)
 
 ### feat: duplicate food items and macro totals in meal builder

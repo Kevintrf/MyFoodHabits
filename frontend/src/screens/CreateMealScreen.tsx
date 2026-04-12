@@ -7,11 +7,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import { showAlert } from '../utils/alert';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { searchFoods, createMeal, getFoodById, Food, FoodServing } from '../services/api';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { Ionicons } from '@expo/vector-icons';
+import { searchFoods, createMeal, getFoodById, getFoodByBarcode, Food, FoodServing } from '../services/api';
 import { MealsStackParamList } from '../navigation/RootNavigator';
 import { fmtNum } from '../utils/format';
 import { KeyboardAvoidingView, Platform } from 'react-native';
@@ -45,8 +48,11 @@ export default function CreateMealScreen() {
   const [searching, setSearching] = useState(false);
   const [draftItems, setDraftItems] = useState<DraftItem[]>([]);
   const [saving, setSaving] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [scannerBusy, setScannerBusy] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const nextDraftId = useRef(0);
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
   const totalMacros = draftItems.reduce(
     (acc, item) => {
@@ -60,6 +66,38 @@ export default function CreateMealScreen() {
     },
     { calories: 0, protein: 0, carbs: 0, fat: 0 },
   );
+
+  async function openScanner() {
+    if (!cameraPermission?.granted) {
+      const result = await requestCameraPermission();
+      if (!result.granted) {
+        showAlert('Camera access needed', 'Enable camera permission in settings to scan barcodes.');
+        return;
+      }
+    }
+    setScannerBusy(false);
+    setScannerOpen(true);
+  }
+
+  async function handleBarcodeScan({ data }: { data: string }) {
+    if (scannerBusy) return;
+    setScannerBusy(true);
+    setScannerOpen(false);
+
+    try {
+      const food = await getFoodByBarcode(data);
+      addFood(food);
+    } catch {
+      showAlert(
+        'Not found',
+        "This barcode isn't in the database yet.",
+        [
+          { text: 'Try again', onPress: () => { setScannerBusy(false); setScannerOpen(true); } },
+          { text: 'Cancel', style: 'cancel', onPress: () => setScannerBusy(false) },
+        ],
+      );
+    }
+  }
 
   function handleSearchChange(text: string) {
     setSearchQuery(text);
@@ -168,8 +206,11 @@ export default function CreateMealScreen() {
               onChangeText={handleSearchChange}
               returnKeyType="search"
             />
-            {searching && <ActivityIndicator style={styles.spinner} color="#2D6A4F" />}
+            <TouchableOpacity style={styles.cameraBtn} onPress={openScanner}>
+              <Ionicons name="barcode-outline" size={24} color="#2D6A4F" />
+            </TouchableOpacity>
           </View>
+          {searching && <ActivityIndicator style={styles.spinner} color="#2D6A4F" />}
           {searchResults.map((food) => (
             <TouchableOpacity
               key={food.id}
@@ -273,6 +314,25 @@ export default function CreateMealScreen() {
         </View>
       }
     />
+
+      {/* Barcode scanner modal */}
+      <Modal visible={scannerOpen} animationType="slide" onRequestClose={() => setScannerOpen(false)}>
+        <View style={styles.scannerContainer}>
+          <CameraView
+            style={StyleSheet.absoluteFillObject}
+            facing="back"
+            onBarcodeScanned={handleBarcodeScan}
+            barcodeScannerSettings={{ barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e'] }}
+          />
+          <View style={styles.scannerOverlay}>
+            <View style={styles.scannerFrame} />
+            <Text style={styles.scannerHint}>Point at a barcode</Text>
+          </View>
+          <TouchableOpacity style={styles.scannerClose} onPress={() => setScannerOpen(false)}>
+            <Ionicons name="close" size={30} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </Modal>
   </KeyboardAvoidingView>
   );
 }
@@ -288,8 +348,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E5E5',
   },
-  searchSection: { marginHorizontal: 16, marginBottom: 4 },
+  searchSection: { marginHorizontal: 16, marginBottom: 4, flexDirection: 'row', alignItems: 'center', gap: 8 },
   searchInput: {
+    flex: 1,
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 12,
@@ -297,7 +358,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E5E5',
   },
-  spinner: { marginTop: 8 },
+  cameraBtn: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    padding: 10,
+  },
+  spinner: { marginTop: 4, marginHorizontal: 16 },
   searchResult: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -381,4 +449,20 @@ const styles = StyleSheet.create({
   },
   saveBtnDisabled: { backgroundColor: '#A8C5B5' },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  // Scanner
+  scannerContainer: { flex: 1, backgroundColor: '#000' },
+  scannerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scannerFrame: {
+    width: 260,
+    height: 160,
+    borderWidth: 2,
+    borderColor: '#fff',
+    borderRadius: 12,
+  },
+  scannerHint: { color: '#fff', marginTop: 16, fontSize: 15 },
+  scannerClose: { position: 'absolute', top: 56, right: 20 },
 });

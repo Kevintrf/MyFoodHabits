@@ -7,10 +7,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { searchFoods, editMeal, deleteMeal, getFoodById, Food, FoodServing } from '../services/api';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { Ionicons } from '@expo/vector-icons';
+import { searchFoods, editMeal, deleteMeal, getFoodById, getFoodByBarcode, Food, FoodServing, FoodSource } from '../services/api';
 import { showAlert } from '../utils/alert';
 import { fmtNum } from '../utils/format';
 import { KeyboardAvoidingView, Platform } from 'react-native';
@@ -49,7 +52,10 @@ export default function EditMealScreen() {
   const [searching, setSearching] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [scannerBusy, setScannerBusy] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   // Existing items use their index as draftId; new items start from meal.items.length
   const nextDraftId = useRef(meal.items.length);
 
@@ -60,6 +66,7 @@ export default function EditMealScreen() {
         id: mi.food_id,
         name: mi.food_name,
         liquid: mi.liquid,
+        source: 'USER' as FoodSource,
         calories_per_100g: mi.calories_per_100g,
         protein_per_100g: mi.protein_per_100g,
         carbs_per_100g: mi.carbs_per_100g,
@@ -109,6 +116,38 @@ export default function EditMealScreen() {
       }
     });
   }, []);
+
+  async function openScanner() {
+    if (!cameraPermission?.granted) {
+      const result = await requestCameraPermission();
+      if (!result.granted) {
+        showAlert('Camera access needed', 'Enable camera permission in settings to scan barcodes.');
+        return;
+      }
+    }
+    setScannerBusy(false);
+    setScannerOpen(true);
+  }
+
+  async function handleBarcodeScan({ data }: { data: string }) {
+    if (scannerBusy) return;
+    setScannerBusy(true);
+    setScannerOpen(false);
+
+    try {
+      const food = await getFoodByBarcode(data);
+      addFood(food);
+    } catch {
+      showAlert(
+        'Not found',
+        "This barcode isn't in the database yet.",
+        [
+          { text: 'Try again', onPress: () => { setScannerBusy(false); setScannerOpen(true); } },
+          { text: 'Cancel', style: 'cancel', onPress: () => setScannerBusy(false) },
+        ],
+      );
+    }
+  }
 
   function handleSearchChange(text: string) {
     setSearchQuery(text);
@@ -242,8 +281,11 @@ export default function EditMealScreen() {
               onChangeText={handleSearchChange}
               returnKeyType="search"
             />
-            {searching && <ActivityIndicator style={styles.spinner} color="#2D6A4F" />}
+            <TouchableOpacity style={styles.cameraBtn} onPress={openScanner}>
+              <Ionicons name="barcode-outline" size={24} color="#2D6A4F" />
+            </TouchableOpacity>
           </View>
+          {searching && <ActivityIndicator style={styles.spinner} color="#2D6A4F" />}
           {searchResults.map((food) => (
             <TouchableOpacity
               key={food.id}
@@ -354,6 +396,25 @@ export default function EditMealScreen() {
         </View>
       }
     />
+
+      {/* Barcode scanner modal */}
+      <Modal visible={scannerOpen} animationType="slide" onRequestClose={() => setScannerOpen(false)}>
+        <View style={styles.scannerContainer}>
+          <CameraView
+            style={StyleSheet.absoluteFillObject}
+            facing="back"
+            onBarcodeScanned={handleBarcodeScan}
+            barcodeScannerSettings={{ barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e'] }}
+          />
+          <View style={styles.scannerOverlay}>
+            <View style={styles.scannerFrame} />
+            <Text style={styles.scannerHint}>Point at a barcode</Text>
+          </View>
+          <TouchableOpacity style={styles.scannerClose} onPress={() => setScannerOpen(false)}>
+            <Ionicons name="close" size={30} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </Modal>
   </KeyboardAvoidingView>
   );
 }
@@ -369,8 +430,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E5E5',
   },
-  searchSection: { marginHorizontal: 16, marginBottom: 4 },
+  searchSection: { marginHorizontal: 16, marginBottom: 4, flexDirection: 'row', alignItems: 'center', gap: 8 },
   searchInput: {
+    flex: 1,
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 12,
@@ -378,7 +440,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E5E5',
   },
-  spinner: { marginTop: 8 },
+  cameraBtn: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    padding: 10,
+  },
+  spinner: { marginTop: 4, marginHorizontal: 16 },
   searchResult: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -469,4 +538,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   deleteBtnText: { color: '#e74c3c', fontSize: 15, fontWeight: '500' },
+  // Scanner
+  scannerContainer: { flex: 1, backgroundColor: '#000' },
+  scannerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scannerFrame: {
+    width: 260,
+    height: 160,
+    borderWidth: 2,
+    borderColor: '#fff',
+    borderRadius: 12,
+  },
+  scannerHint: { color: '#fff', marginTop: 16, fontSize: 15 },
+  scannerClose: { position: 'absolute', top: 56, right: 20 },
 });

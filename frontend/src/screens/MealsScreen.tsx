@@ -41,7 +41,7 @@ function calcMealMacros(items: MealItem[], scale: number) {
 
 export default function MealsScreen() {
   const navigation = useNavigation<NavProp>();
-  const { todayDate, refreshTodayLog } = useApp();
+  const { todayDate, refreshViewingLog } = useApp();
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -77,7 +77,7 @@ export default function MealsScreen() {
     setLogging(true);
     try {
       await logMeal(logTarget.id, todayDate, slot, scale);
-      await refreshTodayLog();
+      await refreshViewingLog();
       setLogTarget(null);
     } catch (e) {
       showAlert('Error', e instanceof Error ? e.message : 'Something went wrong');
