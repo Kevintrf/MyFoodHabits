@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (8)
+
+### feat: allow logging 0 quantity with confirmation
+Logging 0 now shows a confirmation alert instead of silently blocking. Invalid (non-numeric) input still does nothing.
+
+---
+
 ## 2026-04-12 (7)
 
 ### feat: add + button to Search header, remove inline create food buttons

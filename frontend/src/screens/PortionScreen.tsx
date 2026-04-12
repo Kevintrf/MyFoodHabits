@@ -42,15 +42,14 @@ export default function PortionScreen() {
   }, [food.id]);
 
   const servingGrams = selectedServing?.grams ?? 100;
-  const qty = parseFloat(quantity) || 0;
-  const multiplier = (servingGrams / 100) * qty;
+  const qty = parseFloat(quantity);
+  const multiplier = (servingGrams / 100) * (qty || 0);
   const preview = {
     calories: Math.round(food.calories_per_100g * multiplier * 10) / 10,
     protein_g: Math.round(food.protein_per_100g * multiplier * 10) / 10,
   };
 
-  async function handleLog() {
-    if (!qty || qty <= 0) return showAlert('Enter a valid quantity');
+  async function doLog() {
     setLogging(true);
     try {
       await addLogItem({
@@ -67,6 +66,22 @@ export default function PortionScreen() {
     } finally {
       setLogging(false);
     }
+  }
+
+  async function handleLog() {
+    if (isNaN(qty)) return showAlert('Enter a valid quantity');
+    if (qty === 0) {
+      showAlert(
+        'Log 0 quantity?',
+        'This will add the item with 0 calories and macros.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Log anyway', onPress: doLog },
+        ],
+      );
+      return;
+    }
+    doLog();
   }
 
   const unitLabel = food.liquid ? 'ml' : 'g';
