@@ -100,7 +100,7 @@ export default function CalendarScreen() {
   function dotColor(day: number): string | null {
     const cal = summaryMap[dateStr(day)];
     if (cal === undefined) return null;
-    return cal >= targetCal ? '#2D6A4F' : '#e74c3c';
+    return cal <= targetCal ? '#2D6A4F' : '#e74c3c';
   }
 
   function handleDayPress(day: number) {
@@ -181,11 +181,11 @@ export default function CalendarScreen() {
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: '#2D6A4F' }]} />
-          <Text style={styles.legendText}>Goal met</Text>
+          <Text style={styles.legendText}>Within goal</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: '#e74c3c' }]} />
-          <Text style={styles.legendText}>Logged, under goal</Text>
+          <Text style={styles.legendText}>Over goal</Text>
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: '#E5E5E5' }]} />
