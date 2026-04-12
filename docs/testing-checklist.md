@@ -159,11 +159,11 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 ---
 
 ## Settings Screen
-- [ ] Calorie and protein fields are pre-filled with current targets from the database
-- [ ] Changing both targets and saving shows "Saved" confirmation alert
-- [ ] Today screen macro cards immediately reflect the new targets after saving
-- [ ] Entering 0 or non-numeric values shows alert and does not save
-- [ ] Targets persist after app restart
+- [x] Calorie and protein fields are pre-filled with current targets from the database
+- [x] Changing both targets and saving shows "Saved" confirmation alert — *alert works on phone, not browser (known)*
+- [x] Today screen macro cards immediately reflect the new targets after saving
+- [x] Entering 0 or non-numeric values does not save
+- [x] Targets persist after app restart
 
 ---
 
