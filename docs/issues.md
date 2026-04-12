@@ -65,5 +65,5 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 
 ## New Issues Found During Barcode Re-test
 
-- [ ] **Manually created food is not matched when its barcode is later scanned** — if a user creates a food manually without a barcode, then later scans that product's barcode, the scanner creates a new Open Food Facts entry instead of linking to the existing manual entry. The two entries are not deduplicated.
+- [x] **Manually created food is not matched when its barcode is later scanned** — when "Create manually" is chosen after a not-found scan, the scanned barcode is now passed to CreateFoodScreen and stored with the food, so the next scan of the same barcode returns the manually created entry
 - [ ] **No food source indicator in the UI** — Portion Screen and search results don't show where a food came from (user-created, Open Food Facts, verified); should show the source and make clear that non-user foods are not editable

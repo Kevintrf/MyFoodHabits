@@ -119,6 +119,7 @@ export interface ServingDraft {
 
 export const createFood = (data: {
   name: string;
+  barcode?: string;
   calories_per_100g: number;
   protein_per_100g?: number;
   carbs_per_100g?: number;

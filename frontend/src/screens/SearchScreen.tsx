@@ -90,7 +90,7 @@ export default function SearchScreen() {
         'Not found',
         'This barcode isn\'t in the database yet.',
         [
-          { text: 'Create manually', onPress: () => navigation.navigate('CreateFood', {}) },
+          { text: 'Create manually', onPress: () => navigation.navigate('CreateFood', { barcode: data }) },
           { text: 'Try again', onPress: () => { setScannerBusy(false); setScannerOpen(true); } },
           { text: 'Cancel', style: 'cancel' },
         ],

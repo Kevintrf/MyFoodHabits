@@ -23,7 +23,7 @@ import { Food, Meal } from '../services/api';
 export type SearchStackParamList = {
   Search: undefined;
   Portion: { food: Food };
-  CreateFood: { initialName?: string };
+  CreateFood: { initialName?: string; barcode?: string };
   EditFood: { food: Food };
 };
 

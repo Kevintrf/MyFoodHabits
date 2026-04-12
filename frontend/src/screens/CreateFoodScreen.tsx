@@ -24,6 +24,7 @@ export default function CreateFoodScreen() {
   const navigation = useNavigation<NavProp>();
   const route = useRoute<RoutePropType>();
 
+  const barcode = route.params?.barcode;
   const [name, setName] = useState(route.params?.initialName ?? '');
   const [calories, setCalories] = useState('');
   const [protein, setProtein] = useState('');
@@ -99,6 +100,7 @@ export default function CreateFoodScreen() {
     try {
       const food = await createFood({
         name: name.trim(),
+        barcode,
         calories_per_100g: cal,
         protein_per_100g: parseFloat(protein) || 0,
         carbs_per_100g: parseFloat(carbs) || 0,
