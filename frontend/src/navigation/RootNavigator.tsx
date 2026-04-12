@@ -11,11 +11,12 @@ import SearchScreen from '../screens/SearchScreen';
 import PortionScreen from '../screens/PortionScreen';
 import MealsScreen from '../screens/MealsScreen';
 import CreateMealScreen from '../screens/CreateMealScreen';
+import EditMealScreen from '../screens/EditMealScreen';
 import WeightScreen from '../screens/WeightScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import CreateFoodScreen from '../screens/CreateFoodScreen';
 import EditFoodScreen from '../screens/EditFoodScreen';
-import { Food } from '../services/api';
+import { Food, Meal } from '../services/api';
 
 // --- Param list types ---
 
@@ -29,6 +30,7 @@ export type SearchStackParamList = {
 export type MealsStackParamList = {
   MealsList: undefined;
   CreateMeal: undefined;
+  EditMeal: { meal: Meal };
 };
 
 type RootTabParamList = {
@@ -73,6 +75,7 @@ function MealsStackNavigator() {
         })}
       />
       <MealsStack.Screen name="CreateMeal" component={CreateMealScreen} options={{ title: 'New Meal' }} />
+      <MealsStack.Screen name="EditMeal" component={EditMealScreen} options={{ title: 'Edit Meal' }} />
     </MealsStack.Navigator>
   );
 }

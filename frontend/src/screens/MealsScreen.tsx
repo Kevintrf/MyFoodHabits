@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,15 @@ import {
   RefreshControl,
   Modal,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { getMeals, logMeal, Meal, MealItem } from '../services/api';
 import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
+import { MealsStackParamList } from '../navigation/RootNavigator';
+
+type NavProp = NativeStackNavigationProp<MealsStackParamList, 'MealsList'>;
 
 const MEAL_SLOTS = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'] as const;
 const SCALES = [0.5, 1, 2] as const;
@@ -31,6 +37,7 @@ function calcMealMacros(items: MealItem[], scale: number) {
 }
 
 export default function MealsScreen() {
+  const navigation = useNavigation<NavProp>();
   const { todayDate, refreshTodayLog } = useApp();
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,9 +52,11 @@ export default function MealsScreen() {
     setMeals(data);
   }, []);
 
-  useEffect(() => {
-    fetchMeals().finally(() => setLoading(false));
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchMeals().finally(() => setLoading(false));
+    }, [fetchMeals]),
+  );
 
   async function onRefresh() {
     setRefreshing(true);
@@ -88,7 +97,10 @@ export default function MealsScreen() {
         renderItem={({ item }) => {
           const macros = calcMealMacros(item.items, 1);
           return (
-            <View style={styles.mealCard}>
+            <TouchableOpacity
+              style={styles.mealCard}
+              onPress={() => navigation.navigate('EditMeal', { meal: item })}
+            >
               <View style={styles.mealInfo}>
                 <Text style={styles.mealName}>{item.name}</Text>
                 <Text style={styles.mealMeta}>
@@ -105,7 +117,7 @@ export default function MealsScreen() {
               <TouchableOpacity style={styles.logBtn} onPress={() => openLogModal(item)}>
                 <Text style={styles.logBtnText}>Log</Text>
               </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           );
         }}
       />

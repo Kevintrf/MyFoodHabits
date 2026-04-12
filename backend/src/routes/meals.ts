@@ -79,6 +79,64 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// PATCH /meals/:id
+router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { name, items } = req.body;
+
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const { rows: [meal] } = await client.query('SELECT * FROM meals WHERE id = $1', [id]);
+      if (!meal) {
+        await client.query('ROLLBACK');
+        return res.status(404).json({ error: 'meal not found' });
+      }
+
+      const updatedName = name ?? meal.name;
+      const { rows: [updated] } = await client.query(
+        'UPDATE meals SET name = $1 WHERE id = $2 RETURNING *',
+        [updatedName, id],
+      );
+
+      if (items !== undefined) {
+        await client.query('DELETE FROM meal_items WHERE meal_id = $1', [id]);
+        for (const item of items as { food_id: number; serving_id?: number; quantity: number }[]) {
+          await client.query(
+            'INSERT INTO meal_items (meal_id, food_id, serving_id, quantity) VALUES ($1, $2, $3, $4)',
+            [id, item.food_id, item.serving_id ?? null, item.quantity],
+          );
+        }
+      }
+
+      await client.query('COMMIT');
+      return res.json(updated);
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /meals/:id
+router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM meal_items WHERE meal_id = $1', [id]);
+    const { rowCount } = await pool.query('DELETE FROM meals WHERE id = $1', [id]);
+    if (!rowCount) return res.status(404).json({ error: 'meal not found' });
+    return res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});
+
 // POST /meals/:id/log
 router.post('/:id/log', async (req: Request, res: Response, next: NextFunction) => {
   try {

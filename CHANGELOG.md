@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (2)
+
+### feat: edit and delete meals
+Added `EditMealScreen` — tap any meal card to open it. Pre-populates name and food list from the existing meal. Save changes via `PATCH /meals/:id` (replaces items in a transaction). Delete meal via `DELETE /meals/:id` with confirmation. Also fixed meals list not auto-refreshing after create/edit by switching to `useFocusEffect`.
+
+---
+
 ## 2026-04-12
 
 ### fix: cross-platform alert wrapper for web testing

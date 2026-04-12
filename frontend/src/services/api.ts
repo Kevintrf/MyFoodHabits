@@ -168,6 +168,14 @@ export const createMeal = (data: {
 export const logMeal = (mealId: number, date: string, meal_slot: string, scale: number = 1) =>
   request(`/meals/${mealId}/log`, { method: 'POST', body: JSON.stringify({ date, meal_slot, scale }) });
 
+export const editMeal = (mealId: number, data: {
+  name?: string;
+  items?: { food_id: number; serving_id?: number; quantity: number }[];
+}) => request<Meal>(`/meals/${mealId}`, { method: 'PATCH', body: JSON.stringify(data) });
+
+export const deleteMeal = (mealId: number) =>
+  request(`/meals/${mealId}`, { method: 'DELETE' });
+
 // --- Users ---
 
 export interface UserTargets {

@@ -7,7 +7,7 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 ## Bugs (broken behaviour)
 
 - [x] **Delete log item** — confirmed working on device; was failing in browser due to Alert not working on web (fixed by cross-platform alert wrapper)
-- [ ] **Meals list does not auto-refresh after creating a meal** — must pull-to-refresh manually to see the new meal
+- [x] **Meals list does not auto-refresh after creating a meal** — fixed with useFocusEffect to see the new meal
 - [ ] **Liquid foods show "g" instead of "ml" in multiple places:**
   - Create Food Screen: serving input hint text still says "grams" when liquid toggle is on
   - Portion Screen: custom servings show "(30g)" instead of "(30ml)"
@@ -17,7 +17,7 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 
 ## Missing Features
 
-- [ ] **No way to delete or edit a saved meal** — once created, a meal is permanent
+- [x] **No way to delete or edit a saved meal** — EditMealScreen added; tap a meal card to open it
 - [ ] **Meal items only support 100g base quantity** — no way to set a custom serving or gram amount per food when building a meal
 - [ ] **No accessible entry point to create a food without a search query** — the subtle "+ Create new food" button at the bottom of search results does not appear; needs a "+" button in the Search screen header (same pattern as Meals tab)
 - [ ] **Logging 0 quantity is blocked** — should be allowed (e.g. to track that you had something without knowing the exact amount); currently silently does nothing
