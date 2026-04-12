@@ -40,6 +40,17 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 
 ---
 
+## Deferred / Needs Design
+
+- [ ] **Food management screen** — a list of all user-created foods with the ability to delete them
+  - **Design consideration:** foods are immutable by design — old log entries reference their original food row, so deleting a food would orphan those log entries. Options to consider:
+    - Soft-delete: mark the food as deleted so it no longer appears in search, but log entries still resolve correctly
+    - Block delete if the food is referenced by any log entry or meal item; show which logs use it
+    - Allow delete only if the food has never been logged
+  - Hold until the approach is decided
+
+---
+
 ## New Issues Found During Barcode Re-test
 
 - [ ] **Manually created food is not matched when its barcode is later scanned** — if a user creates a food manually without a barcode, then later scans that product's barcode, the scanner creates a new Open Food Facts entry instead of linking to the existing manual entry. The two entries are not deduplicated.
