@@ -108,21 +108,26 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 ---
 
 ## Meals Screen
-- [ ] List shows all saved meals with name, item count, total kcal and protein
-- [ ] Each meal card lists its food items
-- [ ] Empty state "No saved meals yet." shows when none exist
-- [ ] Pull-to-refresh reloads the list
-- [ ] "+" button in header navigates to CreateMealScreen
-- [ ] Tapping "Log" opens the bottom-sheet modal
-- [ ] Modal shows the meal name, scale buttons (0.5×, 1×, 2×), macro preview, and slot selector
-- [ ] Scale buttons are mutually exclusive; selected scale is highlighted
-- [ ] Macro preview updates immediately when scale changes (0.5× shows half, 2× shows double)
-- [ ] Slot selector defaults to Breakfast; selecting another highlights it
-- [ ] Tapping "Log Meal" logs all items at the correct scale and slot; returns to list
-- [ ] Today screen immediately shows the meal items under the correct slot
-- [ ] At 2× scale, Today screen shows doubled quantities/macros
-- [ ] At 0.5× scale, Today screen shows halved quantities/macros
-- [ ] Cancel button dismisses the modal without logging
+- [x] List shows all saved meals with name, item count, total kcal and protein
+  - **BUG:** list does not auto-refresh after creating a meal — must pull-to-refresh manually
+- [x] Each meal card lists its food items
+- [x] Empty state "No saved meals yet." shows when none exist
+- [x] Pull-to-refresh reloads the list (workaround for above bug)
+- [x] "+" button in header navigates to CreateMealScreen
+- [x] Tapping "Log" opens the bottom-sheet modal
+  - **UX note:** this modal is well-received — consider using the same pattern elsewhere (e.g. edit log item)
+- [x] Modal shows the meal name, scale buttons (0.5×, 1×, 2×), macro preview, and slot selector
+- [x] Scale buttons are mutually exclusive; selected scale is highlighted
+- [x] Macro preview updates immediately when scale changes
+- [x] Slot selector defaults to Breakfast; selecting another highlights it
+- [x] Tapping "Log Meal" logs all items at correct scale and slot; returns to list
+  - **Future improvement:** show the meal as a named unit in Today's log (e.g. "My Breakfast × 1") rather than individual food items
+- [x] Today screen immediately shows the meal items under the correct slot
+- [x] At 2× scale, Today screen shows doubled quantities/macros
+- [x] At 0.5× scale, Today screen shows halved quantities/macros
+- [x] Cancel button dismisses the modal without logging
+- **Missing feature:** meal items only support the 100g base quantity — should support custom servings and gram/ml amounts
+- **Missing feature:** no way to remove or edit an existing meal
 
 ---
 
