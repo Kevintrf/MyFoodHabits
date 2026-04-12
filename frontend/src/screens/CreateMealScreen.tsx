@@ -176,7 +176,10 @@ export default function CreateMealScreen() {
               <View style={styles.resultLeft}>
                 <Text style={styles.resultName}>{food.name}</Text>
                 <Text style={styles.resultSub}>
-                  {food.calories_per_100g} kcal · {food.protein_per_100g}g Protein · {food.carbs_per_100g}g Carbs · {food.fat_per_100g}g Fat per 100{food.liquid ? 'ml' : 'g'}
+                  {food.calories_per_100g} kcal per 100{food.liquid ? 'ml' : 'g'}
+                </Text>
+                <Text style={styles.resultSub}>
+                  {food.protein_per_100g}g Protein · {food.carbs_per_100g}g Carbs · {food.fat_per_100g}g Fat
                 </Text>
               </View>
               <Text style={styles.addBtnText}>+ Add</Text>

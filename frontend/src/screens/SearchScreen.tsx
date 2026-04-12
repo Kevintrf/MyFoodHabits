@@ -129,7 +129,10 @@ export default function SearchScreen() {
             <View style={styles.resultLeft}>
               <Text style={styles.resultName}>{item.name}</Text>
               <Text style={styles.resultSub}>
-                {item.calories_per_100g} kcal · {item.protein_per_100g}g Protein · {item.carbs_per_100g}g Carbs · {item.fat_per_100g}g Fat per 100{item.liquid ? 'ml' : 'g'}
+                {item.calories_per_100g} kcal per 100{item.liquid ? 'ml' : 'g'}
+              </Text>
+              <Text style={styles.resultSub}>
+                {item.protein_per_100g}g Protein · {item.carbs_per_100g}g Carbs · {item.fat_per_100g}g Fat
               </Text>
             </View>
             <Text style={styles.chevron}>›</Text>
