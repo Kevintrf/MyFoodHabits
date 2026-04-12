@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (3)
+
+### fix: delete meal crashing with JSON parse error
+The request helper always called res.json() even on 204 No Content responses. Added a 204 check to return early without parsing.
+
+---
+
 ## 2026-04-12 (2)
 
 ### feat: edit and delete meals
