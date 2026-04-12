@@ -48,7 +48,12 @@ cd frontend && npx expo start --clear
 
 Scan the QR code with Expo Go on your phone.
 
-> **Tip:** If the app fails to load on your phone (e.g. "Failed to download remote update"), your firewall may be blocking Metro's port. Use tunnel mode as a fallback — it may need a couple of attempts to connect:
+> **Tip:** If the app fails to load on your phone (e.g. "Failed to download remote update"), UFW may be blocking Metro and the backend. Run once to open the ports:
+> ```bash
+> sudo ufw allow 3000/tcp
+> sudo ufw allow 8081/tcp
+> ```
+> As a fallback, tunnel mode also works (may need a couple of attempts):
 > ```bash
 > cd frontend && npx expo start --tunnel --clear
 > ```
