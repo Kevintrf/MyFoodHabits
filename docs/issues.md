@@ -29,8 +29,8 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 - [x] **Edit/delete log item requires long-press** — changed to single tap
 - [x] **Invalid inputs fail silently** — entering an invalid quantity (Portion Screen), invalid weight (Weight Screen), or invalid food values (Create Food) gives no feedback; confirmed working. Negative quantities/values are allowed but require confirmation.
 - [x] **Serving label in Today log should include grams** — now shows e.g. `1.5 × slice (45g)`
-- [ ] **No way to change the default serving** — must remove and re-add servings to reorder; should be able to mark any serving as default
-- [ ] **Food immutability causes duplicate search results** — editing a food creates a new version which appears as a separate entry in search; consider only showing the latest version per food
+- [x] **No way to change the default serving** — "Set default" button added in Create Food and Edit Food; servings sorted largest to smallest everywhere
+- [ ] **Food immutability causes duplicate search results** — editing a food creates a new version which appears as a separate entry in search; deferred — needs design decision on how to surface only the latest version without breaking log history references
 
 ---
 
