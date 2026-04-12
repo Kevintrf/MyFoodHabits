@@ -52,6 +52,16 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 
 ---
 
+## Phase 4 Features
+
+- [ ] **History / calendar view** — a calendar screen where each day is tappable to view that day's full log
+  - Day colour: green if kcal goal was met, red if logged but goal not met, grey if nothing was logged
+  - Tapping a day opens a read-only view of that day's log (slots + items + totals), same layout as Today
+  - Backend needs an endpoint to fetch a day log by date (may already exist via the today endpoint generalised to accept a date param)
+  - Consider where to put it in the tab bar — could replace or sit alongside the Today tab
+
+---
+
 ## New Issues Found During Barcode Re-test
 
 - [ ] **Manually created food is not matched when its barcode is later scanned** — if a user creates a food manually without a barcode, then later scans that product's barcode, the scanner creates a new Open Food Facts entry instead of linking to the existing manual entry. The two entries are not deduplicated.
