@@ -16,6 +16,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { searchFoods, getFoodByBarcode, getRecentFoods, Food } from '../services/api';
 import { SearchStackParamList } from '../navigation/RootNavigator';
+import { fmtNum } from '../utils/format';
 
 type NavProp = NativeStackNavigationProp<SearchStackParamList, 'Search'>;
 
@@ -129,10 +130,10 @@ export default function SearchScreen() {
             <View style={styles.resultLeft}>
               <Text style={styles.resultName}>{item.name}</Text>
               <Text style={styles.resultSub}>
-                {item.calories_per_100g} kcal per 100{item.liquid ? 'ml' : 'g'}
+                {fmtNum(item.calories_per_100g)} kcal per 100{item.liquid ? 'ml' : 'g'}
               </Text>
               <Text style={styles.resultSub}>
-                {item.protein_per_100g}g Protein · {item.carbs_per_100g}g Carbs · {item.fat_per_100g}g Fat
+                {fmtNum(item.protein_per_100g)}g Protein · {fmtNum(item.carbs_per_100g)}g Carbs · {fmtNum(item.fat_per_100g)}g Fat
               </Text>
             </View>
             <Text style={styles.chevron}>›</Text>

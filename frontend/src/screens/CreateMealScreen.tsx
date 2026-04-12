@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { searchFoods, createMeal, getFoodById, Food, FoodServing } from '../services/api';
 import { MealsStackParamList } from '../navigation/RootNavigator';
+import { fmtNum } from '../utils/format';
 
 type NavProp = NativeStackNavigationProp<MealsStackParamList, 'CreateMeal'>;
 
@@ -28,10 +29,10 @@ function calcItemMacros(item: DraftItem) {
   const grams = item.selectedServing ? item.selectedServing.grams : 100;
   const mult = (grams / 100) * item.quantity;
   return {
-    calories: Math.round(item.food.calories_per_100g * mult),
-    protein: Math.round(item.food.protein_per_100g * mult * 10) / 10,
-    carbs: Math.round(item.food.carbs_per_100g * mult * 10) / 10,
-    fat: Math.round(item.food.fat_per_100g * mult * 10) / 10,
+    calories: Math.round(parseFloat(String(item.food.calories_per_100g)) * mult),
+    protein: Math.round(parseFloat(String(item.food.protein_per_100g)) * mult * 10) / 10,
+    carbs: Math.round(parseFloat(String(item.food.carbs_per_100g)) * mult * 10) / 10,
+    fat: Math.round(parseFloat(String(item.food.fat_per_100g)) * mult * 10) / 10,
   };
 }
 
@@ -176,10 +177,10 @@ export default function CreateMealScreen() {
               <View style={styles.resultLeft}>
                 <Text style={styles.resultName}>{food.name}</Text>
                 <Text style={styles.resultSub}>
-                  {food.calories_per_100g} kcal per 100{food.liquid ? 'ml' : 'g'}
+                  {fmtNum(food.calories_per_100g)} kcal per 100{food.liquid ? 'ml' : 'g'}
                 </Text>
                 <Text style={styles.resultSub}>
-                  {food.protein_per_100g}g Protein · {food.carbs_per_100g}g Carbs · {food.fat_per_100g}g Fat
+                  {fmtNum(food.protein_per_100g)}g Protein · {fmtNum(food.carbs_per_100g)}g Carbs · {fmtNum(food.fat_per_100g)}g Fat
                 </Text>
               </View>
               <Text style={styles.addBtnText}>+ Add</Text>
@@ -189,7 +190,7 @@ export default function CreateMealScreen() {
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Total</Text>
               <Text style={styles.totalMacros}>
-                {totalMacros.calories} kcal · {totalMacros.protein}g Protein · {totalMacros.carbs}g Carbs · {totalMacros.fat}g Fat
+                {fmtNum(totalMacros.calories)} kcal · {fmtNum(totalMacros.protein)}g Protein · {fmtNum(totalMacros.carbs)}g Carbs · {fmtNum(totalMacros.fat)}g Fat
               </Text>
             </View>
           )}
@@ -204,7 +205,7 @@ export default function CreateMealScreen() {
               <View style={styles.draftLeft}>
                 <Text style={styles.draftName}>{item.food.name}</Text>
                 <Text style={styles.draftSub}>
-                  {item.food.calories_per_100g} kcal · {item.food.protein_per_100g}g Protein · {item.food.carbs_per_100g}g Carbs · {item.food.fat_per_100g}g Fat per 100{item.food.liquid ? 'ml' : 'g'}
+                  {fmtNum(item.food.calories_per_100g)} kcal · {fmtNum(item.food.protein_per_100g)}g Protein · {fmtNum(item.food.carbs_per_100g)}g Carbs · {fmtNum(item.food.fat_per_100g)}g Fat per 100{item.food.liquid ? 'ml' : 'g'}
                 </Text>
               </View>
               <View style={styles.qtyRow}>
@@ -244,7 +245,7 @@ export default function CreateMealScreen() {
               </View>
             )}
             <Text style={styles.itemMacros}>
-              {macros.calories} kcal · {macros.protein}g Protein · {macros.carbs}g Carbs · {macros.fat}g Fat
+              {fmtNum(macros.calories)} kcal · {fmtNum(macros.protein)}g Protein · {fmtNum(macros.carbs)}g Carbs · {fmtNum(macros.fat)}g Fat
             </Text>
           </View>
         );

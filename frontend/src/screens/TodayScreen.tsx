@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
 import { LogItem, deleteLogItem, updateLogItem } from '../services/api';
+import { fmtNum } from '../utils/format';
 
 const MEAL_SLOTS = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
 
@@ -122,8 +123,8 @@ export default function TodayScreen() {
                       <Text style={styles.logItemSub}>{portionLabel}</Text>
                     </View>
                     <View style={styles.logItemRight}>
-                      <Text style={styles.logItemCal}>{item.macros.calories} kcal</Text>
-                      <Text style={styles.logItemPro}>{item.macros.protein_g}g Protein · {item.macros.carbs_g}g Carbs · {item.macros.fat_g}g Fat</Text>
+                      <Text style={styles.logItemCal}>{fmtNum(item.macros.calories)} kcal</Text>
+                      <Text style={styles.logItemPro}>{fmtNum(item.macros.protein_g)}g Protein · {fmtNum(item.macros.carbs_g)}g Carbs · {fmtNum(item.macros.fat_g)}g Fat</Text>
                     </View>
                   </TouchableOpacity>
                 );

@@ -16,6 +16,7 @@ import { getMeals, logMeal, Meal, MealItem } from '../services/api';
 import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
 import { MealsStackParamList } from '../navigation/RootNavigator';
+import { fmtNum } from '../utils/format';
 
 type NavProp = NativeStackNavigationProp<MealsStackParamList, 'MealsList'>;
 
@@ -28,10 +29,10 @@ function calcMealMacros(items: MealItem[], scale: number) {
       const grams = item.serving_grams ?? 100;
       const mult = (grams / 100) * item.quantity * scale;
       return {
-        calories: acc.calories + item.calories_per_100g * mult,
-        protein_g: acc.protein_g + item.protein_per_100g * mult,
-        carbs_g: acc.carbs_g + item.carbs_per_100g * mult,
-        fat_g: acc.fat_g + item.fat_per_100g * mult,
+        calories: acc.calories + parseFloat(String(item.calories_per_100g)) * mult,
+        protein_g: acc.protein_g + parseFloat(String(item.protein_per_100g)) * mult,
+        carbs_g: acc.carbs_g + parseFloat(String(item.carbs_per_100g)) * mult,
+        fat_g: acc.fat_g + parseFloat(String(item.fat_per_100g)) * mult,
       };
     },
     { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
@@ -106,7 +107,7 @@ export default function MealsScreen() {
               <View style={styles.mealInfo}>
                 <Text style={styles.mealName}>{item.name}</Text>
                 <Text style={styles.mealMeta}>
-                  {item.items.length} items · {Math.round(macros.calories)} kcal · {Math.round(macros.protein_g)}g Protein · {Math.round(macros.carbs_g)}g Carbs · {Math.round(macros.fat_g)}g Fat
+                  {item.items.length} items · {fmtNum(Math.round(macros.calories))} kcal · {fmtNum(Math.round(macros.protein_g))}g Protein · {fmtNum(Math.round(macros.carbs_g))}g Carbs · {fmtNum(Math.round(macros.fat_g))}g Fat
                 </Text>
                 {item.items.map((mi) => (
                   <Text key={mi.id} style={styles.mealItemLine}>
@@ -151,7 +152,7 @@ export default function MealsScreen() {
             {previewMacros && (
               <View style={styles.preview}>
                 <Text style={styles.previewText}>
-                  {Math.round(previewMacros.calories)} kcal · {Math.round(previewMacros.protein_g)}g Protein · {Math.round(previewMacros.carbs_g)}g Carbs · {Math.round(previewMacros.fat_g)}g Fat
+                  {fmtNum(Math.round(previewMacros.calories))} kcal · {fmtNum(Math.round(previewMacros.protein_g))}g Protein · {fmtNum(Math.round(previewMacros.carbs_g))}g Carbs · {fmtNum(Math.round(previewMacros.fat_g))}g Fat
                 </Text>
               </View>
             )}
