@@ -15,7 +15,7 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 ## Missing Features
 
 - [x] **No way to delete or edit a saved meal** — EditMealScreen added; tap a meal card to open it
-- [ ] **Meal items only support 100g base quantity** — no way to set a custom serving or gram amount per food when building a meal
+- [x] **Meal items only support 100g base quantity** — serving chips now appear in Create/Edit Meal for foods that have custom servings
 - [x] **No accessible entry point to create a food** — added "+" button in Search screen header; removed the inline create buttons from results list
 - [x] **Logging 0 quantity** — now allowed with a confirmation alert warning that 0 calories/macros will be logged
 - [x] **Saving a food with 0 calories** — works correctly; 0 is allowed, negative and non-numeric values are blocked

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { searchFoods, editMeal, deleteMeal, Food } from '../services/api';
+import { searchFoods, editMeal, deleteMeal, getFoodById, Food, FoodServing } from '../services/api';
 import { showAlert } from '../utils/alert';
 import { MealsStackParamList } from '../navigation/RootNavigator';
 
@@ -20,6 +20,8 @@ type RouteType = RouteProp<MealsStackParamList, 'EditMeal'>;
 interface DraftItem {
   food: Food;
   quantity: number;
+  servings: FoodServing[];
+  selectedServing: FoodServing | null;
 }
 
 export default function EditMealScreen() {
@@ -49,8 +51,34 @@ export default function EditMealScreen() {
         barcode: null,
       },
       quantity: mi.quantity,
+      servings: [],
+      selectedServing: mi.serving_id
+        ? { id: mi.serving_id, food_id: mi.food_id, name: mi.serving_name!, grams: mi.serving_grams!, is_default: false }
+        : null,
     })),
   );
+
+  // Fetch all servings for existing items on mount
+  useEffect(() => {
+    meal.items.forEach(async (mi) => {
+      try {
+        const detail = await getFoodById(mi.food_id);
+        setDraftItems((prev) =>
+          prev.map((i) =>
+            i.food.id === mi.food_id
+              ? {
+                  ...i,
+                  servings: detail.servings,
+                  selectedServing: detail.servings.find((s) => s.id === mi.serving_id) ?? i.selectedServing,
+                }
+              : i,
+          ),
+        );
+      } catch {
+        // servings stay empty
+      }
+    });
+  }, []);
 
   function handleSearchChange(text: string) {
     setSearchQuery(text);
@@ -70,16 +98,35 @@ export default function EditMealScreen() {
     }, 250);
   }
 
-  function addFood(food: Food) {
+  async function addFood(food: Food) {
+    setSearchQuery('');
+    setSearchResults([]);
     setDraftItems((prev) => {
       const existing = prev.find((i) => i.food.id === food.id);
       if (existing) {
         return prev.map((i) => (i.food.id === food.id ? { ...i, quantity: i.quantity + 1 } : i));
       }
-      return [...prev, { food, quantity: 1 }];
+      return [...prev, { food, quantity: 1, servings: [], selectedServing: null }];
     });
-    setSearchQuery('');
-    setSearchResults([]);
+    try {
+      const detail = await getFoodById(food.id);
+      const defaultServing = detail.servings.find((s) => s.is_default) ?? detail.servings[0] ?? null;
+      setDraftItems((prev) =>
+        prev.map((i) =>
+          i.food.id === food.id
+            ? { ...i, servings: detail.servings, selectedServing: defaultServing }
+            : i,
+        ),
+      );
+    } catch {
+      // servings stay empty
+    }
+  }
+
+  function selectServing(foodId: number, serving: FoodServing | null) {
+    setDraftItems((prev) =>
+      prev.map((i) => (i.food.id === foodId ? { ...i, selectedServing: serving } : i)),
+    );
   }
 
   function adjustQty(foodId: number, delta: number) {
@@ -107,7 +154,11 @@ export default function EditMealScreen() {
     try {
       await editMeal(meal.id, {
         name: mealName.trim(),
-        items: draftItems.map((i) => ({ food_id: i.food.id, quantity: i.quantity })),
+        items: draftItems.map((i) => ({
+          food_id: i.food.id,
+          quantity: i.quantity,
+          serving_id: i.selectedServing?.id,
+        })),
       });
       navigation.goBack();
     } catch (e) {
@@ -188,25 +239,49 @@ export default function EditMealScreen() {
       }
       renderItem={({ item }) => (
         <View style={styles.draftItem}>
-          <View style={styles.draftLeft}>
-            <Text style={styles.draftName}>{item.food.name}</Text>
-            <Text style={styles.draftSub}>
-              ×{item.quantity} · {item.food.calories_per_100g} kcal per 100
-              {item.food.liquid ? 'ml' : 'g'}
-            </Text>
+          <View style={styles.draftTop}>
+            <View style={styles.draftLeft}>
+              <Text style={styles.draftName}>{item.food.name}</Text>
+              <Text style={styles.draftSub}>
+                {item.food.calories_per_100g} kcal per 100{item.food.liquid ? 'ml' : 'g'}
+              </Text>
+            </View>
+            <View style={styles.qtyRow}>
+              <TouchableOpacity onPress={() => adjustQty(item.food.id, -1)} style={styles.qtyBtn}>
+                <Text style={styles.qtyBtnText}>−</Text>
+              </TouchableOpacity>
+              <Text style={styles.qtyValue}>{item.quantity}</Text>
+              <TouchableOpacity onPress={() => adjustQty(item.food.id, 1)} style={styles.qtyBtn}>
+                <Text style={styles.qtyBtnText}>+</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => removeItem(item.food.id)} style={styles.removeBtn}>
+                <Text style={styles.removeBtnText}>✕</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.qtyRow}>
-            <TouchableOpacity onPress={() => adjustQty(item.food.id, -1)} style={styles.qtyBtn}>
-              <Text style={styles.qtyBtnText}>−</Text>
-            </TouchableOpacity>
-            <Text style={styles.qtyValue}>{item.quantity}</Text>
-            <TouchableOpacity onPress={() => adjustQty(item.food.id, 1)} style={styles.qtyBtn}>
-              <Text style={styles.qtyBtnText}>+</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => removeItem(item.food.id)} style={styles.removeBtn}>
-              <Text style={styles.removeBtnText}>✕</Text>
-            </TouchableOpacity>
-          </View>
+          {item.servings.length > 0 && (
+            <View style={styles.servingChips}>
+              <TouchableOpacity
+                style={[styles.chip, !item.selectedServing && styles.chipActive]}
+                onPress={() => selectServing(item.food.id, null)}
+              >
+                <Text style={[styles.chipText, !item.selectedServing && styles.chipTextActive]}>
+                  100{item.food.liquid ? 'ml' : 'g'}
+                </Text>
+              </TouchableOpacity>
+              {item.servings.map((s) => (
+                <TouchableOpacity
+                  key={s.id}
+                  style={[styles.chip, item.selectedServing?.id === s.id && styles.chipActive]}
+                  onPress={() => selectServing(item.food.id, s)}
+                >
+                  <Text style={[styles.chipText, item.selectedServing?.id === s.id && styles.chipTextActive]}>
+                    {s.name} ({s.grams}{item.food.liquid ? 'ml' : 'g'})
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
       )}
       ListEmptyComponent={
@@ -287,17 +362,28 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   draftItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#fff',
     marginHorizontal: 16,
     marginBottom: 8,
     borderRadius: 10,
     padding: 12,
   },
+  draftTop: { flexDirection: 'row', alignItems: 'center' },
   draftLeft: { flex: 1 },
   draftName: { fontSize: 15, fontWeight: '500', color: '#1A1A1A' },
   draftSub: { fontSize: 12, color: '#999', marginTop: 2 },
+  servingChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
+  chip: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    backgroundColor: '#F9F9F9',
+  },
+  chipActive: { borderColor: '#2D6A4F', backgroundColor: '#F0FAF4' },
+  chipText: { fontSize: 12, color: '#666' },
+  chipTextActive: { color: '#2D6A4F', fontWeight: '600' },
   qtyRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   qtyBtn: {
     width: 30,

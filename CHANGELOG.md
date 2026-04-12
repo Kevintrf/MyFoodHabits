@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (11)
+
+### feat: custom serving selection in Create and Edit Meal
+Foods with custom servings now show serving chips (e.g. "slice (30g)") in the meal builder. The default serving is pre-selected when adding a food. Serving is saved to the meal item and used in macro calculations.
+
+---
+
 ## 2026-04-12 (10)
 
 ### fix: today edit modal appears instantly and closes on outside tap
