@@ -18,7 +18,7 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 - [ ] **Meal items only support 100g base quantity** — no way to set a custom serving or gram amount per food when building a meal
 - [x] **No accessible entry point to create a food** — added "+" button in Search screen header; removed the inline create buttons from results list
 - [x] **Logging 0 quantity** — now allowed with a confirmation alert warning that 0 calories/macros will be logged
-- [ ] **Saving a food with 0 calories is blocked** — should be allowed, but warn the user before proceeding (e.g. "Calories are 0 — continue?")
+- [x] **Saving a food with 0 calories** — works correctly; 0 is allowed, negative and non-numeric values are blocked
 
 ---
 
