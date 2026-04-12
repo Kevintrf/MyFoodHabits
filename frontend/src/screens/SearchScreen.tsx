@@ -91,7 +91,6 @@ export default function SearchScreen() {
   }
 
   const isSearching = query.trim() !== '';
-  const noResults = !loading && isSearching && results.length === 0;
   const listData: Food[] = isSearching ? results : recentFoods;
 
   return (
@@ -140,29 +139,13 @@ export default function SearchScreen() {
         ListEmptyComponent={
           !loading ? (
             isSearching ? (
-              <Text style={styles.empty}>No results for "{query}"</Text>
+              <Text style={styles.empty}>No results for "{query.trim()}"</Text>
             ) : (
               <Text style={styles.placeholder}>Search for a food to log it</Text>
             )
           ) : null
         }
-        ListFooterComponent={
-          noResults ? (
-            <TouchableOpacity
-              style={styles.createBtnProminent}
-              onPress={() => navigation.navigate('CreateFood', { initialName: query.trim() })}
-            >
-              <Text style={styles.createBtnProminentText}>+ Create "{query.trim()}"</Text>
-            </TouchableOpacity>
-          ) : results.length > 0 ? (
-            <TouchableOpacity
-              style={styles.createBtn}
-              onPress={() => navigation.navigate('CreateFood', { initialName: query.trim() })}
-            >
-              <Text style={styles.createBtnText}>+ Create new food</Text>
-            </TouchableOpacity>
-          ) : null
-        }
+        ListFooterComponent={null}
       />
 
       {/* Barcode scanner modal */}
@@ -231,24 +214,6 @@ const styles = StyleSheet.create({
   resultName: { fontSize: 16, fontWeight: '500', color: '#1A1A1A' },
   resultSub: { fontSize: 13, color: '#999', marginTop: 3 },
   chevron: { fontSize: 22, color: '#ccc', marginLeft: 8 },
-  createBtn: {
-    margin: 12,
-    marginTop: 6,
-    padding: 14,
-    alignItems: 'center',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#2D6A4F',
-  },
-  createBtnText: { color: '#2D6A4F', fontSize: 15, fontWeight: '600' },
-  createBtnProminent: {
-    margin: 16,
-    backgroundColor: '#2D6A4F',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-  },
-  createBtnProminentText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   // Scanner
   scannerContainer: { flex: 1, backgroundColor: '#000' },
   scannerOverlay: {

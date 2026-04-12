@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (7)
+
+### feat: add + button to Search header, remove inline create food buttons
+Added a "+" button in the Search screen header (same pattern as Meals). Removed the "Create X" and "Create new food" inline buttons from the results list.
+
+---
+
 ## 2026-04-12 (6)
 
 ### fix: search screen not scrollable

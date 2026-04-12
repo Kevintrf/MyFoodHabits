@@ -48,7 +48,21 @@ const MealsStack = createNativeStackNavigator<MealsStackParamList>();
 function SearchStackNavigator() {
   return (
     <SearchStack.Navigator>
-      <SearchStack.Screen name="Search" component={SearchScreen} options={{ title: 'Search Foods' }} />
+      <SearchStack.Screen
+        name="Search"
+        component={SearchScreen}
+        options={({ navigation }) => ({
+          title: 'Search Foods',
+          headerRight: () => (
+            <Ionicons
+              name="add"
+              size={26}
+              color="#2D6A4F"
+              onPress={() => navigation.navigate('CreateFood', {})}
+            />
+          ),
+        })}
+      />
       <SearchStack.Screen name="Portion" component={PortionScreen} options={{ title: 'Log Food' }} />
       <SearchStack.Screen name="CreateFood" component={CreateFoodScreen} options={{ title: 'New Food' }} />
       <SearchStack.Screen name="EditFood" component={EditFoodScreen} options={{ title: 'Edit Food' }} />

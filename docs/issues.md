@@ -16,7 +16,7 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 
 - [x] **No way to delete or edit a saved meal** — EditMealScreen added; tap a meal card to open it
 - [ ] **Meal items only support 100g base quantity** — no way to set a custom serving or gram amount per food when building a meal
-- [ ] **No accessible entry point to create a food without a search query** — the subtle "+ Create new food" button at the bottom of search results does not appear; needs a "+" button in the Search screen header (same pattern as Meals tab)
+- [x] **No accessible entry point to create a food** — added "+" button in Search screen header; removed the inline create buttons from results list
 - [ ] **Logging 0 quantity is blocked** — should be allowed (e.g. to track that you had something without knowing the exact amount); currently silently does nothing
 - [ ] **Saving a food with 0 calories is blocked** — should be allowed, but warn the user before proceeding (e.g. "Calories are 0 — continue?")
 
