@@ -139,7 +139,7 @@ export default function TodayScreen() {
 
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => navigation.navigate('SearchTab')}
+          onPress={() => navigation.navigate('SearchTab', { screen: 'Search' })}
         >
           <Text style={styles.addButtonText}>+ Add Food</Text>
         </TouchableOpacity>
