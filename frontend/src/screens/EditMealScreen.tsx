@@ -18,10 +18,22 @@ type NavProp = NativeStackNavigationProp<MealsStackParamList, 'EditMeal'>;
 type RouteType = RouteProp<MealsStackParamList, 'EditMeal'>;
 
 interface DraftItem {
+  draftId: number;
   food: Food;
   quantity: number;
   servings: FoodServing[];
   selectedServing: FoodServing | null;
+}
+
+function calcItemMacros(item: DraftItem) {
+  const grams = item.selectedServing ? item.selectedServing.grams : 100;
+  const mult = (grams / 100) * item.quantity;
+  return {
+    calories: Math.round(item.food.calories_per_100g * mult),
+    protein: Math.round(item.food.protein_per_100g * mult * 10) / 10,
+    carbs: Math.round(item.food.carbs_per_100g * mult * 10) / 10,
+    fat: Math.round(item.food.fat_per_100g * mult * 10) / 10,
+  };
 }
 
 export default function EditMealScreen() {
@@ -36,9 +48,12 @@ export default function EditMealScreen() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Existing items use their index as draftId; new items start from meal.items.length
+  const nextDraftId = useRef(meal.items.length);
 
   const [draftItems, setDraftItems] = useState<DraftItem[]>(
-    meal.items.map((mi) => ({
+    meal.items.map((mi, index) => ({
+      draftId: index,
       food: {
         id: mi.food_id,
         name: mi.food_name,
@@ -58,14 +73,27 @@ export default function EditMealScreen() {
     })),
   );
 
+  const totalMacros = draftItems.reduce(
+    (acc, item) => {
+      const m = calcItemMacros(item);
+      return {
+        calories: acc.calories + m.calories,
+        protein: Math.round((acc.protein + m.protein) * 10) / 10,
+        carbs: Math.round((acc.carbs + m.carbs) * 10) / 10,
+        fat: Math.round((acc.fat + m.fat) * 10) / 10,
+      };
+    },
+    { calories: 0, protein: 0, carbs: 0, fat: 0 },
+  );
+
   // Fetch all servings for existing items on mount
   useEffect(() => {
-    meal.items.forEach(async (mi) => {
+    meal.items.forEach(async (mi, index) => {
       try {
         const detail = await getFoodById(mi.food_id);
         setDraftItems((prev) =>
           prev.map((i) =>
-            i.food.id === mi.food_id
+            i.draftId === index
               ? {
                   ...i,
                   servings: detail.servings,
@@ -101,19 +129,14 @@ export default function EditMealScreen() {
   async function addFood(food: Food) {
     setSearchQuery('');
     setSearchResults([]);
-    setDraftItems((prev) => {
-      const existing = prev.find((i) => i.food.id === food.id);
-      if (existing) {
-        return prev.map((i) => (i.food.id === food.id ? { ...i, quantity: i.quantity + 1 } : i));
-      }
-      return [...prev, { food, quantity: 1, servings: [], selectedServing: null }];
-    });
+    const draftId = nextDraftId.current++;
+    setDraftItems((prev) => [...prev, { draftId, food, quantity: 1, servings: [], selectedServing: null }]);
     try {
       const detail = await getFoodById(food.id);
       const defaultServing = detail.servings.find((s) => s.is_default) ?? detail.servings[0] ?? null;
       setDraftItems((prev) =>
         prev.map((i) =>
-          i.food.id === food.id
+          i.draftId === draftId
             ? { ...i, servings: detail.servings, selectedServing: defaultServing }
             : i,
         ),
@@ -123,22 +146,22 @@ export default function EditMealScreen() {
     }
   }
 
-  function selectServing(foodId: number, serving: FoodServing | null) {
+  function selectServing(draftId: number, serving: FoodServing | null) {
     setDraftItems((prev) =>
-      prev.map((i) => (i.food.id === foodId ? { ...i, selectedServing: serving } : i)),
+      prev.map((i) => (i.draftId === draftId ? { ...i, selectedServing: serving } : i)),
     );
   }
 
-  function adjustQty(foodId: number, delta: number) {
+  function adjustQty(draftId: number, delta: number) {
     setDraftItems((prev) =>
       prev.map((i) =>
-        i.food.id === foodId ? { ...i, quantity: Math.max(0, i.quantity + delta) } : i,
+        i.draftId === draftId ? { ...i, quantity: Math.max(0, i.quantity + delta) } : i,
       ),
     );
   }
 
-  function removeItem(foodId: number) {
-    setDraftItems((prev) => prev.filter((i) => i.food.id !== foodId));
+  function removeItem(draftId: number) {
+    setDraftItems((prev) => prev.filter((i) => i.draftId !== draftId));
   }
 
   async function handleSave() {
@@ -197,7 +220,7 @@ export default function EditMealScreen() {
     <FlatList
       style={styles.container}
       data={draftItems}
-      keyExtractor={(item) => String(item.food.id)}
+      keyExtractor={(item) => String(item.draftId)}
       keyboardShouldPersistTaps="handled"
       ListHeaderComponent={
         <View>
@@ -237,53 +260,59 @@ export default function EditMealScreen() {
           {draftItems.length > 0 && <Text style={styles.sectionLabel}>Foods in this meal</Text>}
         </View>
       }
-      renderItem={({ item }) => (
-        <View style={styles.draftItem}>
-          <View style={styles.draftTop}>
-            <View style={styles.draftLeft}>
-              <Text style={styles.draftName}>{item.food.name}</Text>
-              <Text style={styles.draftSub}>
-                {item.food.calories_per_100g} kcal per 100{item.food.liquid ? 'ml' : 'g'}
-              </Text>
-            </View>
-            <View style={styles.qtyRow}>
-              <TouchableOpacity onPress={() => adjustQty(item.food.id, -1)} style={styles.qtyBtn}>
-                <Text style={styles.qtyBtnText}>−</Text>
-              </TouchableOpacity>
-              <Text style={styles.qtyValue}>{item.quantity}</Text>
-              <TouchableOpacity onPress={() => adjustQty(item.food.id, 1)} style={styles.qtyBtn}>
-                <Text style={styles.qtyBtnText}>+</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => removeItem(item.food.id)} style={styles.removeBtn}>
-                <Text style={styles.removeBtnText}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          {item.servings.length > 0 && (
-            <View style={styles.servingChips}>
-              <TouchableOpacity
-                style={[styles.chip, !item.selectedServing && styles.chipActive]}
-                onPress={() => selectServing(item.food.id, null)}
-              >
-                <Text style={[styles.chipText, !item.selectedServing && styles.chipTextActive]}>
-                  100{item.food.liquid ? 'ml' : 'g'}
+      renderItem={({ item }) => {
+        const macros = calcItemMacros(item);
+        return (
+          <View style={styles.draftItem}>
+            <View style={styles.draftTop}>
+              <View style={styles.draftLeft}>
+                <Text style={styles.draftName}>{item.food.name}</Text>
+                <Text style={styles.draftSub}>
+                  {item.food.calories_per_100g} kcal per 100{item.food.liquid ? 'ml' : 'g'}
                 </Text>
-              </TouchableOpacity>
-              {item.servings.map((s) => (
+              </View>
+              <View style={styles.qtyRow}>
+                <TouchableOpacity onPress={() => adjustQty(item.draftId, -1)} style={styles.qtyBtn}>
+                  <Text style={styles.qtyBtnText}>−</Text>
+                </TouchableOpacity>
+                <Text style={styles.qtyValue}>{item.quantity}</Text>
+                <TouchableOpacity onPress={() => adjustQty(item.draftId, 1)} style={styles.qtyBtn}>
+                  <Text style={styles.qtyBtnText}>+</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => removeItem(item.draftId)} style={styles.removeBtn}>
+                  <Text style={styles.removeBtnText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            {item.servings.length > 0 && (
+              <View style={styles.servingChips}>
                 <TouchableOpacity
-                  key={s.id}
-                  style={[styles.chip, item.selectedServing?.id === s.id && styles.chipActive]}
-                  onPress={() => selectServing(item.food.id, s)}
+                  style={[styles.chip, !item.selectedServing && styles.chipActive]}
+                  onPress={() => selectServing(item.draftId, null)}
                 >
-                  <Text style={[styles.chipText, item.selectedServing?.id === s.id && styles.chipTextActive]}>
-                    {s.name} ({s.grams}{item.food.liquid ? 'ml' : 'g'})
+                  <Text style={[styles.chipText, !item.selectedServing && styles.chipTextActive]}>
+                    100{item.food.liquid ? 'ml' : 'g'}
                   </Text>
                 </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </View>
-      )}
+                {item.servings.map((s) => (
+                  <TouchableOpacity
+                    key={s.id}
+                    style={[styles.chip, item.selectedServing?.id === s.id && styles.chipActive]}
+                    onPress={() => selectServing(item.draftId, s)}
+                  >
+                    <Text style={[styles.chipText, item.selectedServing?.id === s.id && styles.chipTextActive]}>
+                      {s.name} ({s.grams}{item.food.liquid ? 'ml' : 'g'})
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+            <Text style={styles.itemMacros}>
+              {macros.calories} kcal · {macros.protein}g P · {macros.carbs}g C · {macros.fat}g F
+            </Text>
+          </View>
+        );
+      }}
       ListEmptyComponent={
         searchQuery.trim() === '' ? (
           <Text style={styles.emptyHint}>Search for foods above to build your meal.</Text>
@@ -291,6 +320,14 @@ export default function EditMealScreen() {
       }
       ListFooterComponent={
         <View>
+          {draftItems.length > 0 && (
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalMacros}>
+                {totalMacros.calories} kcal · {totalMacros.protein}g P · {totalMacros.carbs}g C · {totalMacros.fat}g F
+              </Text>
+            </View>
+          )}
           <TouchableOpacity
             style={[styles.saveBtn, draftItems.length === 0 && styles.saveBtnDisabled]}
             onPress={handleSave}
@@ -384,6 +421,7 @@ const styles = StyleSheet.create({
   chipActive: { borderColor: '#2D6A4F', backgroundColor: '#F0FAF4' },
   chipText: { fontSize: 12, color: '#666' },
   chipTextActive: { color: '#2D6A4F', fontWeight: '600' },
+  itemMacros: { fontSize: 12, color: '#2D6A4F', marginTop: 6 },
   qtyRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   qtyBtn: {
     width: 30,
@@ -398,9 +436,22 @@ const styles = StyleSheet.create({
   removeBtn: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
   removeBtnText: { fontSize: 14, color: '#999' },
   emptyHint: { textAlign: 'center', color: '#bbb', marginTop: 40, fontSize: 14 },
+  totalRow: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  totalLabel: { fontSize: 13, fontWeight: '700', color: '#1A1A1A' },
+  totalMacros: { fontSize: 13, fontWeight: '600', color: '#2D6A4F' },
   saveBtn: {
     margin: 16,
-    marginTop: 24,
+    marginTop: 12,
     backgroundColor: '#2D6A4F',
     borderRadius: 12,
     padding: 16,

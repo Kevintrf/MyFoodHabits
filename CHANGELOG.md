@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (13)
+
+### feat: duplicate food items and macro totals in meal builder
+Create Meal and Edit Meal now allow adding the same food multiple times as separate entries. Each food item shows its computed macros (calories, protein, carbs, fat) based on quantity and selected serving. A total macro row is shown above the save button.
+
+---
+
 ## 2026-04-12 (12)
 
 ### fix: edit meal quantity NaN and allow 0 quantity
