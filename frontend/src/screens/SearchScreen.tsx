@@ -8,8 +8,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   Modal,
-  Alert,
 } from 'react-native';
+import { showAlert } from '../utils/alert';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -61,7 +61,7 @@ export default function SearchScreen() {
     if (!cameraPermission?.granted) {
       const result = await requestCameraPermission();
       if (!result.granted) {
-        Alert.alert('Camera access needed', 'Enable camera permission in settings to scan barcodes.');
+        showAlert('Camera access needed', 'Enable camera permission in settings to scan barcodes.');
         return;
       }
     }
@@ -78,7 +78,7 @@ export default function SearchScreen() {
       const food = await getFoodByBarcode(data);
       navigation.navigate('Portion', { food });
     } catch {
-      Alert.alert(
+      showAlert(
         'Not found',
         'This barcode isn\'t in the database yet.',
         [

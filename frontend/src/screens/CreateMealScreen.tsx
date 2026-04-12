@@ -6,9 +6,9 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
+import { showAlert } from '../utils/alert';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { searchFoods, createMeal, Food } from '../services/api';
@@ -75,11 +75,11 @@ export default function CreateMealScreen() {
 
   async function handleSave() {
     if (!mealName.trim()) {
-      Alert.alert('Name required', 'Please give your meal a name.');
+      showAlert('Name required', 'Please give your meal a name.');
       return;
     }
     if (draftItems.length === 0) {
-      Alert.alert('No foods added', 'Add at least one food to the meal.');
+      showAlert('No foods added', 'Add at least one food to the meal.');
       return;
     }
     setSaving(true);
@@ -90,7 +90,7 @@ export default function CreateMealScreen() {
       });
       navigation.goBack();
     } catch (e) {
-      Alert.alert('Error', e instanceof Error ? e.message : 'Something went wrong');
+      showAlert('Error', e instanceof Error ? e.message : 'Something went wrong');
     } finally {
       setSaving(false);
     }

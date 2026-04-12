@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Alert,
   RefreshControl,
   Modal,
 } from 'react-native';
 import { getMeals, logMeal, Meal, MealItem } from '../services/api';
+import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
 
 const MEAL_SLOTS = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'] as const;
@@ -68,7 +68,7 @@ export default function MealsScreen() {
       await refreshTodayLog();
       setLogTarget(null);
     } catch (e) {
-      Alert.alert('Error', e instanceof Error ? e.message : 'Something went wrong');
+      showAlert('Error', e instanceof Error ? e.message : 'Something went wrong');
     } finally {
       setLogging(false);
     }

@@ -7,8 +7,8 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
+import { showAlert } from '../utils/alert';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 import { getFoodById, addLogItem, FoodServing, FoodWithServings } from '../services/api';
@@ -50,7 +50,7 @@ export default function PortionScreen() {
   };
 
   async function handleLog() {
-    if (!qty || qty <= 0) return Alert.alert('Enter a valid quantity');
+    if (!qty || qty <= 0) return showAlert('Enter a valid quantity');
     setLogging(true);
     try {
       await addLogItem({
@@ -63,7 +63,7 @@ export default function PortionScreen() {
       await refreshTodayLog();
       navigation.navigate('Today');
     } catch (e) {
-      Alert.alert('Error', e instanceof Error ? e.message : 'Something went wrong');
+      showAlert('Error', e instanceof Error ? e.message : 'Something went wrong');
     } finally {
       setLogging(false);
     }

@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12
+
+### fix: cross-platform alert wrapper for web testing
+Created `frontend/src/utils/alert.ts` — a `showAlert` wrapper that uses React Native `Alert` on native and `window.alert`/`window.confirm` on web. Replaced all `Alert.alert` calls across 8 screens so alerts work correctly in both the browser and on device.
+
+---
+
 ## 2026-03-21 (11)
 
 ### `fix: today empty state and meals item spacing`

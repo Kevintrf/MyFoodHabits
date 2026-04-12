@@ -7,9 +7,9 @@ import {
   StyleSheet,
   Modal,
   TextInput,
-  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
 import { LogItem, deleteLogItem, updateLogItem } from '../services/api';
 
@@ -50,7 +50,7 @@ export default function TodayScreen() {
 
   function handleDelete() {
     if (!editTarget) return;
-    Alert.alert(
+    showAlert(
       'Delete item',
       `Remove ${editTarget.item.food_name} from your log?`,
       [

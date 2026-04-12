@@ -7,9 +7,9 @@ import {
   FlatList,
   StyleSheet,
   ActivityIndicator,
-  Alert,
   RefreshControl,
 } from 'react-native';
+import { showAlert } from '../utils/alert';
 import { getWeights, logWeight, WeightEntry } from '../services/api';
 import { useApp } from '../context/AppContext';
 
@@ -37,7 +37,7 @@ export default function WeightScreen() {
 
   async function handleLog() {
     const kg = parseFloat(input);
-    if (!kg || kg <= 0 || kg > 500) return Alert.alert('Enter a valid weight in kg');
+    if (!kg || kg <= 0 || kg > 500) return showAlert('Enter a valid weight in kg');
     setSaving(true);
     try {
       const entry = await logWeight(kg);
@@ -45,7 +45,7 @@ export default function WeightScreen() {
       setInput('');
       await refreshWeightToday();
     } catch (e) {
-      Alert.alert('Error', e instanceof Error ? e.message : 'Something went wrong');
+      showAlert('Error', e instanceof Error ? e.message : 'Something went wrong');
     } finally {
       setSaving(false);
     }

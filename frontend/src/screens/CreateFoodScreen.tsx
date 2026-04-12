@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
   Switch,
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { createFood, ServingDraft } from '../services/api';
+import { showAlert } from '../utils/alert';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 
 type NavProp = NativeStackNavigationProp<SearchStackParamList, 'CreateFood'>;
@@ -36,11 +36,11 @@ export default function CreateFoodScreen() {
   function addServing() {
     const grams = parseFloat(servingGrams);
     if (!servingName.trim()) {
-      Alert.alert('Name required', 'Enter a name for this serving (e.g. slice, cup).');
+      showAlert('Name required', 'Enter a name for this serving (e.g. slice, cup).');
       return;
     }
     if (isNaN(grams) || grams <= 0) {
-      Alert.alert('Invalid grams', 'Enter how many grams this serving equals.');
+      showAlert('Invalid grams', 'Enter how many grams this serving equals.');
       return;
     }
     setServings((prev) => [
@@ -63,11 +63,11 @@ export default function CreateFoodScreen() {
   async function handleSave() {
     const cal = parseFloat(calories);
     if (!name.trim()) {
-      Alert.alert('Name required', 'Please enter a name for this food.');
+      showAlert('Name required', 'Please enter a name for this food.');
       return;
     }
     if (isNaN(cal) || cal < 0) {
-      Alert.alert('Invalid calories', 'Calories per 100g must be a valid number.');
+      showAlert('Invalid calories', 'Calories per 100g must be a valid number.');
       return;
     }
 
@@ -84,7 +84,7 @@ export default function CreateFoodScreen() {
       });
       navigation.replace('Portion', { food });
     } catch {
-      Alert.alert('Error', 'Could not create food. Please try again.');
+      showAlert('Error', 'Could not create food. Please try again.');
     } finally {
       setSaving(false);
     }

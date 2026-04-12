@@ -5,12 +5,12 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { updateTargets } from '../services/api';
+import { showAlert } from '../utils/alert';
 
 export default function SettingsScreen() {
   const { targets, refreshTargets } = useApp();
@@ -29,7 +29,7 @@ export default function SettingsScreen() {
     const pro = parseInt(protein);
 
     if (isNaN(cal) || cal <= 0 || isNaN(pro) || pro <= 0) {
-      Alert.alert('Invalid values', 'Calorie and protein targets must be positive numbers.');
+      showAlert('Invalid values', 'Calorie and protein targets must be positive numbers.');
       return;
     }
 
@@ -37,9 +37,9 @@ export default function SettingsScreen() {
     try {
       await updateTargets({ target_calories: cal, target_protein_g: pro });
       await refreshTargets();
-      Alert.alert('Saved', 'Your targets have been updated.');
+      showAlert('Saved', 'Your targets have been updated.');
     } catch {
-      Alert.alert('Error', 'Could not save targets. Please try again.');
+      showAlert('Error', 'Could not save targets. Please try again.');
     } finally {
       setSaving(false);
     }
