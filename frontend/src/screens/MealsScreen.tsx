@@ -30,9 +30,11 @@ function calcMealMacros(items: MealItem[], scale: number) {
       return {
         calories: acc.calories + item.calories_per_100g * mult,
         protein_g: acc.protein_g + item.protein_per_100g * mult,
+        carbs_g: acc.carbs_g + item.carbs_per_100g * mult,
+        fat_g: acc.fat_g + item.fat_per_100g * mult,
       };
     },
-    { calories: 0, protein_g: 0 },
+    { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
   );
 }
 
@@ -104,8 +106,7 @@ export default function MealsScreen() {
               <View style={styles.mealInfo}>
                 <Text style={styles.mealName}>{item.name}</Text>
                 <Text style={styles.mealMeta}>
-                  {item.items.length} items · {Math.round(macros.calories)} kcal ·{' '}
-                  {Math.round(macros.protein_g)}g protein
+                  {item.items.length} items · {Math.round(macros.calories)} kcal · {Math.round(macros.protein_g)}g Protein · {Math.round(macros.carbs_g)}g Carbs · {Math.round(macros.fat_g)}g Fat
                 </Text>
                 {item.items.map((mi) => (
                   <Text key={mi.id} style={styles.mealItemLine}>
@@ -150,7 +151,7 @@ export default function MealsScreen() {
             {previewMacros && (
               <View style={styles.preview}>
                 <Text style={styles.previewText}>
-                  {Math.round(previewMacros.calories)} kcal · {Math.round(previewMacros.protein_g)}g protein
+                  {Math.round(previewMacros.calories)} kcal · {Math.round(previewMacros.protein_g)}g Protein · {Math.round(previewMacros.carbs_g)}g Carbs · {Math.round(previewMacros.fat_g)}g Fat
                 </Text>
               </View>
             )}

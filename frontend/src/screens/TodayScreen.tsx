@@ -123,7 +123,7 @@ export default function TodayScreen() {
                     </View>
                     <View style={styles.logItemRight}>
                       <Text style={styles.logItemCal}>{item.macros.calories} kcal</Text>
-                      <Text style={styles.logItemPro}>{item.macros.protein_g}g protein</Text>
+                      <Text style={styles.logItemPro}>{item.macros.protein_g}g Protein · {item.macros.carbs_g}g Carbs · {item.macros.fat_g}g Fat</Text>
                     </View>
                   </TouchableOpacity>
                 );

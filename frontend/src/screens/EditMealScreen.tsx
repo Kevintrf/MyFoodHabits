@@ -250,8 +250,7 @@ export default function EditMealScreen() {
               <View style={styles.resultLeft}>
                 <Text style={styles.resultName}>{food.name}</Text>
                 <Text style={styles.resultSub}>
-                  {food.calories_per_100g} kcal · {food.protein_per_100g}g protein per 100
-                  {food.liquid ? 'ml' : 'g'}
+                  {food.calories_per_100g} kcal · {food.protein_per_100g}g Protein · {food.carbs_per_100g}g Carbs · {food.fat_per_100g}g Fat per 100{food.liquid ? 'ml' : 'g'}
                 </Text>
               </View>
               <Text style={styles.addBtnText}>+ Add</Text>
@@ -276,7 +275,7 @@ export default function EditMealScreen() {
               <View style={styles.draftLeft}>
                 <Text style={styles.draftName}>{item.food.name}</Text>
                 <Text style={styles.draftSub}>
-                  {item.food.calories_per_100g} kcal per 100{item.food.liquid ? 'ml' : 'g'}
+                  {item.food.calories_per_100g} kcal · {item.food.protein_per_100g}g Protein · {item.food.carbs_per_100g}g Carbs · {item.food.fat_per_100g}g Fat per 100{item.food.liquid ? 'ml' : 'g'}
                 </Text>
               </View>
               <View style={styles.qtyRow}>

@@ -47,6 +47,8 @@ export default function PortionScreen() {
   const preview = {
     calories: Math.round(food.calories_per_100g * multiplier * 10) / 10,
     protein_g: Math.round(food.protein_per_100g * multiplier * 10) / 10,
+    carbs_g: Math.round(food.carbs_per_100g * multiplier * 10) / 10,
+    fat_g: Math.round(food.fat_per_100g * multiplier * 10) / 10,
   };
 
   async function doLog() {
@@ -94,7 +96,7 @@ export default function PortionScreen() {
       <View style={styles.foodHeader}>
         <Text style={styles.foodName}>{food.name}</Text>
         <Text style={styles.foodSub}>
-          {food.calories_per_100g} kcal · {food.protein_per_100g}g protein per 100{unitLabel}
+          {food.calories_per_100g} kcal · {food.protein_per_100g}g Protein · {food.carbs_per_100g}g Carbs · {food.fat_per_100g}g Fat per 100{unitLabel}
         </Text>
         {food.created_by_user_id === 1 && (
           <TouchableOpacity onPress={() => navigation.navigate('EditFood', { food })}>
@@ -160,7 +162,7 @@ export default function PortionScreen() {
       {/* Live preview */}
       <View style={styles.preview}>
         <Text style={styles.previewText}>
-          {preview.calories} kcal · {preview.protein_g}g protein
+          {preview.calories} kcal · {preview.protein_g}g Protein · {preview.carbs_g}g Carbs · {preview.fat_g}g Fat
         </Text>
       </View>
 
