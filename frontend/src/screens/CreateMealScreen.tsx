@@ -80,7 +80,7 @@ export default function CreateMealScreen() {
   function adjustQty(foodId: number, delta: number) {
     setDraftItems((prev) =>
       prev.map((i) =>
-        i.food.id === foodId ? { ...i, quantity: Math.max(1, i.quantity + delta) } : i,
+        i.food.id === foodId ? { ...i, quantity: Math.max(0, i.quantity + delta) } : i,
       ),
     );
   }

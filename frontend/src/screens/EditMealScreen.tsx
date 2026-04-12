@@ -50,7 +50,7 @@ export default function EditMealScreen() {
         created_by_user_id: null,
         barcode: null,
       },
-      quantity: mi.quantity,
+      quantity: Number(mi.quantity),
       servings: [],
       selectedServing: mi.serving_id
         ? { id: mi.serving_id, food_id: mi.food_id, name: mi.serving_name!, grams: mi.serving_grams!, is_default: false }
@@ -132,7 +132,7 @@ export default function EditMealScreen() {
   function adjustQty(foodId: number, delta: number) {
     setDraftItems((prev) =>
       prev.map((i) =>
-        i.food.id === foodId ? { ...i, quantity: Math.max(1, i.quantity + delta) } : i,
+        i.food.id === foodId ? { ...i, quantity: Math.max(0, i.quantity + delta) } : i,
       ),
     );
   }

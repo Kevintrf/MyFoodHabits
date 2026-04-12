@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (12)
+
+### fix: edit meal quantity NaN and allow 0 quantity
+PostgreSQL returns numeric columns as strings; coerce `mi.quantity` with `Number()` on init so `+` arithmetic works correctly. Changed `Math.max(1, ...)` to `Math.max(0, ...)` in both Create and Edit Meal so quantities can be reduced to 0.
+
+---
+
 ## 2026-04-12 (11)
 
 ### feat: custom serving selection in Create and Edit Meal

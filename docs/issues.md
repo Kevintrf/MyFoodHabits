@@ -9,6 +9,7 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 - [x] **Delete log item** — confirmed working on device; was failing in browser due to Alert not working on web (fixed by cross-platform alert wrapper)
 - [x] **Meals list does not auto-refresh after creating a meal** — fixed with useFocusEffect to see the new meal
 - [x] **Liquid foods show "g" instead of "ml"** — fixed in Create Food, Edit Food, Portion Screen, and Meals Screen
+- [x] **Edit Meal quantity goes NaN when decremented** — PostgreSQL returns numeric as string; coerce with `Number()` on init; also allow 0 quantity (changed `Math.max(1)` → `Math.max(0)` in Create/Edit Meal)
 
 ---
 
