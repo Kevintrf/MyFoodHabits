@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (10)
+
+### fix: today edit modal appears instantly and closes on outside tap
+Removed slide animation so modal appears immediately. Tapping the dark overlay now dismisses the modal.
+
+---
+
 ## 2026-04-12 (9)
 
 ### fix: tap log item to edit instead of long press

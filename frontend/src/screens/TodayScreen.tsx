@@ -147,11 +147,16 @@ export default function TodayScreen() {
       {/* Edit / delete modal */}
       <Modal
         visible={!!editTarget}
-        animationType="slide"
+        animationType="none"
         transparent
         onRequestClose={() => setEditTarget(null)}
       >
-        <View style={styles.modalOverlay}>
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setEditTarget(null)}
+        >
+          <TouchableOpacity activeOpacity={1} onPress={() => {}}>
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>{editTarget?.item.food_name}</Text>
 
@@ -191,7 +196,8 @@ export default function TodayScreen() {
               <Text style={styles.cancelBtnText}>Cancel</Text>
             </TouchableOpacity>
           </View>
-        </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
     </>
   );
