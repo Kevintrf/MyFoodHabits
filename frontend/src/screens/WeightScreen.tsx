@@ -8,6 +8,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   RefreshControl,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { showAlert } from '../utils/alert';
 import { getWeights, logWeight, WeightEntry } from '../services/api';
@@ -56,7 +58,7 @@ export default function WeightScreen() {
   const latest = entries[0];
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Text style={styles.header}>Weight</Text>
 
       {latest && (
@@ -103,7 +105,7 @@ export default function WeightScreen() {
           </View>
         )}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

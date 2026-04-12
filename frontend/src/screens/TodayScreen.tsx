@@ -7,6 +7,8 @@ import {
   StyleSheet,
   Modal,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { CommonActions } from '@react-navigation/native';
@@ -166,6 +168,7 @@ export default function TodayScreen() {
         transparent
         onRequestClose={() => setEditTarget(null)}
       >
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
@@ -213,6 +216,7 @@ export default function TodayScreen() {
           </View>
           </TouchableOpacity>
         </TouchableOpacity>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );

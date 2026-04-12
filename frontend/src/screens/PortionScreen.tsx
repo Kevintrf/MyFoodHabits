@@ -7,6 +7,8 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { showAlert } from '../utils/alert';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -103,7 +105,8 @@ export default function PortionScreen() {
   if (loading) return <ActivityIndicator style={styles.loader} color="#2D6A4F" />;
 
   return (
-    <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <ScrollView keyboardShouldPersistTaps="handled">
       {/* Food header */}
       <View style={styles.foodHeader}>
         <Text style={styles.foodName}>{food.name}</Text>
@@ -187,6 +190,7 @@ export default function PortionScreen() {
         )}
       </TouchableOpacity>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

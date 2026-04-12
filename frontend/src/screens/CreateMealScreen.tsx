@@ -14,6 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { searchFoods, createMeal, getFoodById, Food, FoodServing } from '../services/api';
 import { MealsStackParamList } from '../navigation/RootNavigator';
 import { fmtNum } from '../utils/format';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 
 type NavProp = NativeStackNavigationProp<MealsStackParamList, 'CreateMeal'>;
 
@@ -144,8 +145,9 @@ export default function CreateMealScreen() {
   }
 
   return (
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <FlatList
-      style={styles.container}
+      style={{ flex: 1 }}
       data={draftItems}
       keyExtractor={(item) => String(item.draftId)}
       keyboardShouldPersistTaps="handled"
@@ -271,6 +273,7 @@ export default function CreateMealScreen() {
         </View>
       }
     />
+  </KeyboardAvoidingView>
   );
 }
 

@@ -13,6 +13,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { searchFoods, editMeal, deleteMeal, getFoodById, Food, FoodServing } from '../services/api';
 import { showAlert } from '../utils/alert';
 import { fmtNum } from '../utils/format';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 import { MealsStackParamList } from '../navigation/RootNavigator';
 
 type NavProp = NativeStackNavigationProp<MealsStackParamList, 'EditMeal'>;
@@ -218,8 +219,9 @@ export default function EditMealScreen() {
   }
 
   return (
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <FlatList
-      style={styles.container}
+      style={{ flex: 1 }}
       data={draftItems}
       keyExtractor={(item) => String(item.draftId)}
       keyboardShouldPersistTaps="handled"
@@ -352,6 +354,7 @@ export default function EditMealScreen() {
         </View>
       }
     />
+  </KeyboardAvoidingView>
   );
 }
 

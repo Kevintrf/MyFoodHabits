@@ -7,6 +7,8 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { updateTargets } from '../services/api';
@@ -46,7 +48,8 @@ export default function SettingsScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <ScrollView contentContainerStyle={styles.content}>
       <Text style={styles.heading}>Daily Targets</Text>
 
       <View style={styles.field}>
@@ -81,6 +84,7 @@ export default function SettingsScreen() {
         )}
       </TouchableOpacity>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
