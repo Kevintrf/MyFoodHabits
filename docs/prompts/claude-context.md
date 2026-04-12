@@ -1,5 +1,15 @@
 # Claude Context
 
+> **OUTDATED — last accurate as of Phase 3 completion.**
+>
+> The project structure, AppContext API, navigation setup, and phase status described below are no longer accurate. For current state, refer to:
+> - `docs/roadmap.md` — phase completion status
+> - `docs/next-steps.md` — what to work on next
+> - `docs/architecture.md` — current system design
+> - `docs/issues.md` — open bugs and improvements
+>
+> The "Known Gotchas" and "Coding Standards" sections below are still valid.
+
 This file is a briefing document for Claude. Read this at the start of any conversation to get full context on the project.
 
 ---

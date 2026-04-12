@@ -37,7 +37,8 @@ Functional completions that matter before showing the app to anyone:
 - [ ] **Onboarding flow** — first-run screen to set name, calorie target, protein target before the app is meaningful to a new user.
 - [ ] **Food management screen** — list of user-created foods, with edit and delete (once the deletion strategy is decided above).
 - [ ] **Edit barcode on existing foods** — "Edit barcode" button in EditFoodScreen that opens the scanner; scanned value replaces the stored barcode. Useful when a food was created manually and the barcode wasn't captured at the time.
-- [ ] **Weight chart** — simple line chart on the Weight screen showing the trend over the last 30/90 days instead of just a flat list.
+- [ ] **Weight chart** — line chart on the Weight screen showing the trend over the last 30/90 days. Use a 7-day moving average rather than raw daily values — daily weight fluctuates heavily due to water/sodium/glycogen and the raw line confuses people.
+- [ ] **Search result ranking** — user-created foods should be ranked above Open Food Facts results for the same query. Currently all results are sorted by name alphabetically regardless of source.
 - [ ] **Copy a previous day's log** — "Log same as [date]" shortcut, or a button on the calendar day view to re-log an entire past day.
 
 ### Option B: Full UI Overhaul *(original Phase 4 plan)*
