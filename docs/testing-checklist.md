@@ -168,9 +168,12 @@ Work through this during the Phase 3.5 end-to-end walkthrough. Check off items a
 ---
 
 ## Cross-Cutting / Edge Cases
-- [ ] App opens cold with no data — no crashes, all empty states render
-- [ ] Navigating between tabs does not reset Today screen log data
-- [ ] Logging a food from a barcode-scanned result works end-to-end
-- [ ] A food with `liquid: true` shows "per 100ml" consistently in Search, Portion, Today, and Meals screens
-- [ ] Macro math: log 100g of a food with 200 kcal/100g — Today should show exactly 200 kcal
-- [ ] Macro math: log 0.5 serving of a food with a 50g custom serving — should show 25g worth of macros
+- [ ] App opens cold with no data — no crashes, all empty states render — *cannot test (existing data in DB)*
+- [x] Navigating between tabs does not reset Today screen log data
+- [ ] Logging a food from a barcode-scanned result works end-to-end — *needs re-test once barcode backend works on same WiFi*
+- [ ] **BUG:** `liquid: true` foods show "g" instead of "ml" in multiple places:
+  - Create Food: serving input hint text still says "grams" when liquid toggle is on
+  - Portion Screen: custom servings still show "g" in the picker
+  - Meals Screen: food quantities show "g" instead of "ml"
+- [x] Macro math: 100g of 200 kcal/100g food shows exactly 200 kcal ✓
+- [x] Macro math: 0.5 × 50g custom serving shows 25g worth of macros ✓
