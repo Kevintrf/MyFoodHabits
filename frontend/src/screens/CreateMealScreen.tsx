@@ -183,6 +183,14 @@ export default function CreateMealScreen() {
               <Text style={styles.addBtnText}>+ Add</Text>
             </TouchableOpacity>
           ))}
+          {draftItems.length > 0 && (
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalMacros}>
+                {totalMacros.calories} kcal · {totalMacros.protein}g Protein · {totalMacros.carbs}g Carbs · {totalMacros.fat}g Fat
+              </Text>
+            </View>
+          )}
           {draftItems.length > 0 && <Text style={styles.sectionLabel}>Added foods</Text>}
         </View>
       }
@@ -234,7 +242,7 @@ export default function CreateMealScreen() {
               </View>
             )}
             <Text style={styles.itemMacros}>
-              {macros.calories} kcal · {macros.protein}g P · {macros.carbs}g C · {macros.fat}g F
+              {macros.calories} kcal · {macros.protein}g Protein · {macros.carbs}g Carbs · {macros.fat}g Fat
             </Text>
           </View>
         );
@@ -246,14 +254,6 @@ export default function CreateMealScreen() {
       }
       ListFooterComponent={
         <View>
-          {draftItems.length > 0 && (
-            <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>Total</Text>
-              <Text style={styles.totalMacros}>
-                {totalMacros.calories} kcal · {totalMacros.protein}g P · {totalMacros.carbs}g C · {totalMacros.fat}g F
-              </Text>
-            </View>
-          )}
           <TouchableOpacity
             style={[styles.saveBtn, draftItems.length === 0 && styles.saveBtnDisabled]}
             onPress={handleSave}
@@ -357,17 +357,14 @@ const styles = StyleSheet.create({
   emptyHint: { textAlign: 'center', color: '#bbb', marginTop: 40, fontSize: 14 },
   totalRow: {
     marginHorizontal: 16,
-    marginTop: 8,
+    marginTop: 12,
     paddingVertical: 12,
     paddingHorizontal: 14,
     backgroundColor: '#fff',
     borderRadius: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   },
-  totalLabel: { fontSize: 13, fontWeight: '700', color: '#1A1A1A' },
-  totalMacros: { fontSize: 13, fontWeight: '600', color: '#2D6A4F' },
+  totalLabel: { fontSize: 12, fontWeight: '700', color: '#999', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 },
+  totalMacros: { fontSize: 14, fontWeight: '600', color: '#2D6A4F' },
   saveBtn: {
     margin: 16,
     marginTop: 12,
