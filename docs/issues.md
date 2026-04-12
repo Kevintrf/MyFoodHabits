@@ -25,7 +25,7 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 
 ## UX Improvements
 
-- [ ] **Search input only auto-focuses on the first visit** — should auto-focus every time the Search tab is opened
+- [x] **Search input only auto-focuses on the first visit** — replaced `autoFocus` with `useFocusEffect` + ref so the input focuses on every tab visit
 - [x] **Edit/delete log item requires long-press** — changed to single tap
 - [x] **Invalid inputs fail silently** — entering an invalid quantity (Portion Screen), invalid weight (Weight Screen), or invalid food values (Create Food) gives no feedback; confirmed working. Negative quantities/values are allowed but require confirmation.
 - [x] **Serving label in Today log should include grams** — now shows e.g. `1.5 × slice (45g)`

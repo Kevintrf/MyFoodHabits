@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { showAlert } from '../utils/alert';
 import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,12 +29,18 @@ export default function SearchScreen() {
   const [scannerOpen, setScannerOpen] = useState(false);
   const [scannerBusy, setScannerBusy] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inputRef = useRef<TextInput>(null);
   const navigation = useNavigation<NavProp>();
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
   useEffect(() => {
     getRecentFoods().then(setRecentFoods).catch(() => {});
   }, []);
+
+  useFocusEffect(() => {
+    const timer = setTimeout(() => inputRef.current?.focus(), 100);
+    return () => clearTimeout(timer);
+  });
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -104,11 +111,11 @@ export default function SearchScreen() {
           <View>
             <View style={styles.searchBar}>
               <TextInput
+                ref={inputRef}
                 style={styles.input}
                 placeholder="Search foods..."
                 value={query}
                 onChangeText={setQuery}
-                autoFocus
                 clearButtonMode="while-editing"
                 returnKeyType="search"
               />
