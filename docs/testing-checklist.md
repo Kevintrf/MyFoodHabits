@@ -46,11 +46,10 @@
 - [x] Denying permission shows an alert
 - [x] Granting permission opens the full-screen scanner with frame overlay and hint text
 - [x] Close (✕) button dismisses the scanner
-- [ ] **Needs re-test on same WiFi (no tunnel):** Barcode scanner backend communication — scanning a known barcode should look up DB / Open Food Facts and navigate to PortionScreen with the correct food
-- [ ] **Needs re-test on same WiFi (no tunnel):** Scanning an unknown barcode shows "Not found" alert with three options: Create manually, Try again, Cancel
-- [ ] **Needs re-test on same WiFi (no tunnel):** "Try again" re-opens the scanner
-- [ ] **Needs re-test on same WiFi (no tunnel):** "Create manually" navigates to CreateFoodScreen with blank name
-  - *Root cause: tunnel mode serves the bundle via ngrok but API calls still target the local IP, which the phone can't reach from outside the network*
+- [x] Barcode scanner backend communication — known barcode lookup works ✓
+- [x] Scanning an unknown barcode shows "Not found" alert with three options ✓
+- [x] "Try again" re-opens the scanner ✓
+- [x] "Create manually" navigates to CreateFoodScreen with blank name ✓
 - **UX question — duplicate foods:** users can create identical food entries; need to decide how to handle (prevent duplicates on creation? show a warning? deduplicate in search results?)
 - **UX question — two create buttons:** the subtle "Create new food" button (when results exist) and the prominent "+ Create X" button (when no results) serve the same purpose but at different points; consider whether the subtle button adds value or just adds noise — could be removed and only show the prominent one on no-results
 
@@ -103,7 +102,7 @@
   - **Design question:** food immutability (edits create a new version) is technically correct but may be surprising to users who expect an edit to update the food globally. Consider whether to communicate this in the UI (e.g. "Changes won't affect previous log entries") or reconsider the approach in Phase 3.5.
 - [x] The new version of the food appears in search results as a separate entry
   - **Related to above:** this will cause duplicates in search over time if users edit foods repeatedly. May want to only show the latest version per food name/barcode.
-- [ ] "Edit food" link is NOT visible on a barcode-scanned or verified food — *needs re-test once barcode backend is working*
+- [x] "Edit food" link is NOT visible on a barcode-scanned or verified food ✓
 
 ---
 

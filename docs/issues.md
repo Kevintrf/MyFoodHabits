@@ -38,5 +38,12 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 
 ## Needs Re-testing
 
-- [ ] **Barcode scanner backend flow** — re-test on same WiFi (no tunnel): known barcode lookup, unknown barcode "Not found" alert, "Try again", "Create manually"
-- [ ] **"Edit food" link hidden for non-user foods** — re-test once a barcode-scanned food is available
+- [x] **Barcode scanner backend flow** — all flows confirmed working on same WiFi: known barcode lookup, unknown barcode alert, Try again, Create manually
+- [x] **"Edit food" link correctly hidden for non-user foods** ✓
+
+---
+
+## New Issues Found During Barcode Re-test
+
+- [ ] **Manually created food is not matched when its barcode is later scanned** — if a user creates a food manually without a barcode, then later scans that product's barcode, the scanner creates a new Open Food Facts entry instead of linking to the existing manual entry. The two entries are not deduplicated.
+- [ ] **No food source indicator in the UI** — Portion Screen and search results don't show where a food came from (user-created, Open Food Facts, verified); should show the source and make clear that non-user foods are not editable
