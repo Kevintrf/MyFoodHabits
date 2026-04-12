@@ -166,7 +166,7 @@ export default function CreateFoodScreen() {
       {servings.map((s, i) => (
         <View key={i} style={styles.servingRow}>
           <Text style={styles.servingText}>
-            {s.name} — {s.grams}g{s.is_default ? ' (default)' : ''}
+            {s.name} — {s.grams}{liquid ? 'ml' : 'g'}{s.is_default ? ' (default)' : ''}
           </Text>
           <TouchableOpacity onPress={() => removeServing(i)}>
             <Text style={styles.removeBtn}>Remove</Text>
@@ -185,7 +185,7 @@ export default function CreateFoodScreen() {
           style={[styles.input, styles.fieldHalf]}
           value={servingGrams}
           onChangeText={setServingGrams}
-          placeholder="grams"
+          placeholder={liquid ? 'ml' : 'grams'}
           placeholderTextColor="#bbb"
           keyboardType="decimal-pad"
         />

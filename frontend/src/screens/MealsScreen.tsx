@@ -110,7 +110,7 @@ export default function MealsScreen() {
                 {item.items.map((mi) => (
                   <Text key={mi.id} style={styles.mealItemLine}>
                     · {mi.food_name} ({mi.quantity}
-                    {mi.serving_name ? ` × ${mi.serving_name}` : ` × 100g`})
+                    {mi.serving_name ? ` × ${mi.serving_name}` : ` × 100${mi.liquid ? 'ml' : 'g'}`})
                   </Text>
                 ))}
               </View>

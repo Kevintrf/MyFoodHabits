@@ -105,7 +105,7 @@ export default function PortionScreen() {
               onPress={() => setSelectedServing(s)}
             >
               <Text style={styles.servingText}>
-                {s.name} ({s.grams}g)
+                {s.name} ({s.grams}{unitLabel})
               </Text>
             </TouchableOpacity>
           ))}

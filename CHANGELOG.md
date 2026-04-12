@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-12 (4)
+
+### fix: liquid foods showing "g" instead of "ml"
+Fixed serving unit labels across Create Food, Edit Food, Portion Screen, and Meals Screen to use "ml" when a food has liquid=true.
+
+---
+
 ## 2026-04-12 (3)
 
 ### fix: delete meal crashing with JSON parse error
