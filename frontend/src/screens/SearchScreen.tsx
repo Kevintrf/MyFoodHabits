@@ -15,9 +15,10 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
-import { searchFoods, getFoodByBarcode, getRecentFoods, Food, FoodSource } from '../services/api';
+import { searchFoods, getFoodByBarcode, Food, FoodSource } from '../services/api';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 import { fmtNum } from '../utils/format';
+import { useApp } from '../context/AppContext';
 
 type NavProp = NativeStackNavigationProp<SearchStackParamList, 'Search'>;
 
@@ -33,9 +34,9 @@ const SOURCE_COLOR: Record<FoodSource, string> = {
 };
 
 export default function SearchScreen() {
+  const { recentFoods } = useApp();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Food[]>([]);
-  const [recentFoods, setRecentFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [scannerBusy, setScannerBusy] = useState(false);
@@ -43,10 +44,6 @@ export default function SearchScreen() {
   const inputRef = useRef<TextInput>(null);
   const navigation = useNavigation<NavProp>();
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
-
-  useEffect(() => {
-    getRecentFoods().then(setRecentFoods).catch(() => {});
-  }, []);
 
   useFocusEffect(() => {
     const timer = setTimeout(() => inputRef.current?.focus(), 100);

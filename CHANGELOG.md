@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-15 (15)
+
+### fix: weight dot timezone bug and performance pre-fetch on app open
+`getTodayDate()` now uses local date methods instead of `.toISOString()` so the "logged today" check is correct for all timezones. The `logged_at` comparison also converts to local date. Additionally, `AppContext` now pre-fetches targets, weight status, and recent foods on mount; `recentFoods` is stored in context so `SearchScreen` renders the recent list immediately without a separate fetch.
+
+---
+
 ## 2026-04-12 (14)
 
 ### feat: barcode scanning in Create Meal and Edit Meal screens

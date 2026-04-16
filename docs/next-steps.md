@@ -1,6 +1,6 @@
 # Next Steps
 
-Last updated: 2026-04-12
+Last updated: 2026-04-16
 
 ---
 
@@ -8,9 +8,9 @@ Last updated: 2026-04-12
 
 Small remaining items before the phase is truly done.
 
-- [ ] **Weight dot timezone bug** — `logged_at.startsWith(todayDate)` compares UTC timestamp strings. For UTC+ timezones a weight logged late at night may have tomorrow's UTC date, so the dot never clears. Fix by comparing dates in local time instead.
-- [ ] **Performance pass** — pre-load today's log and recent foods on app open so there's no visible fetch delay when the app first launches.
-- [ ] **Keyboard avoiding view** — needs testing in a built APK. `softwareKeyboardLayoutMode: "resize"` only takes effect after a native build, not in Expo Go. Test each screen and fix any that still hide behind the keyboard.
+- [x] **Weight dot timezone bug** — Fixed: `getTodayDate()` now uses local date methods instead of `.toISOString()` (UTC). The `logged_at` comparison also converts to local date before comparing.
+- [x] **Performance pass** — Fixed: `AppContext` pre-fetches targets, weight status, and recent foods on mount. `recentFoods` moved into context so `SearchScreen` gets data instantly without its own fetch.
+- [ ] **Keyboard avoiding view** — `softwareKeyboardLayoutMode: "resize"` tested on a physical device (2026-04-15) but keyboard still obscures inputs on some screens. Needs a proper fix (likely per-screen `KeyboardAvoidingView` tuning). Deferred — not blocking.
 
 ---
 
@@ -26,7 +26,54 @@ These are blocked on deciding the right approach, not on implementation effort.
 
 ---
 
-## Phase 4 — Options
+## Phase 4 — Offline-first (go serverless)
+
+**Goal:** The app runs entirely on-device with no backend server. Data lives in a local SQLite database. Barcode lookups hit Open Food Facts directly from the app. The backend and PostgreSQL become optional (kept for future multi-user sync, but not required to use the app).
+
+**Why now:** Removes the requirement to run a server locally before the app is usable. Enables real daily use for finding bugs and improvements.
+
+**Architecture after this phase:**
+```
+[Expo App] → [expo-sqlite local DB]
+                      ↑
+           [Open Food Facts API]   (barcode lookups only, with local cache)
+```
+
+### Tasks (in order)
+
+- [ ] **Install expo-sqlite and design the local schema**
+  Install `expo-sqlite`. Write `CREATE TABLE IF NOT EXISTS` statements for all tables: `foods`, `food_servings`, `day_logs`, `log_items`, `meals`, `meal_items`, `weights`, `user_settings`. Schema mirrors the current PostgreSQL schema but adapted for SQLite (no enums — use TEXT with CHECK, no `SERIAL` — use `INTEGER PRIMARY KEY`, timestamps as ISO strings).
+
+- [ ] **DB initialisation on app start**
+  On first launch, run all schema statements and seed a default user row in `user_settings` (calorie target 2000, protein 150). Store a `schema_version` integer in `user_settings` for future migrations.
+
+- [ ] **Write the local service layer**
+  Replace `frontend/src/services/api.ts` HTTP calls with direct SQLite queries. Keep the same function signatures so no screens need to change. One file per domain:
+  - `db/foods.ts` — `searchFoods`, `getFoodById`, `getRecentFoods`, `createFood`, `editFood` (versioning preserved)
+  - `db/log.ts` — `getLog`, `getMonthSummary`, `addLogItem`, `deleteLogItem`, `updateLogItem`
+  - `db/meals.ts` — `getMeals`, `createMeal`, `logMeal`, `editMeal`, `deleteMeal`
+  - `db/weight.ts` — `getWeights`, `logWeight`
+  - `db/settings.ts` — `getTargets`, `updateTargets`
+
+- [ ] **Move barcode lookup to the app**
+  `getFoodByBarcode` currently lives in the backend. Move it: check local `foods` table first, then fetch `https://world.openfoodfacts.org/api/v0/product/{barcode}.json`, parse the result, cache it in local SQLite. Handle no-internet gracefully (show "not found" rather than crashing).
+
+- [ ] **Wire up AppContext and screens to local services**
+  Swap all imports of `../services/api` for the new local db modules. Remove `EXPO_PUBLIC_API_URL` from app config. Verify every screen works end-to-end.
+
+- [ ] **Remove backend dependency from the app**
+  Delete `frontend/.env`, `frontend/app.config.js` API URL references. The backend directory stays in the repo but is no longer needed to run the app.
+
+### Decisions already made
+- **SQLite library:** `expo-sqlite` — built into Expo, no extra native config, sufficient for single-user
+- **No ORM:** Raw SQL queries in typed service functions — keeps it simple and debuggable
+- **User ID:** Keep hardcoded `user_id = 1`; authentication is Phase 5
+- **Food immutability:** Preserve the same versioning pattern (edit = insert new row, old row stays)
+- **Backend:** Keep it in the repo, untouched — useful for future multi-user sync
+
+---
+
+## Phase 5 — Options
 
 We discussed three directions. Pick one (or mix) before starting.
 
@@ -68,7 +115,7 @@ Things that make this app better than the alternatives:
 
 ## Notes
 
-- The app is fully functional and stable. Phase 3.5 is ~90% done.
-- Option A is the natural next step — authentication in particular blocks any real multi-user use.
-- Options B and C can run in parallel with A (UI work doesn't conflict with feature work).
-- The full original Phase 4 and Phase 5 plans are still in `docs/roadmap.md`.
+- Phase 3.5 is functionally complete (keyboard view deferred, not blocking).
+- **Phase 4 (offline-first) is the current priority** — enables daily use without running a server.
+- Phase 5 options A/B/C are unchanged from the original roadmap; Option A (polish for real users) is still the recommended next step after offline-first.
+- The full original roadmap is still in `docs/roadmap.md`.

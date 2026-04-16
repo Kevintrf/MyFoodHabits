@@ -30,7 +30,6 @@ export default function TodayScreen() {
   const isViewingToday = viewingDate === todayDate;
 
   useEffect(() => {
-    refreshViewingLog();
     refreshTargets();
   }, []);
 
