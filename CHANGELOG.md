@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-16 (22)
+
+### chore: rename app to MyFoodHabits, update icons and bundle identifiers
+Set name/slug to MyFoodHabits/myfoodhabits in app.json. Updated iOS bundleIdentifier and Android package to com.kevintrf.myfoodhabits. Replaced all icon assets.
+
+---
+
 ## 2026-04-16 (21)
 
 ### feat: remove backend dependency — app is now fully offline
