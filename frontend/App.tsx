@@ -1,6 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { AppProvider } from './src/context/AppContext';
 import RootNavigator from './src/navigation/RootNavigator';
+import { initSchema } from './src/db/schema';
+
+// Run synchronously at module load — creates tables and seeds defaults on first
+// install, is a no-op on every subsequent launch (CREATE TABLE IF NOT EXISTS).
+initSchema();
 
 export default function App() {
   return (

@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-16 (17)
+
+### feat: wire DB initialisation into app start
+`initSchema()` is now called at module load in `App.tsx`, synchronously before any component mounts. On first install it creates all tables, indexes, and seeds the default `user_settings` row; on every subsequent launch it is a no-op.
+
+---
+
 ## 2026-04-16 (16)
 
 ### feat: install expo-sqlite and define local SQLite schema

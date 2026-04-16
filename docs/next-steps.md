@@ -44,8 +44,8 @@ These are blocked on deciding the right approach, not on implementation effort.
 - [x] **Install expo-sqlite and design the local schema**
   `expo-sqlite` v16 installed. `src/db/client.ts` opens the DB singleton with `PRAGMA foreign_keys = ON`. `src/db/schema.ts` defines all tables (`user_settings`, `foods`, `food_servings`, `day_logs`, `log_items`, `meals`, `meal_items`, `weights`) and indexes, adapted for SQLite (TEXT CHECK for enums, INTEGER PRIMARY KEY, ISO-8601 TEXT timestamps, REAL for floats). `initSchema()` exported — not yet wired into app start.
 
-- [ ] **DB initialisation on app start**
-  On first launch, run all schema statements and seed a default user row in `user_settings` (calorie target 2000, protein 150). Store a `schema_version` integer in `user_settings` for future migrations.
+- [x] **DB initialisation on app start**
+  `initSchema()` called at module load in `App.tsx` — runs synchronously before any component mounts. Creates all tables and indexes (no-op after first install) and seeds the `user_settings` row with defaults.
 
 - [ ] **Write the local service layer**
   Replace `frontend/src/services/api.ts` HTTP calls with direct SQLite queries. Keep the same function signatures so no screens need to change. One file per domain:
