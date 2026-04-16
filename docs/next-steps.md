@@ -47,13 +47,8 @@ These are blocked on deciding the right approach, not on implementation effort.
 - [x] **DB initialisation on app start**
   `initSchema()` called at module load in `App.tsx` — runs synchronously before any component mounts. Creates all tables and indexes (no-op after first install) and seeds the `user_settings` row with defaults.
 
-- [ ] **Write the local service layer**
-  Replace `frontend/src/services/api.ts` HTTP calls with direct SQLite queries. Keep the same function signatures so no screens need to change. One file per domain:
-  - `db/foods.ts` — `searchFoods`, `getFoodById`, `getRecentFoods`, `createFood`, `editFood` (versioning preserved)
-  - `db/log.ts` — `getLog`, `getMonthSummary`, `addLogItem`, `deleteLogItem`, `updateLogItem`
-  - `db/meals.ts` — `getMeals`, `createMeal`, `logMeal`, `editMeal`, `deleteMeal`
-  - `db/weight.ts` — `getWeights`, `logWeight`
-  - `db/settings.ts` — `getTargets`, `updateTargets`
+- [x] **Write the local service layer**
+  Six files created with identical function signatures to `api.ts`: `db/macros.ts` (pure calc helpers), `db/foods.ts` (search, CRUD, versioned edit, local barcode lookup), `db/log.ts` (getLog, month summary, add/delete/update log items), `db/meals.ts` (CRUD + logMeal with scale), `db/settings.ts` (targets), `db/weight.ts` (history + log). Not yet wired into app — screens still use `api.ts`.
 
 - [ ] **Move barcode lookup to the app**
   `getFoodByBarcode` currently lives in the backend. Move it: check local `foods` table first, then fetch `https://world.openfoodfacts.org/api/v0/product/{barcode}.json`, parse the result, cache it in local SQLite. Handle no-internet gracefully (show "not found" rather than crashing).

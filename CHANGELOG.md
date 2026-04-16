@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-16 (18)
+
+### feat: local SQLite service layer (foods, log, meals, settings, weight)
+Added six db/ modules replacing all backend HTTP calls with direct SQLite queries: `macros.ts` (pure calc helpers), `foods.ts` (search, CRUD, versioned edit, local barcode lookup), `log.ts` (getLog with macro totals, month summary, add/delete/update items), `meals.ts` (CRUD + logMeal with scale factor), `settings.ts` (targets), `weight.ts` (history + log). Function signatures are identical to `api.ts` so screens need no changes when wired up.
+
+---
+
 ## 2026-04-16 (17)
 
 ### feat: wire DB initialisation into app start
