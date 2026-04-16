@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-16 (21)
+
+### feat: remove backend dependency — app is now fully offline
+Deleted `frontend/.env` (hardcoded server IP). Stripped `services/api.ts` to types only — all HTTP functions, the `request` helper, and `BASE_URL` removed. Updated `.env.example` to note the server is no longer required. Phase 4 (offline-first) is complete.
+
+---
+
 ## 2026-04-16 (20)
 
 ### feat: barcode lookup direct from app via Open Food Facts

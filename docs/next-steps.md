@@ -56,8 +56,8 @@ These are blocked on deciding the right approach, not on implementation effort.
 - [x] **Wire up AppContext and screens to local services**
   All 10 screens and AppContext now import functions from `db/` modules. Type-only imports (`Food`, `Meal`, `LogItem`, etc.) still come from `services/api.ts` — that file is now types-only. TypeScript confirms zero errors.
 
-- [ ] **Remove backend dependency from the app**
-  Delete `frontend/.env`, `frontend/app.config.js` API URL references. The backend directory stays in the repo but is no longer needed to run the app.
+- [x] **Remove backend dependency from the app**
+  Deleted `frontend/.env` (hardcoded server IP). Stripped `services/api.ts` to types only — all HTTP functions and `BASE_URL` removed. Updated `.env.example` with a note that the server is no longer required. The backend directory stays in the repo for future reference.
 
 ### Decisions already made
 - **SQLite library:** `expo-sqlite` — built into Expo, no extra native config, sufficient for single-user

@@ -1,6 +1,5 @@
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
-
-// --- Types ---
+// Types only — all data access now goes through src/db/ (local SQLite).
+// HTTP functions have been removed; this file is kept as the canonical type source.
 
 export type FoodSource = 'USER' | 'VERIFIED' | 'OPENFOODFACTS';
 
@@ -27,6 +26,12 @@ export interface FoodServing {
 
 export interface FoodWithServings extends Food {
   servings: FoodServing[];
+}
+
+export interface ServingDraft {
+  name: string;
+  grams: number;
+  is_default: boolean;
 }
 
 export interface MacroResult {
@@ -90,121 +95,7 @@ export interface WeightEntry {
   logged_at: string;
 }
 
-// --- HTTP helper ---
-
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error((body as { error?: string }).error ?? `HTTP ${res.status}`);
-  }
-  if (res.status === 204) return undefined as T;
-  return res.json() as Promise<T>;
-}
-
-// --- Foods ---
-
-export const searchFoods = (q: string) =>
-  request<Food[]>(`/foods/search?q=${encodeURIComponent(q)}`);
-
-export const getFoodById = (id: number) =>
-  request<FoodWithServings>(`/foods/${id}`);
-
-export const getFoodByBarcode = (barcode: string) =>
-  request<Food>(`/foods/barcode/${encodeURIComponent(barcode)}`);
-
-export const getRecentFoods = () =>
-  request<Food[]>('/foods/recent');
-
-export interface ServingDraft {
-  name: string;
-  grams: number;
-  is_default: boolean;
-}
-
-export const createFood = (data: {
-  name: string;
-  barcode?: string;
-  calories_per_100g: number;
-  protein_per_100g?: number;
-  carbs_per_100g?: number;
-  fat_per_100g?: number;
-  liquid?: boolean;
-  servings?: ServingDraft[];
-}) => request<Food>('/foods', { method: 'POST', body: JSON.stringify(data) });
-
-export const editFood = (id: number, data: {
-  name: string;
-  calories_per_100g: number;
-  protein_per_100g?: number;
-  carbs_per_100g?: number;
-  fat_per_100g?: number;
-  liquid?: boolean;
-  servings?: ServingDraft[];
-}) => request<Food>(`/foods/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
-
-// --- Log ---
-
-export const getLog = (date: string) =>
-  request<DayLog>(`/log/${date}`);
-
-export const getMonthSummary = (year: number, month: number) =>
-  request<DaySummary[]>(`/log/month/${year}/${month}`);
-
-export const addLogItem = (item: {
-  date: string;
-  meal_slot: string;
-  food_id: number;
-  serving_id?: number;
-  quantity: number;
-}) => request<LogItem>('/log', { method: 'POST', body: JSON.stringify(item) });
-
-export const deleteLogItem = (id: number) =>
-  request<{ deleted: boolean }>(`/log/items/${id}`, { method: 'DELETE' });
-
-export const updateLogItem = (id: number, data: { quantity?: number; meal_slot?: string }) =>
-  request<LogItem>(`/log/items/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
-
-// --- Meals ---
-
-export const getMeals = () => request<Meal[]>('/meals');
-
-export const createMeal = (data: {
-  name: string;
-  category?: string;
-  items: { food_id: number; serving_id?: number; quantity: number }[];
-}) => request<Meal>('/meals', { method: 'POST', body: JSON.stringify(data) });
-
-export const logMeal = (mealId: number, date: string, meal_slot: string, scale: number = 1) =>
-  request(`/meals/${mealId}/log`, { method: 'POST', body: JSON.stringify({ date, meal_slot, scale }) });
-
-export const editMeal = (mealId: number, data: {
-  name?: string;
-  items?: { food_id: number; serving_id?: number; quantity: number }[];
-}) => request<Meal>(`/meals/${mealId}`, { method: 'PATCH', body: JSON.stringify(data) });
-
-export const deleteMeal = (mealId: number) =>
-  request(`/meals/${mealId}`, { method: 'DELETE' });
-
-// --- Users ---
-
 export interface UserTargets {
   target_calories: number | null;
   target_protein_g: number | null;
 }
-
-export const getTargets = () =>
-  request<UserTargets>('/users/me');
-
-export const updateTargets = (data: { target_calories?: number; target_protein_g?: number }) =>
-  request<UserTargets>('/users/me', { method: 'PATCH', body: JSON.stringify(data) });
-
-// --- Weight ---
-
-export const getWeights = () => request<WeightEntry[]>('/weight');
-
-export const logWeight = (weight_kg: number) =>
-  request<WeightEntry>('/weight', { method: 'POST', body: JSON.stringify({ weight_kg }) });
