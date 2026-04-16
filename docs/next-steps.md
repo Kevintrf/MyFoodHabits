@@ -50,8 +50,8 @@ These are blocked on deciding the right approach, not on implementation effort.
 - [x] **Write the local service layer**
   Six files created with identical function signatures to `api.ts`: `db/macros.ts` (pure calc helpers), `db/foods.ts` (search, CRUD, versioned edit, local barcode lookup), `db/log.ts` (getLog, month summary, add/delete/update log items), `db/meals.ts` (CRUD + logMeal with scale), `db/settings.ts` (targets), `db/weight.ts` (history + log). Not yet wired into app — screens still use `api.ts`.
 
-- [ ] **Move barcode lookup to the app**
-  `getFoodByBarcode` currently lives in the backend. Move it: check local `foods` table first, then fetch `https://world.openfoodfacts.org/api/v0/product/{barcode}.json`, parse the result, cache it in local SQLite. Handle no-internet gracefully (show "not found" rather than crashing).
+- [x] **Move barcode lookup to the app**
+  `getFoodByBarcode` in `db/foods.ts` now checks local DB first, then falls back to Open Food Facts (`/api/v0/product/{barcode}.json`), caches the result in SQLite with `source='OPENFOODFACTS'`, and throws `BARCODE_NOT_FOUND` for unknown barcodes or network failures. Liquid detection and macro parsing ported from backend.
 
 - [x] **Wire up AppContext and screens to local services**
   All 10 screens and AppContext now import functions from `db/` modules. Type-only imports (`Food`, `Meal`, `LogItem`, etc.) still come from `services/api.ts` — that file is now types-only. TypeScript confirms zero errors.

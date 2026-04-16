@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-16 (20)
+
+### feat: barcode lookup direct from app via Open Food Facts
+`getFoodByBarcode` in `db/foods.ts` now checks local SQLite first, then fetches from Open Food Facts, caches the result locally, and throws on unknown barcodes or network failure. Liquid detection and macro parsing ported from the backend route. The backend is no longer involved in barcode lookups.
+
+---
+
 ## 2026-04-16 (19)
 
 ### feat: wire all screens and AppContext to local SQLite services

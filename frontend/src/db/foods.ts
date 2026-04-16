@@ -93,17 +93,54 @@ export async function getFoodById(id: number): Promise<FoodWithServings> {
   return { ...mapFood(row), servings: await getServingsForFood(id) };
 }
 
-// Checks local DB only. OFI fallback is added in the barcode task (task 4).
-// Throws Error('BARCODE_NOT_FOUND') when not cached locally.
+// Check local DB first; fall back to Open Food Facts and cache the result.
 export async function getFoodByBarcode(barcode: string): Promise<Food> {
-  const row = await db.getFirstAsync<FoodRow>(
+  const cached = await db.getFirstAsync<FoodRow>(
     `SELECT id, name, barcode, liquid, source, created_by_user_id,
             calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
      FROM foods WHERE barcode = ? ORDER BY version DESC LIMIT 1`,
     [barcode],
   );
-  if (!row) throw new Error('BARCODE_NOT_FOUND');
-  return mapFood(row);
+  if (cached) return mapFood(cached);
+
+  // Fetch from Open Food Facts
+  const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${encodeURIComponent(barcode)}.json`);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = await res.json() as any;
+
+  if (data.status !== 1 || !data.product) {
+    throw new Error('BARCODE_NOT_FOUND');
+  }
+
+  const p = data.product;
+  const n = p.nutriments ?? {};
+
+  const name = ((p.product_name || p.product_name_en) as string ?? '').trim();
+  if (!name) throw new Error('BARCODE_NOT_FOUND');
+
+  const categories: string[] = p.categories_tags ?? [];
+  const liquid = categories.some((c) =>
+    ['en:beverages', 'en:drinks', 'en:waters', 'en:sodas', 'en:juices'].includes(c),
+  );
+
+  const round1 = (x: number) => Math.round(x * 10) / 10;
+  const rawKcal = n['energy-kcal_100g'] ?? (n['energy_100g'] ? n['energy_100g'] / 4.184 : 0);
+  const calories_per_100g  = round1(rawKcal);
+  const protein_per_100g   = round1(n['proteins_100g']      ?? 0);
+  const carbs_per_100g     = round1(n['carbohydrates_100g'] ?? 0);
+  const fat_per_100g       = round1(n['fat_100g']           ?? 0);
+
+  // Cache in local DB
+  const result = await db.runAsync(
+    `INSERT INTO foods
+       (name, barcode, liquid, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g,
+        source, version)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'OPENFOODFACTS', 1)`,
+    [name, barcode, liquid ? 1 : 0, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g],
+  );
+
+  const row = await db.getFirstAsync<FoodRow>('SELECT * FROM foods WHERE id = ?', [result.lastInsertRowId]);
+  return mapFood(row!);
 }
 
 export async function getRecentFoods(): Promise<Food[]> {
