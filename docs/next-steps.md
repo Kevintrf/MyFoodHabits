@@ -41,8 +41,8 @@ These are blocked on deciding the right approach, not on implementation effort.
 
 ### Tasks (in order)
 
-- [ ] **Install expo-sqlite and design the local schema**
-  Install `expo-sqlite`. Write `CREATE TABLE IF NOT EXISTS` statements for all tables: `foods`, `food_servings`, `day_logs`, `log_items`, `meals`, `meal_items`, `weights`, `user_settings`. Schema mirrors the current PostgreSQL schema but adapted for SQLite (no enums — use TEXT with CHECK, no `SERIAL` — use `INTEGER PRIMARY KEY`, timestamps as ISO strings).
+- [x] **Install expo-sqlite and design the local schema**
+  `expo-sqlite` v16 installed. `src/db/client.ts` opens the DB singleton with `PRAGMA foreign_keys = ON`. `src/db/schema.ts` defines all tables (`user_settings`, `foods`, `food_servings`, `day_logs`, `log_items`, `meals`, `meal_items`, `weights`) and indexes, adapted for SQLite (TEXT CHECK for enums, INTEGER PRIMARY KEY, ISO-8601 TEXT timestamps, REAL for floats). `initSchema()` exported — not yet wired into app start.
 
 - [ ] **DB initialisation on app start**
   On first launch, run all schema statements and seed a default user row in `user_settings` (calorie target 2000, protein 150). Store a `schema_version` integer in `user_settings` for future migrations.

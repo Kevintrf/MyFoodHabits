@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-16 (16)
+
+### feat: install expo-sqlite and define local SQLite schema
+Added `expo-sqlite` v16. Created `src/db/client.ts` (DB singleton, foreign keys enabled) and `src/db/schema.ts` (all 8 tables + 6 indexes adapted from the PostgreSQL schema, plus `initSchema()` which creates tables and seeds default user settings on first install). Not yet wired into app start — that is the next task.
+
+---
+
 ## 2026-04-15 (15)
 
 ### fix: weight dot timezone bug and performance pre-fetch on app open
