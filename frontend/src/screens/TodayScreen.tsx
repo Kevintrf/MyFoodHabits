@@ -11,7 +11,6 @@ import {
   Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { CommonActions } from '@react-navigation/native';
 import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
 import { LogItem } from '../services/api';
@@ -152,20 +151,7 @@ export default function TodayScreen() {
 
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => {
-            navigation.dispatch((state: any) => {
-              const routes = state.routes.map((r: any) =>
-                r.name === 'SearchTab'
-                  ? { ...r, state: { index: 0, routes: [{ name: 'Search' }] } }
-                  : r,
-              );
-              return CommonActions.reset({
-                ...state,
-                routes,
-                index: routes.findIndex((r: any) => r.name === 'SearchTab'),
-              });
-            });
-          }}
+          onPress={() => navigation.getParent()?.navigate('SearchTab')}
         >
           <Text style={styles.addButtonText}>+ Add Food</Text>
         </TouchableOpacity>

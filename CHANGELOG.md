@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-16 (23)
+
+### fix: "+ Add Food" crash in release build
+`TodayScreen` lives inside `TodayStack`, so `navigation.dispatch(CommonActions.reset(...))` was handled by the stack navigator — `state.routes` contained only stack routes, `findIndex('SearchTab')` returned -1, and `index: -1` caused a hard crash in release (Hermes). Replaced the broken reset dispatch with `navigation.getParent()?.navigate('SearchTab')` which correctly targets the parent tab navigator.
+
+---
+
 ## 2026-04-16 (22)
 
 ### chore: rename app to MyFoodHabits, update icons and bundle identifiers
