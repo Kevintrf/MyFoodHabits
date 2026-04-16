@@ -12,7 +12,8 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { getMeals, logMeal, Meal, MealItem } from '../services/api';
+import { Meal, MealItem } from '../services/api';
+import { getMeals, logMeal } from '../db/meals';
 import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
 import { MealsStackParamList } from '../navigation/RootNavigator';

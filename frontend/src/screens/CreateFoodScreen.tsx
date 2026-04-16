@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { createFood, ServingDraft } from '../services/api';
+import { ServingDraft } from '../services/api';
+import { createFood } from '../db/foods';
 import { showAlert } from '../utils/alert';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 

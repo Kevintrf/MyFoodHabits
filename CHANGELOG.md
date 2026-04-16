@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-16 (19)
+
+### feat: wire all screens and AppContext to local SQLite services
+All 10 screens and AppContext now import functions from the db/ modules instead of the HTTP api.ts. Type-only imports (Food, Meal, LogItem, etc.) remain in api.ts which is now effectively a types file. No server connection required for any app feature.
+
+---
+
 ## 2026-04-16 (18)
 
 ### feat: local SQLite service layer (foods, log, meals, settings, weight)

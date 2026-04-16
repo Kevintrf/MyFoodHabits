@@ -8,7 +8,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getMonthSummary, DaySummary } from '../services/api';
+import { DaySummary } from '../services/api';
+import { getMonthSummary } from '../db/log';
 import { useApp } from '../context/AppContext';
 
 const DAY_LABELS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];

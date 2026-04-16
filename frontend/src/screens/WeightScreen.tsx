@@ -12,7 +12,8 @@ import {
   Platform,
 } from 'react-native';
 import { showAlert } from '../utils/alert';
-import { getWeights, logWeight, WeightEntry } from '../services/api';
+import { WeightEntry } from '../services/api';
+import { getWeights, logWeight } from '../db/weight';
 import { useApp } from '../context/AppContext';
 
 export default function WeightScreen() {

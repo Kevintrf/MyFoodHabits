@@ -14,7 +14,8 @@ import { useNavigation } from '@react-navigation/native';
 import { CommonActions } from '@react-navigation/native';
 import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
-import { LogItem, deleteLogItem, updateLogItem } from '../services/api';
+import { LogItem } from '../services/api';
+import { deleteLogItem, updateLogItem } from '../db/log';
 import { fmtNum } from '../utils/format';
 
 const MEAL_SLOTS = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];

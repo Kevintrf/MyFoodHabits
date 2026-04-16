@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { useApp } from '../context/AppContext';
-import { updateTargets } from '../services/api';
+import { updateTargets } from '../db/settings';
 import { showAlert } from '../utils/alert';
 
 export default function SettingsScreen() {

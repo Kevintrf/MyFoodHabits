@@ -13,7 +13,9 @@ import {
 import { showAlert } from '../utils/alert';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SearchStackParamList } from '../navigation/RootNavigator';
-import { getFoodById, addLogItem, FoodServing, FoodWithServings } from '../services/api';
+import { FoodServing, FoodWithServings } from '../services/api';
+import { getFoodById } from '../db/foods';
+import { addLogItem } from '../db/log';
 import { useApp } from '../context/AppContext';
 import { fmtNum } from '../utils/format';
 

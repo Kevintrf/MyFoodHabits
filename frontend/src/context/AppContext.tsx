@@ -1,5 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { getLog, DayLog, getTargets, UserTargets, getWeights, getRecentFoods, Food } from '../services/api';
+import { DayLog, UserTargets, Food } from '../services/api';
+import { getLog } from '../db/log';
+import { getTargets } from '../db/settings';
+import { getWeights } from '../db/weight';
+import { getRecentFoods } from '../db/foods';
 
 // TODO: replace with real user from auth
 export const USER_ID = 1;

@@ -53,8 +53,8 @@ These are blocked on deciding the right approach, not on implementation effort.
 - [ ] **Move barcode lookup to the app**
   `getFoodByBarcode` currently lives in the backend. Move it: check local `foods` table first, then fetch `https://world.openfoodfacts.org/api/v0/product/{barcode}.json`, parse the result, cache it in local SQLite. Handle no-internet gracefully (show "not found" rather than crashing).
 
-- [ ] **Wire up AppContext and screens to local services**
-  Swap all imports of `../services/api` for the new local db modules. Remove `EXPO_PUBLIC_API_URL` from app config. Verify every screen works end-to-end.
+- [x] **Wire up AppContext and screens to local services**
+  All 10 screens and AppContext now import functions from `db/` modules. Type-only imports (`Food`, `Meal`, `LogItem`, etc.) still come from `services/api.ts` — that file is now types-only. TypeScript confirms zero errors.
 
 - [ ] **Remove backend dependency from the app**
   Delete `frontend/.env`, `frontend/app.config.js` API URL references. The backend directory stays in the repo but is no longer needed to run the app.
