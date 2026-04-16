@@ -58,6 +58,17 @@ Scan the QR code with Expo Go on your phone.
 > cd frontend && npx expo start --tunnel --clear
 > ```
 
+### Building a standalone APK (no Metro required)
+
+A release build bundles the JavaScript directly into the APK so the app runs fully standalone — no computer, no Metro, no server needed.
+
+```bash
+cd frontend
+npx expo run:android --variant release
+```
+
+The APK is built and installed directly on your connected phone. The first build takes a few minutes; subsequent builds are faster due to Gradle's cache.
+
 ---
 
 ## Technology stack
