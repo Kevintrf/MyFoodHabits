@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-17 (24)
+
+### fix: reset search stack to fresh screen after logging a food
+After logging a food in PortionScreen, the SearchStack was left with Portion on top. Revisiting the Search tab would land on the previous food's screen. Now resets the SearchStack to a fresh Search screen before switching to Today.
+
+---
+
 ## 2026-04-16 (23)
 
 ### fix: "+ Add Food" crash in release build

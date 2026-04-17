@@ -67,7 +67,8 @@ export default function PortionScreen() {
         quantity: qty,
       });
       await refreshViewingLog();
-      navigation.navigate('Today');
+      navigation.reset({ index: 0, routes: [{ name: 'Search' }] });
+      navigation.getParent()?.navigate('Today');
     } catch (e) {
       showAlert('Error', e instanceof Error ? e.message : 'Something went wrong');
     } finally {
