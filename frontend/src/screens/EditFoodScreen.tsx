@@ -61,7 +61,7 @@ export default function EditFoodScreen() {
       return;
     }
     setServings((prev) => {
-      const next = [...prev, { name: servingName.trim(), grams, is_default: prev.length === 0 }];
+      const next = [...prev, { name: servingName.trim(), grams, is_default: false }];
       return next.sort((a, b) => b.grams - a.grams);
     });
     setServingName('');
@@ -69,17 +69,18 @@ export default function EditFoodScreen() {
   }
 
   function removeServing(index: number) {
-    setServings((prev) => {
-      const removedWasDefault = prev[index].is_default;
-      const next = prev.filter((_, i) => i !== index);
-      if (removedWasDefault && next.length > 0) next[0] = { ...next[0], is_default: true };
-      return next;
-    });
+    setServings((prev) => prev.filter((_, i) => i !== index).map((s) => ({ ...s, is_default: false })));
   }
 
   function setDefault(index: number) {
     setServings((prev) => prev.map((s, i) => ({ ...s, is_default: i === index })));
   }
+
+  function setGramsAsDefault() {
+    setServings((prev) => prev.map((s) => ({ ...s, is_default: false })));
+  }
+
+  const gramsIsDefault = !servings.some((s) => s.is_default);
 
   async function handleSave() {
     const cal = parseFloat(calories);
@@ -206,6 +207,18 @@ export default function EditFoodScreen() {
         <ActivityIndicator color="#2D6A4F" style={{ marginBottom: 12 }} />
       ) : (
         <>
+          <View style={styles.servingRow}>
+            <Text style={styles.servingText}>{liquid ? 'Milliliters' : 'Grams'}</Text>
+            <View style={styles.servingActions}>
+              {gramsIsDefault ? (
+                <Text style={styles.defaultBadge}>Default</Text>
+              ) : (
+                <TouchableOpacity onPress={setGramsAsDefault}>
+                  <Text style={styles.setDefaultBtn}>Set default</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
           {servings.map((s, i) => (
             <View key={i} style={styles.servingRow}>
               <Text style={styles.servingText}>

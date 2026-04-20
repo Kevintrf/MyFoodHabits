@@ -40,7 +40,7 @@ export default function PortionScreen() {
     getFoodById(food.id)
       .then((f) => {
         setFoodDetail(f);
-        const def = f.servings.find((s) => s.is_default) ?? f.servings[0] ?? null;
+        const def = f.servings.find((s) => s.is_default) ?? null;
         setSelectedServing(def);
         setQuantity(def ? '1' : '100');
       })
