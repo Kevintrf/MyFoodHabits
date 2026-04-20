@@ -214,7 +214,7 @@ export default function TodayScreen() {
                       onPress={() => setEditServingId(s.id)}
                     >
                       <Text style={[styles.slotBtnText, editServingId === s.id && styles.slotBtnTextActive]}>
-                        {s.name}
+                        {s.name} ({s.grams}{editTarget?.item.liquid ? 'ml' : 'g'})
                       </Text>
                     </TouchableOpacity>
                   ))}
