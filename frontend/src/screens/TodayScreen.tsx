@@ -108,6 +108,7 @@ export default function TodayScreen() {
             value={Math.round(totals.protein_g)}
             target={targets.target_protein_g ?? 150}
             unit="g"
+            minGoal
           />
         </View>
 
@@ -223,14 +224,17 @@ function MacroCard({
   value,
   target,
   unit,
+  minGoal = false,
 }: {
   label: string;
   value: number;
   target: number;
   unit: string;
+  minGoal?: boolean;
 }) {
   const pct = Math.min(value / target, 1);
   const over = value > target;
+  const fillColor = minGoal ? (over ? '#2D6A4F' : '#e74c3c') : (over ? '#e74c3c' : '#2D6A4F');
   return (
     <View style={styles.macroCard}>
       <Text style={styles.macroLabel}>{label}</Text>
@@ -242,7 +246,7 @@ function MacroCard({
         <View
           style={[
             styles.progressFill,
-            { width: `${pct * 100}%` as any, backgroundColor: over ? '#e74c3c' : '#2D6A4F' },
+            { width: `${pct * 100}%` as any, backgroundColor: fillColor },
           ]}
         />
       </View>
