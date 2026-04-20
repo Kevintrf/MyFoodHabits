@@ -58,7 +58,7 @@ async function fetchLogItem(id: number): Promise<LogItem> {
 }
 
 function mapLogItemRow(row: LogItemRow): LogItem {
-  const servingGrams = row.serving_grams ?? 100;
+  const servingGrams = row.serving_grams ?? 1;
   const macros = calcMacros(
     {
       calories_per_100g: row.calories_per_100g,
@@ -136,7 +136,7 @@ export async function getMonthSummary(year: number, month: number): Promise<DayS
     `SELECT dl.date AS date,
             ROUND(SUM(
               f.calories_per_100g
-              * COALESCE(fs.grams, 100)
+              * COALESCE(fs.grams, 1)
               / 100
               * li.quantity
             )) AS calories
@@ -195,10 +195,10 @@ export async function deleteLogItem(id: number): Promise<{ deleted: boolean }> {
 
 export async function updateLogItem(
   id: number,
-  data: { quantity?: number; meal_slot?: string },
+  data: { quantity?: number; meal_slot?: string; serving_id?: number | null },
 ): Promise<LogItem> {
   const setClauses: string[] = [];
-  const params: (string | number)[] = [];
+  const params: (string | number | null)[] = [];
 
   if (data.quantity !== undefined) {
     setClauses.push('quantity = ?');
@@ -207,6 +207,10 @@ export async function updateLogItem(
   if (data.meal_slot !== undefined) {
     setClauses.push('meal_slot = ?');
     params.push(data.meal_slot);
+  }
+  if (data.serving_id !== undefined) {
+    setClauses.push('serving_id = ?');
+    params.push(data.serving_id);
   }
 
   params.push(id);

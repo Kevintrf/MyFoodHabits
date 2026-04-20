@@ -31,7 +31,7 @@ export default function PortionScreen() {
 
   const [foodDetail, setFoodDetail] = useState<FoodWithServings | null>(null);
   const [selectedServing, setSelectedServing] = useState<FoodServing | null>(null);
-  const [quantity, setQuantity] = useState('1');
+  const [quantity, setQuantity] = useState('100');
   const [mealSlot, setMealSlot] = useState('BREAKFAST');
   const [loading, setLoading] = useState(true);
   const [logging, setLogging] = useState(false);
@@ -42,11 +42,12 @@ export default function PortionScreen() {
         setFoodDetail(f);
         const def = f.servings.find((s) => s.is_default) ?? f.servings[0] ?? null;
         setSelectedServing(def);
+        setQuantity(def ? '1' : '100');
       })
       .finally(() => setLoading(false));
   }, [food.id]);
 
-  const servingGrams = selectedServing?.grams ?? 100;
+  const servingGrams = selectedServing?.grams ?? 1;
   const qty = parseFloat(quantity);
   const multiplier = (servingGrams / 100) * (qty || 0);
   const preview = {
@@ -103,6 +104,14 @@ export default function PortionScreen() {
     doLog();
   }
 
+  function handleServingChange(serving: FoodServing | null) {
+    const currentGrams = (selectedServing?.grams ?? 1) * (parseFloat(quantity) || 0);
+    const newServingGrams = serving?.grams ?? 1;
+    const converted = Math.round((currentGrams / newServingGrams) * 10) / 10;
+    setSelectedServing(serving);
+    setQuantity(String(converted || (serving ? 1 : 100)));
+  }
+
   const unitLabel = food.liquid ? 'ml' : 'g';
 
   if (loading) return <ActivityIndicator style={styles.loader} color="#2D6A4F" />;
@@ -132,15 +141,15 @@ export default function PortionScreen() {
           <Text style={styles.sectionLabel}>SERVING SIZE</Text>
           <TouchableOpacity
             style={[styles.servingOption, !selectedServing && styles.servingSelected]}
-            onPress={() => setSelectedServing(null)}
+            onPress={() => handleServingChange(null)}
           >
-            <Text style={styles.servingText}>100{unitLabel}</Text>
+            <Text style={styles.servingText}>{food.liquid ? 'Milliliters' : 'Grams'}</Text>
           </TouchableOpacity>
           {[...foodDetail.servings].sort((a, b) => b.grams - a.grams).map((s) => (
             <TouchableOpacity
               key={s.id}
               style={[styles.servingOption, selectedServing?.id === s.id && styles.servingSelected]}
-              onPress={() => setSelectedServing(s)}
+              onPress={() => handleServingChange(s)}
             >
               <Text style={styles.servingText}>
                 {s.name} ({s.grams}{unitLabel})
@@ -152,7 +161,9 @@ export default function PortionScreen() {
 
       {/* Quantity */}
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>QUANTITY</Text>
+        <Text style={styles.sectionLabel}>
+          {selectedServing ? 'QUANTITY' : food.liquid ? 'MILLILITERS' : 'GRAMS'}
+        </Text>
         <TextInput
           style={styles.quantityInput}
           value={quantity}

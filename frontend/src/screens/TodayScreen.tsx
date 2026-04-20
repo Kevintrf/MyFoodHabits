@@ -13,8 +13,9 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
-import { LogItem } from '../services/api';
+import { LogItem, FoodServing, FoodWithServings } from '../services/api';
 import { deleteLogItem, updateLogItem } from '../db/log';
+import { getFoodById } from '../db/foods';
 import { fmtNum } from '../utils/format';
 
 const MEAL_SLOTS = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
@@ -25,6 +26,9 @@ export default function TodayScreen() {
   const [editTarget, setEditTarget] = useState<{ item: LogItem; slot: string } | null>(null);
   const [editQty, setEditQty] = useState('');
   const [editSlot, setEditSlot] = useState('');
+  const [editServingId, setEditServingId] = useState<number | null>(null);
+  const [editServings, setEditServings] = useState<FoodServing[]>([]);
+  const [editFood, setEditFood] = useState<FoodWithServings | null>(null);
   const [saving, setSaving] = useState(false);
 
   const isViewingToday = viewingDate === todayDate;
@@ -37,6 +41,13 @@ export default function TodayScreen() {
     setEditTarget({ item, slot });
     setEditQty(String(item.quantity));
     setEditSlot(slot);
+    setEditServingId(item.serving_id);
+    setEditServings([]);
+    setEditFood(null);
+    getFoodById(item.food_id).then((f) => {
+      setEditFood(f);
+      setEditServings(f.servings);
+    });
   }
 
   async function handleSave() {
@@ -45,7 +56,7 @@ export default function TodayScreen() {
     if (isNaN(qty) || qty <= 0) return;
     setSaving(true);
     try {
-      await updateLogItem(editTarget.item.id, { quantity: qty, meal_slot: editSlot });
+      await updateLogItem(editTarget.item.id, { quantity: qty, meal_slot: editSlot, serving_id: editServingId });
       await refreshViewingLog();
       setEditTarget(null);
     } finally {
@@ -71,6 +82,15 @@ export default function TodayScreen() {
         },
       ],
     );
+  }
+
+  function handleEditFood() {
+    if (!editFood) return;
+    setEditTarget(null);
+    navigation.getParent()?.navigate('SearchTab', {
+      screen: 'EditFood',
+      params: { food: editFood },
+    });
   }
 
   const totals = viewingLog?.totals ?? { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 };
@@ -175,7 +195,38 @@ export default function TodayScreen() {
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>{editTarget?.item.food_name}</Text>
 
-            <Text style={styles.modalLabel}>QUANTITY</Text>
+            {editServings.length > 0 && (
+              <>
+                <Text style={styles.modalLabel}>SERVING</Text>
+                <View style={styles.slotRow}>
+                  <TouchableOpacity
+                    style={[styles.slotBtn, editServingId === null && styles.slotBtnActive]}
+                    onPress={() => setEditServingId(null)}
+                  >
+                    <Text style={[styles.slotBtnText, editServingId === null && styles.slotBtnTextActive]}>
+                      {editTarget?.item.liquid ? 'ml' : 'g'}
+                    </Text>
+                  </TouchableOpacity>
+                  {editServings.map((s) => (
+                    <TouchableOpacity
+                      key={s.id}
+                      style={[styles.slotBtn, editServingId === s.id && styles.slotBtnActive]}
+                      onPress={() => setEditServingId(s.id)}
+                    >
+                      <Text style={[styles.slotBtnText, editServingId === s.id && styles.slotBtnTextActive]}>
+                        {s.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </>
+            )}
+
+            <Text style={styles.modalLabel}>
+              {editServingId === null
+                ? editTarget?.item.liquid ? 'MILLILITERS' : 'GRAMS'
+                : 'QUANTITY'}
+            </Text>
             <TextInput
               style={styles.modalInput}
               value={editQty}
@@ -202,6 +253,12 @@ export default function TodayScreen() {
             <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={saving}>
               <Text style={styles.saveBtnText}>{saving ? 'Saving…' : 'Save changes'}</Text>
             </TouchableOpacity>
+
+            {editFood?.source === 'USER' && (
+              <TouchableOpacity style={styles.editFoodBtn} onPress={handleEditFood}>
+                <Text style={styles.editFoodBtnText}>Edit food</Text>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity style={styles.deleteBtn} onPress={handleDelete}>
               <Text style={styles.deleteBtnText}>Delete from log</Text>
@@ -364,6 +421,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  editFoodBtn: { padding: 14, alignItems: 'center', marginBottom: 4 },
+  editFoodBtnText: { color: '#2D6A4F', fontSize: 16, fontWeight: '500' },
   deleteBtn: { padding: 14, alignItems: 'center', marginBottom: 4 },
   deleteBtnText: { color: '#e74c3c', fontSize: 16, fontWeight: '500' },
   cancelBtn: { padding: 10, alignItems: 'center' },

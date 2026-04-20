@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-20 (25)
+
+### feat: gram/ml input for raw serving, serving picker and edit food in log modal
+When no named serving is selected, the input now represents grams (or milliliters) directly — the serving picker option is labelled "Grams"/"Milliliters" instead of "100g", and the quantity label updates to match. Switching between servings auto-converts the quantity to preserve the same gram amount. The log-item edit modal in TodayScreen now shows a serving picker and an "Edit food" button (for user-created foods). `updateLogItem` accepts a `serving_id` change. Note: existing log entries saved without a serving type stored quantity as multiples of 100g; those entries will display incorrect values and should be re-logged.
+
+---
+
 ## 2026-04-17 (24)
 
 ### fix: reset search stack to fresh screen after logging a food
