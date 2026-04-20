@@ -12,62 +12,48 @@ The app should follow the SLC model "Simple, Loveable, Complete" and focus on do
 
 ### Prerequisites
 
-- Docker (for the local PostgreSQL database)
 - Node.js
-- Expo Go app on your phone
+- Android Studio (for the emulator or to provide the Android SDK for physical device builds)
 
-### First-time setup
-
-```bash
-# 1. Start the database
-docker compose up -d
-
-# 2. Apply schema migrations
-cd backend && npm run migrate:up
-
-# 3. Seed the default dev user
-npm run seed
-
-# 4. Set your machine's LAN IP in the frontend env
-cp frontend/.env.example frontend/.env
-# Edit frontend/.env and set: EXPO_PUBLIC_API_URL=http://<your-machine-ip>:3000
-```
-
-### Starting the app
+### Running on a physical phone (Expo Go)
 
 ```bash
-# Terminal 1 — make sure the database is running
-docker compose up -d
-
-# Terminal 2 — start the backend
-cd backend && npm run dev
-
-# Terminal 3 — start the frontend
 cd frontend && npx expo start --clear
 ```
 
-Scan the QR code with Expo Go on your phone.
+Scan the QR code with the Expo Go app on your phone.
 
-> **Tip:** If the app fails to load on your phone (e.g. "Failed to download remote update"), UFW may be blocking Metro and the backend. Run once to open the ports:
+> **Tip:** If the app fails to load (e.g. "Failed to download remote update"), UFW may be blocking Metro. Run once to open the port:
 > ```bash
-> sudo ufw allow 3000/tcp
 > sudo ufw allow 8081/tcp
 > ```
-> As a fallback, tunnel mode also works (may need a couple of attempts):
+> As a fallback, tunnel mode also works:
 > ```bash
 > cd frontend && npx expo start --tunnel --clear
 > ```
 
+### Running on an Android emulator
+
+1. Open Android Studio → **Device Manager** → create a virtual device (e.g. Pixel 8, API 35) if you don't have one
+2. Start the emulator from Device Manager (or via the AVD Manager)
+3. Start Metro:
+   ```bash
+   cd frontend && npx expo start --clear
+   ```
+4. Press `a` in the Metro terminal to open the app in the running emulator
+
+The first launch installs the Expo Go app automatically into the emulator.
+
 ### Building a standalone APK (no Metro required)
 
-A release build bundles the JavaScript directly into the APK so the app runs fully standalone — no computer, no Metro, no server needed.
+A release build bundles the JavaScript directly into the APK so the app runs fully standalone — no computer, no Metro needed. Requires a connected physical device or a running emulator.
 
 ```bash
 cd frontend
 npx expo run:android --variant release
 ```
 
-The APK is built and installed directly on your connected phone. The first build takes a few minutes; subsequent builds are faster due to Gradle's cache.
+The APK is built and installed directly on the connected device. The first build takes a few minutes; subsequent builds are faster due to Gradle's cache.
 
 ---
 
