@@ -234,7 +234,7 @@ function MacroCard({
 }) {
   const pct = Math.min(value / target, 1);
   const over = value > target;
-  const fillColor = minGoal ? (over ? '#2D6A4F' : '#e74c3c') : (over ? '#e74c3c' : '#2D6A4F');
+  const fillColor = minGoal ? (value >= target ? '#2D6A4F' : '#e74c3c') : (over ? '#e74c3c' : '#2D6A4F');
   return (
     <View style={styles.macroCard}>
       <Text style={styles.macroLabel}>{label}</Text>
