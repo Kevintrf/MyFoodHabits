@@ -124,15 +124,14 @@ export default function PortionScreen() {
         <Text style={styles.foodName}>{food.name}</Text>
         <Text style={styles.foodSourceLabel}>
           {food.source === 'USER' ? 'My food' : food.source === 'OPENFOODFACTS' ? 'Open Food Facts' : 'Verified'}
+          {food.locally_modified ? ' · Modified' : ''}
         </Text>
         <Text style={styles.foodSub}>
           {fmtNum(food.calories_per_100g)} kcal · {fmtNum(food.protein_per_100g)}g Protein · {fmtNum(food.carbs_per_100g)}g Carbs · {fmtNum(food.fat_per_100g)}g Fat per 100{unitLabel}
         </Text>
-        {food.source === 'USER' && (
-          <TouchableOpacity onPress={() => navigation.navigate('EditFood', { food })}>
-            <Text style={styles.editLink}>Edit food</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity onPress={() => navigation.navigate('EditFood', { food })}>
+          <Text style={styles.editLink}>Edit food</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Serving picker */}

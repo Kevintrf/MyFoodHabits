@@ -1,7 +1,7 @@
 import { db } from './client';
 
 // Bump this when adding new tables or columns and add a migration below.
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 // ---------------------------------------------------------------------------
 // Table definitions
@@ -36,6 +36,7 @@ const CREATE_TABLES = `
     protein_per_100g     REAL NOT NULL DEFAULT 0,
     carbs_per_100g       REAL NOT NULL DEFAULT 0,
     fat_per_100g         REAL NOT NULL DEFAULT 0,
+    locally_modified     INTEGER NOT NULL DEFAULT 0,
     created_at           TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -128,8 +129,22 @@ export function initSchema(): void {
     // Seed the single user_settings row on first install
     db.runSync(
       `INSERT OR IGNORE INTO user_settings (id, target_calories, target_protein_g, schema_version)
-       VALUES (1, 2000, 150, ?)`,
-      [SCHEMA_VERSION],
+       VALUES (1, 2000, 150, 1)`,
     );
+
+    // Run migrations for existing installs
+    const row = db.getFirstSync<{ schema_version: number }>(
+      'SELECT schema_version FROM user_settings WHERE id = 1',
+    );
+    const currentVersion = row?.schema_version ?? 1;
+
+    if (currentVersion < 2) {
+      try {
+        db.execSync('ALTER TABLE foods ADD COLUMN locally_modified INTEGER NOT NULL DEFAULT 0;');
+      } catch {
+        // Column already exists (fresh install from updated CREATE TABLE)
+      }
+      db.runSync('UPDATE user_settings SET schema_version = 2 WHERE id = 1');
+    }
   });
 }

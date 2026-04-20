@@ -11,6 +11,7 @@ interface FoodRow {
   barcode: string | null;
   liquid: number;
   source: string;
+  locally_modified: number;
   created_by_user_id: number | null;
   calories_per_100g: number;
   protein_per_100g: number;
@@ -39,6 +40,7 @@ function mapFood(row: FoodRow): Food {
     barcode: row.barcode,
     liquid: !!row.liquid,
     source: row.source as FoodSource,
+    locally_modified: !!row.locally_modified,
     created_by_user_id: row.created_by_user_id,
     calories_per_100g: row.calories_per_100g,
     protein_per_100g: row.protein_per_100g,
@@ -71,7 +73,7 @@ async function getServingsForFood(foodId: number): Promise<FoodServing[]> {
 
 export async function searchFoods(q: string): Promise<Food[]> {
   const rows = await db.getAllAsync<FoodRow>(
-    `SELECT id, name, barcode, liquid, source, created_by_user_id,
+    `SELECT id, name, barcode, liquid, source, locally_modified, created_by_user_id,
             calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
      FROM foods
      WHERE name LIKE ?
@@ -84,7 +86,7 @@ export async function searchFoods(q: string): Promise<Food[]> {
 
 export async function getFoodById(id: number): Promise<FoodWithServings> {
   const row = await db.getFirstAsync<FoodRow>(
-    `SELECT id, name, barcode, liquid, source, created_by_user_id,
+    `SELECT id, name, barcode, liquid, source, locally_modified, created_by_user_id,
             calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, created_at
      FROM foods WHERE id = ?`,
     [id],
@@ -96,7 +98,7 @@ export async function getFoodById(id: number): Promise<FoodWithServings> {
 // Check local DB first; fall back to Open Food Facts and cache the result.
 export async function getFoodByBarcode(barcode: string): Promise<Food> {
   const cached = await db.getFirstAsync<FoodRow>(
-    `SELECT id, name, barcode, liquid, source, created_by_user_id,
+    `SELECT id, name, barcode, liquid, source, locally_modified, created_by_user_id,
             calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
      FROM foods WHERE barcode = ? ORDER BY version DESC LIMIT 1`,
     [barcode],
@@ -201,6 +203,49 @@ export async function createFood(data: {
   });
 
   const row = await db.getFirstAsync<FoodRow>('SELECT * FROM foods WHERE id = ?', [foodId]);
+  return mapFood(row!);
+}
+
+// Update an external (OPENFOODFACTS/VERIFIED) food in-place and mark it locally modified.
+export async function patchExternalFood(
+  id: number,
+  data: {
+    name: string;
+    calories_per_100g: number;
+    protein_per_100g?: number;
+    carbs_per_100g?: number;
+    fat_per_100g?: number;
+    liquid: boolean;
+    servings?: ServingDraft[];
+  },
+): Promise<Food> {
+  await db.withTransactionAsync(async () => {
+    await db.runAsync(
+      `UPDATE foods SET
+         name = ?, calories_per_100g = ?, protein_per_100g = ?,
+         carbs_per_100g = ?, fat_per_100g = ?, liquid = ?, locally_modified = 1
+       WHERE id = ?`,
+      [
+        data.name,
+        data.calories_per_100g,
+        data.protein_per_100g ?? 0,
+        data.carbs_per_100g ?? 0,
+        data.fat_per_100g ?? 0,
+        data.liquid ? 1 : 0,
+        id,
+      ],
+    );
+
+    await db.runAsync('DELETE FROM food_servings WHERE food_id = ?', [id]);
+    for (const s of data.servings ?? []) {
+      await db.runAsync(
+        'INSERT INTO food_servings (food_id, name, grams, is_default) VALUES (?, ?, ?, ?)',
+        [id, s.name, s.grams, s.is_default ? 1 : 0],
+      );
+    }
+  });
+
+  const row = await db.getFirstAsync<FoodRow>('SELECT * FROM foods WHERE id = ?', [id]);
   return mapFood(row!);
 }
 

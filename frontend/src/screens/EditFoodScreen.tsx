@@ -14,7 +14,7 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ServingDraft } from '../services/api';
-import { editFood, getFoodById } from '../db/foods';
+import { editFood, patchExternalFood, getFoodById } from '../db/foods';
 import { showAlert } from '../utils/alert';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 
@@ -112,7 +112,7 @@ export default function EditFoodScreen() {
     const cal = parseFloat(calories);
     setSaving(true);
     try {
-      const updated = await editFood(food.id, {
+      const draft = {
         name: name.trim(),
         calories_per_100g: cal,
         protein_per_100g: parseFloat(protein) || 0,
@@ -120,7 +120,11 @@ export default function EditFoodScreen() {
         fat_per_100g: parseFloat(fat) || 0,
         liquid,
         servings,
-      });
+      };
+      const isExternal = food.source === 'OPENFOODFACTS' || food.source === 'VERIFIED';
+      const updated = isExternal
+        ? await patchExternalFood(food.id, draft)
+        : await editFood(food.id, draft);
       navigation.replace('Portion', { food: updated });
     } catch {
       showAlert('Error', 'Could not save changes. Please try again.');

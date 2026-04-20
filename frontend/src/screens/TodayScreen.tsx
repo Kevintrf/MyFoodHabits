@@ -254,7 +254,7 @@ export default function TodayScreen() {
               <Text style={styles.saveBtnText}>{saving ? 'Saving…' : 'Save changes'}</Text>
             </TouchableOpacity>
 
-            {editFood?.source === 'USER' && (
+            {editFood && (
               <TouchableOpacity style={styles.editFoodBtn} onPress={handleEditFood}>
                 <Text style={styles.editFoodBtnText}>Edit food</Text>
               </TouchableOpacity>

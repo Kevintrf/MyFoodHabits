@@ -155,6 +155,9 @@ export default function SearchScreen() {
                 <Text style={[styles.sourceBadge, { color: SOURCE_COLOR[item.source] }]}>
                   {SOURCE_LABEL[item.source]}
                 </Text>
+                {item.locally_modified && (
+                  <Text style={styles.modifiedBadge}>Modified</Text>
+                )}
               </View>
               <Text style={styles.resultSub}>
                 {fmtNum(item.calories_per_100g)} kcal per 100{item.liquid ? 'ml' : 'g'}
@@ -244,6 +247,7 @@ const styles = StyleSheet.create({
   resultNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
   resultName: { fontSize: 16, fontWeight: '500', color: '#1A1A1A' },
   sourceBadge: { fontSize: 11, fontWeight: '600' },
+  modifiedBadge: { fontSize: 11, fontWeight: '600', color: '#E67E22' },
   resultSub: { fontSize: 13, color: '#999', marginTop: 3 },
   chevron: { fontSize: 22, color: '#ccc', marginLeft: 8 },
   // Scanner

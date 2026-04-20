@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-20 (26)
+
+### feat: edit external foods in-place with locally_modified flag
+External foods (Open Food Facts, Verified) can now be edited directly from PortionScreen and the TodayScreen log modal. Editing an external food updates the row in-place and sets a `locally_modified` flag instead of creating a new versioned row, so the same food is returned on future scans or searches. A "Modified" badge (amber) appears next to the source label in search results and on the portion screen. Schema bumped to v2 with an ALTER TABLE migration for existing installs. "Edit food" button is now shown for all food sources.
+
+---
+
 ## 2026-04-20 (25)
 
 ### feat: gram/ml input for raw serving, serving picker and edit food in log modal

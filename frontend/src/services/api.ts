@@ -9,6 +9,7 @@ export interface Food {
   barcode: string | null;
   liquid: boolean;
   source: FoodSource;
+  locally_modified: boolean;
   created_by_user_id: number | null;
   calories_per_100g: number;
   protein_per_100g: number;
