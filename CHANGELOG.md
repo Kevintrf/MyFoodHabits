@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-29 (32)
+
+### feat: paginated recent foods list in search screen
+The recent foods list now loads 20 items at a time. Scrolling to the bottom loads the next page automatically with a spinner indicator. The list refreshes when the search screen is focused. Recent foods fetching has been moved from AppContext into SearchScreen directly.
+
+---
+
 ## 2026-04-29 (31)
 
 ### feat: weight graph with trend and plan predictions

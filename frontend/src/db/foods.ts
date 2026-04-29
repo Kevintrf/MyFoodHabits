@@ -145,9 +145,9 @@ export async function getFoodByBarcode(barcode: string): Promise<Food> {
   return mapFood(row!);
 }
 
-export async function getRecentFoods(): Promise<Food[]> {
+export async function getRecentFoods(offset = 0, limit = 20): Promise<Food[]> {
   const rows = await db.getAllAsync<FoodRow>(
-    `SELECT f.id, f.name, f.barcode, f.liquid, f.source, f.created_by_user_id,
+    `SELECT f.id, f.name, f.barcode, f.liquid, f.source, f.locally_modified, f.created_by_user_id,
             f.calories_per_100g, f.protein_per_100g, f.carbs_per_100g, f.fat_per_100g
      FROM foods f
      JOIN (
@@ -158,8 +158,8 @@ export async function getRecentFoods(): Promise<Food[]> {
        GROUP BY li.food_id
      ) recent ON recent.food_id = f.id
      ORDER BY recent.last_logged DESC
-     LIMIT 10`,
-    [],
+     LIMIT ? OFFSET ?`,
+    [limit, offset],
   );
   return rows.map(mapFood);
 }

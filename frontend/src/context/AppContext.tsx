@@ -1,14 +1,13 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { DayLog, UserTargets, Food } from '../services/api';
+import { DayLog, UserTargets } from '../services/api';
 import { getLog } from '../db/log';
 import { getTargets } from '../db/settings';
 import { getWeights } from '../db/weight';
-import { getRecentFoods } from '../db/foods';
 
 // TODO: replace with real user from auth
 export const USER_ID = 1;
 
-const DEFAULT_TARGETS: UserTargets = { target_calories: 2000, target_protein_g: 150 };
+const DEFAULT_TARGETS: UserTargets = { target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY' };
 
 interface AppContextType {
   userId: number;
@@ -21,8 +20,6 @@ interface AppContextType {
   refreshTargets: () => Promise<void>;
   loggedWeightToday: boolean;
   refreshWeightToday: () => Promise<void>;
-  recentFoods: Food[];
-  refreshRecentFoods: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -44,7 +41,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [viewingLog, setViewingLog] = useState<DayLog | null>(null);
   const [targets, setTargets] = useState<UserTargets>(DEFAULT_TARGETS);
   const [loggedWeightToday, setLoggedWeightToday] = useState(false);
-  const [recentFoods, setRecentFoods] = useState<Food[]>([]);
 
   const refreshViewingLog = useCallback(async () => {
     const log = await getLog(viewingDate);
@@ -60,6 +56,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTargets({
       target_calories: t.target_calories ?? DEFAULT_TARGETS.target_calories,
       target_protein_g: t.target_protein_g ?? DEFAULT_TARGETS.target_protein_g,
+      activity_level: t.activity_level ?? DEFAULT_TARGETS.activity_level,
     });
   }, []);
 
@@ -70,16 +67,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setLoggedWeightToday(logged);
   }, [todayDate]);
 
-  const refreshRecentFoods = useCallback(async () => {
-    const foods = await getRecentFoods();
-    setRecentFoods(foods);
-  }, []);
-
   // Pre-fetch everything on app open so screens have data immediately
   useEffect(() => {
     refreshTargets();
     refreshWeightToday();
-    refreshRecentFoods();
   }, []);
 
   return (
@@ -94,8 +85,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       refreshTargets,
       loggedWeightToday,
       refreshWeightToday,
-      recentFoods,
-      refreshRecentFoods,
     }}>
       {children}
     </AppContext.Provider>

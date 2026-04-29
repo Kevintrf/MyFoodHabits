@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -16,12 +16,13 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { Food, FoodSource } from '../services/api';
-import { searchFoods, getFoodByBarcode } from '../db/foods';
+import { searchFoods, getFoodByBarcode, getRecentFoods } from '../db/foods';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 import { fmtNum } from '../utils/format';
-import { useApp } from '../context/AppContext';
 
 type NavProp = NativeStackNavigationProp<SearchStackParamList, 'Search'>;
+
+const PAGE_SIZE = 20;
 
 const SOURCE_LABEL: Record<FoodSource, string> = {
   USER: 'My food',
@@ -35,21 +36,32 @@ const SOURCE_COLOR: Record<FoodSource, string> = {
 };
 
 export default function SearchScreen() {
-  const { recentFoods } = useApp();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Food[]>([]);
   const [loading, setLoading] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [scannerBusy, setScannerBusy] = useState(false);
+  const [recentFoods, setRecentFoods] = useState<Food[]>([]);
+  const [recentOffset, setRecentOffset] = useState(0);
+  const [recentHasMore, setRecentHasMore] = useState(true);
+  const [recentLoadingMore, setRecentLoadingMore] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<TextInput>(null);
   const navigation = useNavigation<NavProp>();
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
-  useFocusEffect(() => {
+  const loadRecent = useCallback(async (offset: number, replace: boolean) => {
+    const page = await getRecentFoods(offset, PAGE_SIZE);
+    setRecentFoods((prev) => replace ? page : [...prev, ...page]);
+    setRecentOffset(offset + page.length);
+    setRecentHasMore(page.length === PAGE_SIZE);
+  }, []);
+
+  useFocusEffect(useCallback(() => {
     const timer = setTimeout(() => inputRef.current?.focus(), 100);
+    loadRecent(0, true);
     return () => clearTimeout(timer);
-  });
+  }, [loadRecent]));
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -113,6 +125,16 @@ export default function SearchScreen() {
     }
   }
 
+  async function loadMoreRecent() {
+    if (recentLoadingMore || !recentHasMore) return;
+    setRecentLoadingMore(true);
+    try {
+      await loadRecent(recentOffset, false);
+    } finally {
+      setRecentLoadingMore(false);
+    }
+  }
+
   const isSearching = query.trim() !== '';
   const listData: Food[] = isSearching ? results : recentFoods;
 
@@ -120,6 +142,13 @@ export default function SearchScreen() {
     <View style={styles.container}>
       <FlatList
         data={listData}
+        onEndReached={!isSearching ? loadMoreRecent : undefined}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={
+          !isSearching && recentLoadingMore
+            ? <ActivityIndicator style={styles.footerSpinner} color="#2D6A4F" />
+            : null
+        }
         keyExtractor={(item) => String(item.id)}
         keyboardShouldPersistTaps="handled"
         ListHeaderComponent={
@@ -178,7 +207,6 @@ export default function SearchScreen() {
             )
           ) : null
         }
-        ListFooterComponent={null}
       />
 
       {/* Barcode scanner modal */}
@@ -223,6 +251,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   spinner: { marginTop: 20 },
+  footerSpinner: { marginVertical: 16 },
   sectionHeader: {
     fontSize: 11,
     fontWeight: '700',
