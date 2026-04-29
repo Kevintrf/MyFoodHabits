@@ -79,7 +79,7 @@ export default function WeightScreen() {
           placeholder="Weight in kg"
           value={input}
           onChangeText={setInput}
-          keyboardType="decimal-pad"
+          keyboardType="decimal-pad" autoComplete="off" textContentType="none"
           selectTextOnFocus
         />
         <TouchableOpacity style={styles.logBtn} onPress={handleLog} disabled={saving}>

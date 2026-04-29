@@ -141,7 +141,7 @@ export default function CreateFoodScreen() {
             style={styles.input}
             value={calories}
             onChangeText={setCalories}
-            keyboardType="decimal-pad"
+            keyboardType="decimal-pad" autoComplete="off" textContentType="none"
             placeholder="0"
             placeholderTextColor="#bbb"
           />
@@ -152,7 +152,7 @@ export default function CreateFoodScreen() {
             style={styles.input}
             value={protein}
             onChangeText={setProtein}
-            keyboardType="decimal-pad"
+            keyboardType="decimal-pad" autoComplete="off" textContentType="none"
             placeholder="0"
             placeholderTextColor="#bbb"
           />
@@ -166,7 +166,7 @@ export default function CreateFoodScreen() {
             style={styles.input}
             value={carbs}
             onChangeText={setCarbs}
-            keyboardType="decimal-pad"
+            keyboardType="decimal-pad" autoComplete="off" textContentType="none"
             placeholder="0"
             placeholderTextColor="#bbb"
           />
@@ -177,7 +177,7 @@ export default function CreateFoodScreen() {
             style={styles.input}
             value={fat}
             onChangeText={setFat}
-            keyboardType="decimal-pad"
+            keyboardType="decimal-pad" autoComplete="off" textContentType="none"
             placeholder="0"
             placeholderTextColor="#bbb"
           />
@@ -224,7 +224,7 @@ export default function CreateFoodScreen() {
           onChangeText={setServingGrams}
           placeholder={liquid ? 'ml' : 'grams'}
           placeholderTextColor="#bbb"
-          keyboardType="decimal-pad"
+          keyboardType="decimal-pad" autoComplete="off" textContentType="none"
         />
       </View>
       <TouchableOpacity style={styles.addServingBtn} onPress={addServing}>

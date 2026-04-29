@@ -275,7 +275,7 @@ export default function CreateMealScreen() {
                   style={styles.qtyInput}
                   value={item.quantityText}
                   onChangeText={(t) => setQtyText(item.draftId, t)}
-                  keyboardType="decimal-pad"
+                  keyboardType="decimal-pad" autoComplete="off" textContentType="none"
                   selectTextOnFocus
                 />
                 <TouchableOpacity onPress={() => adjustQty(item.draftId, 1)} style={styles.qtyBtn}>

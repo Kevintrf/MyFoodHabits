@@ -167,7 +167,7 @@ export default function PortionScreen() {
           style={styles.quantityInput}
           value={quantity}
           onChangeText={setQuantity}
-          keyboardType="decimal-pad"
+          keyboardType="decimal-pad" autoComplete="off" textContentType="none"
           selectTextOnFocus
         />
       </View>

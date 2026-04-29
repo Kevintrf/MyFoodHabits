@@ -231,7 +231,7 @@ export default function TodayScreen() {
               style={styles.modalInput}
               value={editQty}
               onChangeText={setEditQty}
-              keyboardType="decimal-pad"
+              keyboardType="decimal-pad" autoComplete="off" textContentType="none"
               autoFocus
             />
 

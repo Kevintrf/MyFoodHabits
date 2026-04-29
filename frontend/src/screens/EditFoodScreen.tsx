@@ -157,7 +157,7 @@ export default function EditFoodScreen() {
             style={styles.input}
             value={calories}
             onChangeText={setCalories}
-            keyboardType="decimal-pad"
+            keyboardType="decimal-pad" autoComplete="off" textContentType="none"
             placeholderTextColor="#bbb"
           />
         </View>
@@ -167,7 +167,7 @@ export default function EditFoodScreen() {
             style={styles.input}
             value={protein}
             onChangeText={setProtein}
-            keyboardType="decimal-pad"
+            keyboardType="decimal-pad" autoComplete="off" textContentType="none"
             placeholderTextColor="#bbb"
           />
         </View>
@@ -180,7 +180,7 @@ export default function EditFoodScreen() {
             style={styles.input}
             value={carbs}
             onChangeText={setCarbs}
-            keyboardType="decimal-pad"
+            keyboardType="decimal-pad" autoComplete="off" textContentType="none"
             placeholderTextColor="#bbb"
           />
         </View>
@@ -190,7 +190,7 @@ export default function EditFoodScreen() {
             style={styles.input}
             value={fat}
             onChangeText={setFat}
-            keyboardType="decimal-pad"
+            keyboardType="decimal-pad" autoComplete="off" textContentType="none"
             placeholderTextColor="#bbb"
           />
         </View>
@@ -252,7 +252,7 @@ export default function EditFoodScreen() {
               onChangeText={setServingGrams}
               placeholder={liquid ? 'ml' : 'grams'}
               placeholderTextColor="#bbb"
-              keyboardType="decimal-pad"
+              keyboardType="decimal-pad" autoComplete="off" textContentType="none"
             />
           </View>
           <TouchableOpacity style={styles.addServingBtn} onPress={addServing}>

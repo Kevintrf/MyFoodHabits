@@ -78,7 +78,7 @@ export default function SettingsScreen() {
           style={styles.input}
           value={calories}
           onChangeText={handleCaloriesChange}
-          keyboardType="number-pad"
+          keyboardType="number-pad" autoComplete="off" textContentType="none"
           placeholder="e.g. 2000"
           placeholderTextColor="#bbb"
         />
@@ -90,7 +90,7 @@ export default function SettingsScreen() {
           style={styles.input}
           value={protein}
           onChangeText={handleProteinChange}
-          keyboardType="number-pad"
+          keyboardType="number-pad" autoComplete="off" textContentType="none"
           placeholder="e.g. 150"
           placeholderTextColor="#bbb"
         />
