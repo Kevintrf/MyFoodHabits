@@ -219,11 +219,21 @@ export async function patchExternalFood(
     servings?: ServingDraft[];
   },
 ): Promise<Food> {
+  const existing = await db.getFirstAsync<FoodRow>('SELECT * FROM foods WHERE id = ?', [id]);
+
+  const macrosChanged =
+    existing &&
+    (existing.calories_per_100g !== data.calories_per_100g ||
+      existing.protein_per_100g !== (data.protein_per_100g ?? 0) ||
+      existing.carbs_per_100g !== (data.carbs_per_100g ?? 0) ||
+      existing.fat_per_100g !== (data.fat_per_100g ?? 0));
+
   await db.withTransactionAsync(async () => {
     await db.runAsync(
       `UPDATE foods SET
          name = ?, calories_per_100g = ?, protein_per_100g = ?,
-         carbs_per_100g = ?, fat_per_100g = ?, liquid = ?, locally_modified = 1
+         carbs_per_100g = ?, fat_per_100g = ?, liquid = ?
+         ${macrosChanged ? ', locally_modified = 1' : ''}
        WHERE id = ?`,
       [
         data.name,
