@@ -28,12 +28,13 @@ interface DraftItem {
   draftId: number;
   food: Food;
   quantity: number;
+  quantityText: string;
   servings: FoodServing[];
   selectedServing: FoodServing | null;
 }
 
 function calcItemMacros(item: DraftItem) {
-  const grams = item.selectedServing ? item.selectedServing.grams : 100;
+  const grams = item.selectedServing ? item.selectedServing.grams : 1;
   const mult = (grams / 100) * item.quantity;
   return {
     calories: Math.round(parseFloat(String(item.food.calories_per_100g)) * mult),
@@ -78,6 +79,7 @@ export default function EditMealScreen() {
         barcode: null,
       },
       quantity: Number(mi.quantity),
+      quantityText: String(Number(mi.quantity)),
       servings: [],
       selectedServing: mi.serving_id
         ? { id: mi.serving_id, food_id: mi.food_id, name: mi.serving_name!, grams: mi.serving_grams!, is_default: false }
@@ -174,14 +176,15 @@ export default function EditMealScreen() {
     setSearchQuery('');
     setSearchResults([]);
     const draftId = nextDraftId.current++;
-    setDraftItems((prev) => [...prev, { draftId, food, quantity: 1, servings: [], selectedServing: null }]);
+    setDraftItems((prev) => [...prev, { draftId, food, quantity: 100, quantityText: '100', servings: [], selectedServing: null }]);
     try {
       const detail = await getFoodById(food.id);
-      const defaultServing = detail.servings.find((s) => s.is_default) ?? detail.servings[0] ?? null;
+      const defaultServing = detail.servings.find((s) => s.is_default) ?? null;
+      const defaultQty = defaultServing ? 1 : 100;
       setDraftItems((prev) =>
         prev.map((i) =>
           i.draftId === draftId
-            ? { ...i, servings: detail.servings, selectedServing: defaultServing }
+            ? { ...i, servings: detail.servings, selectedServing: defaultServing, quantity: defaultQty, quantityText: String(defaultQty) }
             : i,
         ),
       );
@@ -198,10 +201,34 @@ export default function EditMealScreen() {
 
   function adjustQty(draftId: number, delta: number) {
     setDraftItems((prev) =>
-      prev.map((i) =>
-        i.draftId === draftId ? { ...i, quantity: Math.max(0, i.quantity + delta) } : i,
-      ),
+      prev.map((i) => {
+        if (i.draftId !== draftId) return i;
+        const next = Math.max(0, Math.round((i.quantity + delta) * 10) / 10);
+        return { ...i, quantity: next, quantityText: String(next) };
+      }),
     );
+  }
+
+  function setQtyText(draftId: number, text: string) {
+    setDraftItems((prev) =>
+      prev.map((i) => {
+        if (i.draftId !== draftId) return i;
+        const num = parseFloat(text);
+        return { ...i, quantityText: text, quantity: isNaN(num) || num < 0 ? i.quantity : num };
+      }),
+    );
+  }
+
+  async function handleEditFood(foodId: number) {
+    try {
+      const food = await getFoodById(foodId);
+      navigation.getParent()?.navigate('SearchTab', {
+        screen: 'EditFood',
+        params: { food },
+      });
+    } catch {
+      showAlert('Error', 'Could not load food details.');
+    }
   }
 
   function removeItem(draftId: number) {
@@ -328,12 +355,21 @@ export default function EditMealScreen() {
                 <Text style={styles.draftSub}>
                   {fmtNum(item.food.calories_per_100g)} kcal · {fmtNum(item.food.protein_per_100g)}g Protein · {fmtNum(item.food.carbs_per_100g)}g Carbs · {fmtNum(item.food.fat_per_100g)}g Fat per 100{item.food.liquid ? 'ml' : 'g'}
                 </Text>
+                <TouchableOpacity onPress={() => handleEditFood(item.food.id)}>
+                  <Text style={styles.editFoodLink}>Edit food</Text>
+                </TouchableOpacity>
               </View>
               <View style={styles.qtyRow}>
                 <TouchableOpacity onPress={() => adjustQty(item.draftId, -1)} style={styles.qtyBtn}>
                   <Text style={styles.qtyBtnText}>−</Text>
                 </TouchableOpacity>
-                <Text style={styles.qtyValue}>{item.quantity}</Text>
+                <TextInput
+                  style={styles.qtyInput}
+                  value={item.quantityText}
+                  onChangeText={(t) => setQtyText(item.draftId, t)}
+                  keyboardType="decimal-pad"
+                  selectTextOnFocus
+                />
                 <TouchableOpacity onPress={() => adjustQty(item.draftId, 1)} style={styles.qtyBtn}>
                   <Text style={styles.qtyBtnText}>+</Text>
                 </TouchableOpacity>
@@ -349,7 +385,7 @@ export default function EditMealScreen() {
                   onPress={() => selectServing(item.draftId, null)}
                 >
                   <Text style={[styles.chipText, !item.selectedServing && styles.chipTextActive]}>
-                    100{item.food.liquid ? 'ml' : 'g'}
+                    {item.food.liquid ? 'Milliliters' : 'Grams'}
                   </Text>
                 </TouchableOpacity>
                 {[...item.servings].sort((a, b) => b.grams - a.grams).map((s) => (
@@ -510,7 +546,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   qtyBtnText: { fontSize: 18, fontWeight: '600', color: '#333' },
-  qtyValue: { fontSize: 15, fontWeight: '600', color: '#1A1A1A', minWidth: 24, textAlign: 'center' },
+  qtyInput: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1A1A1A',
+    width: 54,
+    textAlign: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    borderRadius: 6,
+    paddingVertical: 4,
+  },
+  editFoodLink: { fontSize: 12, color: '#2D6A4F', marginTop: 4 },
   removeBtn: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
   removeBtnText: { fontSize: 14, color: '#999' },
   emptyHint: { textAlign: 'center', color: '#bbb', marginTop: 40, fontSize: 14 },
