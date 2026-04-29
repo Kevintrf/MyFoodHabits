@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { updateTargets } from '../db/settings';
-import { showAlert } from '../utils/alert';
 import { ActivityLevel } from '../services/api';
 
 const ACTIVITY_LEVELS: { value: ActivityLevel; label: string; description: string }[] = [
@@ -29,33 +27,44 @@ export default function SettingsScreen() {
   const [calories, setCalories] = useState('');
   const [protein, setProtein] = useState('');
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>('SEDENTARY');
-  const [saving, setSaving] = useState(false);
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const initialised = useRef(false);
 
   useEffect(() => {
     setCalories(String(targets.target_calories ?? ''));
     setProtein(String(targets.target_protein_g ?? ''));
     setActivityLevel(targets.activity_level ?? 'SEDENTARY');
+    initialised.current = true;
   }, [targets]);
 
-  async function handleSave() {
-    const cal = parseInt(calories);
-    const pro = parseInt(protein);
+  const save = useCallback(async (cal: string, pro: string, activity: ActivityLevel) => {
+    const calNum = parseInt(cal);
+    const proNum = parseInt(pro);
+    if (isNaN(calNum) || calNum <= 0 || isNaN(proNum) || proNum <= 0) return;
+    await updateTargets({ target_calories: calNum, target_protein_g: proNum, activity_level: activity });
+    await refreshTargets();
+  }, [refreshTargets]);
 
-    if (isNaN(cal) || cal <= 0 || isNaN(pro) || pro <= 0) {
-      showAlert('Invalid values', 'Calorie and protein targets must be positive numbers.');
-      return;
-    }
+  function scheduleTextSave(cal: string, pro: string, activity: ActivityLevel) {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => save(cal, pro, activity), 600);
+  }
 
-    setSaving(true);
-    try {
-      await updateTargets({ target_calories: cal, target_protein_g: pro, activity_level: activityLevel });
-      await refreshTargets();
-      showAlert('Saved', 'Your targets have been updated.');
-    } catch {
-      showAlert('Error', 'Could not save targets. Please try again.');
-    } finally {
-      setSaving(false);
-    }
+  function handleCaloriesChange(val: string) {
+    setCalories(val);
+    scheduleTextSave(val, protein, activityLevel);
+  }
+
+  function handleProteinChange(val: string) {
+    setProtein(val);
+    scheduleTextSave(calories, val, activityLevel);
+  }
+
+  async function handleActivityChange(level: ActivityLevel) {
+    setActivityLevel(level);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    await save(calories, protein, level);
   }
 
   return (
@@ -68,7 +77,7 @@ export default function SettingsScreen() {
         <TextInput
           style={styles.input}
           value={calories}
-          onChangeText={setCalories}
+          onChangeText={handleCaloriesChange}
           keyboardType="number-pad"
           placeholder="e.g. 2000"
           placeholderTextColor="#bbb"
@@ -80,7 +89,7 @@ export default function SettingsScreen() {
         <TextInput
           style={styles.input}
           value={protein}
-          onChangeText={setProtein}
+          onChangeText={handleProteinChange}
           keyboardType="number-pad"
           placeholder="e.g. 150"
           placeholderTextColor="#bbb"
@@ -93,7 +102,7 @@ export default function SettingsScreen() {
           <TouchableOpacity
             key={lvl.value}
             style={[styles.activityOption, activityLevel === lvl.value && styles.activityOptionActive]}
-            onPress={() => setActivityLevel(lvl.value)}
+            onPress={() => handleActivityChange(lvl.value)}
           >
             <Text style={[styles.activityLabel, activityLevel === lvl.value && styles.activityLabelActive]}>
               {lvl.label}
@@ -104,14 +113,6 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         ))}
       </View>
-
-      <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={saving}>
-        {saving ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.saveBtnText}>Save</Text>
-        )}
-      </TouchableOpacity>
     </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -132,14 +133,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#1A1A1A',
   },
-  saveBtn: {
-    backgroundColor: '#2D6A4F',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   activityOption: {
     backgroundColor: '#fff',
     borderWidth: 1,

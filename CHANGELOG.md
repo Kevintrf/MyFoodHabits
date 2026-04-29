@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-29 (33)
+
+### feat: auto-save settings on change
+Removed the Save button from SettingsScreen. Calorie and protein inputs save 600ms after the user stops typing; activity level saves immediately on tap.
+
+---
+
 ## 2026-04-29 (32)
 
 ### feat: paginated recent foods list in search screen
