@@ -370,14 +370,16 @@ export default function WeightGraphScreen() {
 
   const FORECAST_DAYS = 30;
 
-  const tdee = calibrateTDEE(weights, calorieHistory) ??
-    estimateTDEE(currentWeight ?? 75, targets.activity_level ?? 'SEDENTARY');
+  // Plan prediction always uses activity-level estimate so the setting has a visible effect.
+  const estimatedTDEE = estimateTDEE(currentWeight ?? 75, targets.activity_level ?? 'SEDENTARY');
+  // Trend prediction uses calibrated TDEE when enough data exists; falls back to estimate.
+  const calibratedTDEE = calibrateTDEE(weights, calorieHistory);
+  const trendTDEE = calibratedTDEE ?? estimatedTDEE;
 
-  const planNetCalories = (targets.target_calories ?? 2000) - tdee;
+  const planNetCalories = (targets.target_calories ?? 2000) - estimatedTDEE;
 
   let planPrediction: ChartPoint[] = [];
   let trendPrediction: ChartPoint[] = [];
-  let trendTDEE: number | null = null;
 
   if (currentWeight !== null) {
     planPrediction = buildPrediction(currentDate, currentWeight, planNetCalories, FORECAST_DAYS);
@@ -388,9 +390,8 @@ export default function WeightGraphScreen() {
     );
     if (recentCals.length >= 5) {
       const avgCals = recentCals.reduce((s, d) => s + d.calories, 0) / recentCals.length;
-      const histNetCalories = avgCals - tdee;
+      const histNetCalories = avgCals - trendTDEE;
       trendPrediction = buildPrediction(currentDate, currentWeight, histNetCalories, FORECAST_DAYS);
-      trendTDEE = tdee;
     }
   }
 
@@ -447,8 +448,7 @@ export default function WeightGraphScreen() {
     return delta > 0 ? `+${delta} kg` : `${delta} kg`;
   }
 
-  const tdeeLabel = `Estimated TDEE: ~${tdee} kcal/day`;
-  const calibrated = calibrateTDEE(weights, calorieHistory) !== null;
+  const calibrated = calibratedTDEE !== null;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -505,8 +505,13 @@ export default function WeightGraphScreen() {
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>30-day forecast</Text>
           <Text style={styles.summaryNote}>
-            {tdeeLabel}{calibrated ? ' (calibrated from your data)' : ' (estimated)'}
+            Plan TDEE: ~{estimatedTDEE} kcal/day (from activity level)
           </Text>
+          {calibrated && (
+            <Text style={styles.summaryNote}>
+              Trend TDEE: ~{trendTDEE} kcal/day (calibrated from your data)
+            </Text>
+          )}
 
           {planDelta !== null && (
             <View style={styles.summaryRow}>
