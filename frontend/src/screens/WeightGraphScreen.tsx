@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Svg, { Path, Circle, Line, Text as SvgText, Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
+import { useFocusEffect } from '@react-navigation/native';
 import { getWeights } from '../db/weight';
 import { getCalorieHistory } from '../db/log';
 import { getTargets } from '../db/settings';
@@ -337,7 +338,7 @@ export default function WeightGraphScreen() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useFocusEffect(useCallback(() => { load(); }, [load]));
 
   if (loading) return <ActivityIndicator style={{ flex: 1, marginTop: 60 }} color="#2D6A4F" />;
 
