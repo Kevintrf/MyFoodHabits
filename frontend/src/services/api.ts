@@ -96,7 +96,10 @@ export interface WeightEntry {
   logged_at: string;
 }
 
+export type ActivityLevel = 'SEDENTARY' | 'LIGHTLY_ACTIVE' | 'MODERATELY_ACTIVE' | 'VERY_ACTIVE' | 'EXTREMELY_ACTIVE';
+
 export interface UserTargets {
   target_calories: number | null;
   target_protein_g: number | null;
+  activity_level: ActivityLevel;
 }

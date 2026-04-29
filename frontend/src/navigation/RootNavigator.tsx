@@ -14,6 +14,7 @@ import MealsScreen from '../screens/MealsScreen';
 import CreateMealScreen from '../screens/CreateMealScreen';
 import EditMealScreen from '../screens/EditMealScreen';
 import WeightScreen from '../screens/WeightScreen';
+import WeightGraphScreen from '../screens/WeightGraphScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import CreateFoodScreen from '../screens/CreateFoodScreen';
 import EditFoodScreen from '../screens/EditFoodScreen';
@@ -39,11 +40,16 @@ export type MealsStackParamList = {
   EditMeal: { meal: Meal };
 };
 
+export type WeightStackParamList = {
+  WeightHome: undefined;
+  WeightGraph: undefined;
+};
+
 type RootTabParamList = {
   Today: undefined;
   SearchTab: undefined;
   MealsTab: undefined;
-  Weight: undefined;
+  WeightTab: undefined;
   Settings: undefined;
 };
 
@@ -51,6 +57,7 @@ const Tab = createBottomTabNavigator<RootTabParamList>();
 const TodayStack = createNativeStackNavigator<TodayStackParamList>();
 const SearchStack = createNativeStackNavigator<SearchStackParamList>();
 const MealsStack = createNativeStackNavigator<MealsStackParamList>();
+const WeightStack = createNativeStackNavigator<WeightStackParamList>();
 
 function TodayStackNavigator() {
   return (
@@ -124,11 +131,34 @@ function MealsStackNavigator() {
   );
 }
 
+function WeightStackNavigator() {
+  return (
+    <WeightStack.Navigator>
+      <WeightStack.Screen
+        name="WeightHome"
+        component={WeightScreen}
+        options={({ navigation }) => ({
+          title: 'Weight',
+          headerRight: () => (
+            <Ionicons
+              name="stats-chart-outline"
+              size={22}
+              color="#2D6A4F"
+              onPress={() => navigation.navigate('WeightGraph')}
+            />
+          ),
+        })}
+      />
+      <WeightStack.Screen name="WeightGraph" component={WeightGraphScreen} options={{ title: 'Weight Trend' }} />
+    </WeightStack.Navigator>
+  );
+}
+
 const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   Today: 'today-outline',
   SearchTab: 'search-outline',
   MealsTab: 'restaurant-outline',
-  Weight: 'scale-outline',
+  WeightTab: 'scale-outline',
   Settings: 'settings-outline',
 };
 
@@ -142,6 +172,8 @@ function WeightTabIcon({ color, size }: { color: string; size: number }) {
     </View>
   );
 }
+
+
 
 const navStyles = StyleSheet.create({
   dot: {
@@ -161,7 +193,7 @@ export default function RootNavigator() {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) =>
-            route.name === 'Weight' ? (
+            route.name === 'WeightTab' ? (
               <WeightTabIcon color={color} size={size} />
             ) : (
               <Ionicons name={TAB_ICONS[route.name]} size={size} color={color} />
@@ -174,7 +206,7 @@ export default function RootNavigator() {
         <Tab.Screen name="Today" component={TodayStackNavigator} options={{ title: 'Today', headerShown: false }} />
         <Tab.Screen name="SearchTab" component={SearchStackNavigator} options={{ title: 'Search' }} />
         <Tab.Screen name="MealsTab" component={MealsStackNavigator} options={{ title: 'Meals' }} />
-        <Tab.Screen name="Weight" component={WeightScreen} />
+        <Tab.Screen name="WeightTab" component={WeightStackNavigator} options={{ title: 'Weight', headerShown: false }} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
     </NavigationContainer>

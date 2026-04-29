@@ -60,8 +60,6 @@ export default function WeightScreen() {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Text style={styles.header}>Weight</Text>
-
       {latest && (
         <View style={styles.latestCard}>
           <Text style={styles.latestLabel}>Latest</Text>
@@ -113,9 +111,9 @@ export default function WeightScreen() {
 const styles = StyleSheet.create({
   loader: { flex: 1, marginTop: 100 },
   container: { flex: 1, backgroundColor: '#F9F9F9' },
-  header: { fontSize: 22, fontWeight: '700', color: '#1A1A1A', padding: 20, paddingTop: 56 },
   latestCard: {
     marginHorizontal: 16,
+    marginTop: 16,
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,

@@ -4,6 +4,40 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-04-29 (31)
+
+### feat: weight graph with trend and plan predictions
+Added WeightGraphScreen accessible via chart icon in the Weight tab header. Shows an SVG line chart (react-native-svg) with actual weight, a plan prediction based on calorie target vs estimated TDEE, and a historical trend prediction derived from actual weight change rate. Supports 30d/90d range toggle and daily/7-day moving average toggle. TDEE is calibrated from actual weight+calorie history when enough data exists, otherwise estimated as weight × 22 × activity multiplier. A summary card shows predicted weight in 30 days for both scenarios. Activity level (sedentary through extremely active) is now collected in Settings and stored in user_settings; schema bumped to v3.
+
+---
+
+## 2026-04-29 (30)
+
+### feat: decimal quantity input and Edit food button in meal screens
+Replaced integer +/− stepper with a decimal TextInput in CreateMealScreen and EditMealScreen so quantities like 1.5 or 250 can be entered directly. EditMealScreen also shows an "Edit food" link under each food name that navigates to EditFoodScreen.
+
+---
+
+## 2026-04-29 (29)
+
+### feat: Grams/Milliliters always present as non-removable default serving option
+In EditFoodScreen, the Grams (or Milliliters for liquids) option is now always shown at the top of the servings list and cannot be removed. It can be set as the default serving, and setting any named serving as default automatically unsets Grams/Milliliters as default.
+
+---
+
+## 2026-04-29 (28)
+
+### fix: show serving size in grams/ml in log edit modal
+Serving picker entries in the TodayScreen log-edit modal now include the gram amount: "MyServing (123g)" so the user can see portion sizes without opening the food editor.
+
+---
+
+## 2026-04-20 (27)
+
+### feat: Edit food button shown for all food sources in log modal and portion screen
+
+---
+
 ## 2026-04-20 (26)
 
 ### feat: edit external foods in-place with locally_modified flag

@@ -1,7 +1,7 @@
 import { db } from './client';
 
 // Bump this when adding new tables or columns and add a migration below.
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 
 // ---------------------------------------------------------------------------
 // Table definitions
@@ -20,6 +20,7 @@ const CREATE_TABLES = `
     name              TEXT,
     target_calories   INTEGER NOT NULL DEFAULT 2000,
     target_protein_g  INTEGER NOT NULL DEFAULT 150,
+    activity_level    TEXT NOT NULL DEFAULT 'SEDENTARY',
     schema_version    INTEGER NOT NULL DEFAULT 1
   );
 
@@ -145,6 +146,15 @@ export function initSchema(): void {
         // Column already exists (fresh install from updated CREATE TABLE)
       }
       db.runSync('UPDATE user_settings SET schema_version = 2 WHERE id = 1');
+    }
+
+    if (currentVersion < 3) {
+      try {
+        db.execSync("ALTER TABLE user_settings ADD COLUMN activity_level TEXT NOT NULL DEFAULT 'SEDENTARY';");
+      } catch {
+        // Column already exists (fresh install with updated schema)
+      }
+      db.runSync('UPDATE user_settings SET schema_version = 3 WHERE id = 1');
     }
   });
 }
