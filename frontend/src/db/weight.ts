@@ -16,3 +16,7 @@ export async function logWeight(weight_kg: number): Promise<WeightEntry> {
   );
   return { id: result.lastInsertRowId, weight_kg, logged_at };
 }
+
+export async function deleteWeight(id: number): Promise<void> {
+  await db.runAsync('DELETE FROM weights WHERE id = ? AND user_id = 1', [id]);
+}

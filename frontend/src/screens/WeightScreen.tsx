@@ -10,10 +10,11 @@ import {
   RefreshControl,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { showAlert } from '../utils/alert';
 import { WeightEntry } from '../services/api';
-import { getWeights, logWeight } from '../db/weight';
+import { getWeights, logWeight, deleteWeight } from '../db/weight';
 import { useApp } from '../context/AppContext';
 
 export default function WeightScreen() {
@@ -36,6 +37,28 @@ export default function WeightScreen() {
   async function onRefresh() {
     setRefreshing(true);
     await fetchWeights().finally(() => setRefreshing(false));
+  }
+
+  function handleLongPress(item: WeightEntry) {
+    const date = new Date(item.logged_at).toLocaleDateString('en-US', {
+      weekday: 'short', month: 'short', day: 'numeric',
+    });
+    Alert.alert(
+      'Delete entry',
+      `Remove ${item.weight_kg} kg logged on ${date}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            await deleteWeight(item.id);
+            setEntries((prev) => prev.filter((e) => e.id !== item.id));
+            await refreshWeightToday();
+          },
+        },
+      ],
+    );
   }
 
   async function handleLog() {
@@ -94,14 +117,14 @@ export default function WeightScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         ListEmptyComponent={<Text style={styles.empty}>No entries yet.</Text>}
         renderItem={({ item }) => (
-          <View style={styles.entryRow}>
+          <TouchableOpacity style={styles.entryRow} onLongPress={() => handleLongPress(item)} delayLongPress={400}>
             <Text style={styles.entryDate}>
               {new Date(item.logged_at).toLocaleDateString('en-US', {
                 weekday: 'short', month: 'short', day: 'numeric',
               })}
             </Text>
             <Text style={styles.entryWeight}>{item.weight_kg} kg</Text>
-          </View>
+          </TouchableOpacity>
         )}
       />
     </KeyboardAvoidingView>
