@@ -7,7 +7,7 @@ import { getWeights } from '../db/weight';
 // TODO: replace with real user from auth
 export const USER_ID = 1;
 
-const DEFAULT_TARGETS: UserTargets = { target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY' };
+const DEFAULT_TARGETS: UserTargets = { target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false };
 
 interface AppContextType {
   userId: number;
@@ -57,6 +57,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       target_calories: t.target_calories ?? DEFAULT_TARGETS.target_calories,
       target_protein_g: t.target_protein_g ?? DEFAULT_TARGETS.target_protein_g,
       activity_level: t.activity_level ?? DEFAULT_TARGETS.activity_level,
+      show_vitamins: t.show_vitamins ?? DEFAULT_TARGETS.show_vitamins,
     });
   }, []);
 

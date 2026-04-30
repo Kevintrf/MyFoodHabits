@@ -11,10 +11,11 @@ import {
   Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
 import { LogItem, FoodServing, FoodWithServings } from '../services/api';
-import { deleteLogItem, updateLogItem } from '../db/log';
+import { deleteLogItem, updateLogItem, setVitaminsTaken } from '../db/log';
 import { getFoodById } from '../db/foods';
 import { fmtNum } from '../utils/format';
 
@@ -95,6 +96,12 @@ export default function TodayScreen() {
 
   const totals = viewingLog?.totals ?? { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 };
   const slots = viewingLog?.slots ?? {};
+  const vitaminsTaken = viewingLog?.vitamins_taken ?? false;
+
+  async function handleVitaminsToggle() {
+    await setVitaminsTaken(viewingDate, !vitaminsTaken);
+    await refreshViewingLog();
+  }
 
   const dateLabel = new Date(viewingDate + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'long',
@@ -131,6 +138,20 @@ export default function TodayScreen() {
             minGoal
           />
         </View>
+
+        {/* Vitamins checkbox */}
+        {targets.show_vitamins && (
+          <TouchableOpacity style={styles.vitaminsRow} onPress={handleVitaminsToggle}>
+            <Ionicons
+              name={vitaminsTaken ? 'checkbox' : 'square-outline'}
+              size={22}
+              color={vitaminsTaken ? '#2D6A4F' : '#ccc'}
+            />
+            <Text style={[styles.vitaminsLabel, vitaminsTaken && styles.vitaminsLabelDone]}>
+              Vitamins
+            </Text>
+          </TouchableOpacity>
+        )}
 
         {/* Log items grouped by meal slot */}
         {MEAL_SLOTS.map((slot) => {
@@ -372,6 +393,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  vitaminsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginBottom: 12,
+    borderRadius: 10,
+    padding: 12,
+  },
+  vitaminsLabel: { fontSize: 15, fontWeight: '500', color: '#1A1A1A' },
+  vitaminsLabelDone: { color: '#2D6A4F' },
   // Modal
   modalOverlay: {
     flex: 1,

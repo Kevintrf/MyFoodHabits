@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { updateTargets } from '../db/settings';
 import { ActivityLevel } from '../services/api';
@@ -27,6 +28,7 @@ export default function SettingsScreen() {
   const [calories, setCalories] = useState('');
   const [protein, setProtein] = useState('');
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>('SEDENTARY');
+  const [showVitamins, setShowVitamins] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const initialised = useRef(false);
@@ -35,36 +37,44 @@ export default function SettingsScreen() {
     setCalories(String(targets.target_calories ?? ''));
     setProtein(String(targets.target_protein_g ?? ''));
     setActivityLevel(targets.activity_level ?? 'SEDENTARY');
+    setShowVitamins(targets.show_vitamins ?? false);
     initialised.current = true;
   }, [targets]);
 
-  const save = useCallback(async (cal: string, pro: string, activity: ActivityLevel) => {
+  const save = useCallback(async (cal: string, pro: string, activity: ActivityLevel, vitamins: boolean) => {
     const calNum = parseInt(cal);
     const proNum = parseInt(pro);
     if (isNaN(calNum) || calNum <= 0 || isNaN(proNum) || proNum <= 0) return;
-    await updateTargets({ target_calories: calNum, target_protein_g: proNum, activity_level: activity });
+    await updateTargets({ target_calories: calNum, target_protein_g: proNum, activity_level: activity, show_vitamins: vitamins });
     await refreshTargets();
   }, [refreshTargets]);
 
-  function scheduleTextSave(cal: string, pro: string, activity: ActivityLevel) {
+  function scheduleTextSave(cal: string, pro: string, activity: ActivityLevel, vitamins: boolean) {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => save(cal, pro, activity), 600);
+    debounceRef.current = setTimeout(() => save(cal, pro, activity, vitamins), 600);
   }
 
   function handleCaloriesChange(val: string) {
     setCalories(val);
-    scheduleTextSave(val, protein, activityLevel);
+    scheduleTextSave(val, protein, activityLevel, showVitamins);
   }
 
   function handleProteinChange(val: string) {
     setProtein(val);
-    scheduleTextSave(calories, val, activityLevel);
+    scheduleTextSave(calories, val, activityLevel, showVitamins);
   }
 
   async function handleActivityChange(level: ActivityLevel) {
     setActivityLevel(level);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    await save(calories, protein, level);
+    await save(calories, protein, level, showVitamins);
+  }
+
+  async function handleVitaminsToggle() {
+    const next = !showVitamins;
+    setShowVitamins(next);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    await save(calories, protein, activityLevel, next);
   }
 
   return (
@@ -113,6 +123,21 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         ))}
       </View>
+
+      <View style={styles.field}>
+        <Text style={styles.label}>TRACKING</Text>
+        <TouchableOpacity style={styles.toggleRow} onPress={handleVitaminsToggle}>
+          <View>
+            <Text style={styles.toggleLabel}>Vitamins</Text>
+            <Text style={styles.toggleDesc}>Show a daily vitamins checkbox on the Today screen</Text>
+          </View>
+          <Ionicons
+            name={showVitamins ? 'checkbox' : 'square-outline'}
+            size={24}
+            color={showVitamins ? '#2D6A4F' : '#ccc'}
+          />
+        </TouchableOpacity>
+      </View>
     </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -146,4 +171,16 @@ const styles = StyleSheet.create({
   activityLabelActive: { color: '#2D6A4F', fontWeight: '600' },
   activityDesc: { fontSize: 12, color: '#999', marginTop: 2 },
   activityDescActive: { color: '#2D6A4F' },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    borderRadius: 10,
+    padding: 12,
+  },
+  toggleLabel: { fontSize: 15, fontWeight: '500', color: '#1A1A1A' },
+  toggleDesc: { fontSize: 12, color: '#999', marginTop: 2 },
 });

@@ -1,7 +1,7 @@
 import { db } from './client';
 
 // Bump this when adding new tables or columns and add a migration below.
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4;
 
 // ---------------------------------------------------------------------------
 // Table definitions
@@ -21,6 +21,7 @@ const CREATE_TABLES = `
     target_calories   INTEGER NOT NULL DEFAULT 2000,
     target_protein_g  INTEGER NOT NULL DEFAULT 150,
     activity_level    TEXT NOT NULL DEFAULT 'SEDENTARY',
+    show_vitamins     INTEGER NOT NULL DEFAULT 0,
     schema_version    INTEGER NOT NULL DEFAULT 1
   );
 
@@ -66,9 +67,10 @@ const CREATE_TABLES = `
   );
 
   CREATE TABLE IF NOT EXISTS day_logs (
-    id       INTEGER PRIMARY KEY NOT NULL,
-    user_id  INTEGER NOT NULL DEFAULT 1,
-    date     TEXT NOT NULL,
+    id              INTEGER PRIMARY KEY NOT NULL,
+    user_id         INTEGER NOT NULL DEFAULT 1,
+    date            TEXT NOT NULL,
+    vitamins_taken  INTEGER NOT NULL DEFAULT 0,
     UNIQUE(user_id, date)
   );
 
@@ -155,6 +157,16 @@ export function initSchema(): void {
         // Column already exists (fresh install with updated schema)
       }
       db.runSync('UPDATE user_settings SET schema_version = 3 WHERE id = 1');
+    }
+
+    if (currentVersion < 4) {
+      try {
+        db.execSync('ALTER TABLE user_settings ADD COLUMN show_vitamins INTEGER NOT NULL DEFAULT 0;');
+      } catch { /* already exists */ }
+      try {
+        db.execSync('ALTER TABLE day_logs ADD COLUMN vitamins_taken INTEGER NOT NULL DEFAULT 0;');
+      } catch { /* already exists */ }
+      db.runSync('UPDATE user_settings SET schema_version = 4 WHERE id = 1');
     }
   });
 }

@@ -59,6 +59,7 @@ export interface DayLog {
   date: string;
   totals: MacroResult;
   slots: Record<string, LogItem[]>;
+  vitamins_taken: boolean;
 }
 
 export interface DaySummary {
@@ -102,4 +103,5 @@ export interface UserTargets {
   target_calories: number | null;
   target_protein_g: number | null;
   activity_level: ActivityLevel;
+  show_vitamins: boolean;
 }
