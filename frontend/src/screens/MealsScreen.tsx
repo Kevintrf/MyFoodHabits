@@ -27,7 +27,7 @@ const SCALES = [0.5, 1, 2] as const;
 function calcMealMacros(items: MealItem[], scale: number) {
   return items.reduce(
     (acc, item) => {
-      const grams = item.serving_grams ?? 100;
+      const grams = item.serving_grams ?? 1;
       const mult = (grams / 100) * item.quantity * scale;
       return {
         calories: acc.calories + parseFloat(String(item.calories_per_100g)) * mult,
