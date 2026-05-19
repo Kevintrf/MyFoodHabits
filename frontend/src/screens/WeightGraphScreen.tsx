@@ -359,12 +359,9 @@ export default function WeightGraphScreen() {
     actualPoints = movingAvg(actualPoints, 7);
   }
 
-  const currentWeight = recentWeights.length > 0
-    ? recentWeights[recentWeights.length - 1].weight_kg
-    : null;
-  const currentDate = recentWeights.length > 0
-    ? isoToDate(recentWeights[recentWeights.length - 1].logged_at)
-    : today;
+  const lastActual = actualPoints.length > 0 ? actualPoints[actualPoints.length - 1] : null;
+  const currentWeight = lastActual?.weight ?? null;
+  const currentDate = lastActual ? isoToDate(lastActual.date) : today;
 
   // ── Predictions ──────────────────────────────────────────
 
