@@ -227,7 +227,7 @@ export default function TodayScreen() {
         transparent
         onRequestClose={() => setEditTarget(null)}
       >
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
