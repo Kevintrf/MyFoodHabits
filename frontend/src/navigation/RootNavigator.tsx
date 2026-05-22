@@ -47,6 +47,10 @@ export type WeightStackParamList = {
   WeightGraph: undefined;
 };
 
+export type SettingsStackParamList = {
+  SettingsHome: undefined;
+};
+
 type RootTabParamList = {
   Today: undefined;
   SearchTab: undefined;
@@ -60,6 +64,7 @@ const TodayStack = createNativeStackNavigator<TodayStackParamList>();
 const SearchStack = createNativeStackNavigator<SearchStackParamList>();
 const MealsStack = createNativeStackNavigator<MealsStackParamList>();
 const WeightStack = createNativeStackNavigator<WeightStackParamList>();
+const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
 
 function TodayStackNavigator() {
   return (
@@ -142,6 +147,14 @@ function MealsStackNavigator() {
   );
 }
 
+function SettingsStackNavigator() {
+  return (
+    <SettingsStack.Navigator>
+      <SettingsStack.Screen name="SettingsHome" component={SettingsScreen} options={{ title: 'Settings' }} />
+    </SettingsStack.Navigator>
+  );
+}
+
 function WeightStackNavigator() {
   return (
     <WeightStack.Navigator>
@@ -218,7 +231,7 @@ export default function RootNavigator() {
         <Tab.Screen name="SearchTab" component={SearchStackNavigator} options={{ title: 'Search' }} />
         <Tab.Screen name="MealsTab" component={MealsStackNavigator} options={{ title: 'Meals' }} />
         <Tab.Screen name="WeightTab" component={WeightStackNavigator} options={{ title: 'Weight', headerShown: false }} />
-        <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings', headerShown: true }} />
+        <Tab.Screen name="Settings" component={SettingsStackNavigator} options={{ title: 'Settings', headerShown: false }} />
       </Tab.Navigator>
     </NavigationContainer>
   );
