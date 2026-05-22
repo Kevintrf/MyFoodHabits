@@ -8,11 +8,14 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { updateTargets } from '../db/settings';
 import { ActivityLevel } from '../services/api';
+import { exportAllData, importAllData } from '../db/dataTransfer';
 
 const ACTIVITY_LEVELS: { value: ActivityLevel; label: string; description: string }[] = [
   { value: 'SEDENTARY',          label: 'Sedentary',          description: 'Desk job, little or no exercise' },
@@ -29,6 +32,8 @@ export default function SettingsScreen() {
   const [protein, setProtein] = useState('');
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>('SEDENTARY');
   const [showVitamins, setShowVitamins] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const initialised = useRef(false);
@@ -68,6 +73,45 @@ export default function SettingsScreen() {
     setActivityLevel(level);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     await save(calories, protein, level, showVitamins);
+  }
+
+  async function handleExport() {
+    setExporting(true);
+    try {
+      await exportAllData();
+    } catch (e) {
+      Alert.alert('Export failed', e instanceof Error ? e.message : 'Something went wrong.');
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  async function handleImport() {
+    Alert.alert(
+      'Import data',
+      'This will overwrite all current data. This cannot be undone. Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Import',
+          style: 'destructive',
+          onPress: async () => {
+            setImporting(true);
+            try {
+              const result = await importAllData();
+              if (result.success) {
+                await refreshTargets();
+                Alert.alert('Import complete', 'Your data has been restored.');
+              } else if (result.error) {
+                Alert.alert('Import failed', result.error);
+              }
+            } finally {
+              setImporting(false);
+            }
+          },
+        },
+      ],
+    );
   }
 
   async function handleVitaminsToggle() {
@@ -141,6 +185,27 @@ export default function SettingsScreen() {
         </TouchableOpacity>
       </View>
 
+      <Text style={styles.sectionHeading}>DATA</Text>
+      <View style={[styles.card, styles.cardNoPadding]}>
+        <TouchableOpacity style={styles.dataRow} onPress={handleExport} disabled={exporting}>
+          <Ionicons name="share-outline" size={22} color="#2D6A4F" />
+          <View style={styles.dataText}>
+            <Text style={styles.dataLabel}>Export data</Text>
+            <Text style={styles.dataDesc}>Save a backup of all your foods, logs, and settings</Text>
+          </View>
+          {exporting ? <ActivityIndicator size="small" color="#2D6A4F" /> : <Ionicons name="chevron-forward" size={18} color="#ccc" />}
+        </TouchableOpacity>
+        <View style={styles.activityOptionBorder} />
+        <TouchableOpacity style={styles.dataRow} onPress={handleImport} disabled={importing}>
+          <Ionicons name="download-outline" size={22} color="#2D6A4F" />
+          <View style={styles.dataText}>
+            <Text style={styles.dataLabel}>Import data</Text>
+            <Text style={styles.dataDesc}>Restore from a previously exported backup file</Text>
+          </View>
+          {importing ? <ActivityIndicator size="small" color="#2D6A4F" /> : <Ionicons name="chevron-forward" size={18} color="#ccc" />}
+        </TouchableOpacity>
+      </View>
+
     </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -180,6 +245,15 @@ const styles = StyleSheet.create({
   activityLabelActive: { color: '#2D6A4F', fontWeight: '600' },
   activityDesc: { fontSize: 12, color: '#999', marginTop: 2 },
   activityDescActive: { color: '#2D6A4F' },
+  dataRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 14,
+  },
+  dataText: { flex: 1 },
+  dataLabel: { fontSize: 15, fontWeight: '500', color: '#1A1A1A' },
+  dataDesc: { fontSize: 12, color: '#999', marginTop: 2 },
   toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',

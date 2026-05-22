@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-05-22 (34)
+
+### feat: export and import data from settings
+Added a DATA section to the Settings screen with Export and Import buttons. Export serialises all tables (foods, food_servings, meals, meal_items, day_logs, log_items, weights, user_settings) to a JSON file and opens the system share sheet. Import picks a previously exported JSON file and restores all data inside a single transaction, prompting the user for confirmation first. Uses expo-file-system/legacy, expo-sharing, and expo-document-picker.
+
+---
+
 ## 2026-04-29 (33)
 
 ### feat: auto-save settings on change
