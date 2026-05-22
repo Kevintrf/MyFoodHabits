@@ -299,6 +299,7 @@ export default function EditMealScreen() {
           <TextInput
             style={styles.nameInput}
             placeholder="Meal name"
+            placeholderTextColor="#bbb"
             value={mealName}
             onChangeText={setMealName}
             returnKeyType="next"
@@ -307,6 +308,7 @@ export default function EditMealScreen() {
             <TextInput
               style={styles.searchInput}
               placeholder="Search foods to add..."
+              placeholderTextColor="#bbb"
               value={searchQuery}
               onChangeText={handleSearchChange}
               returnKeyType="search"

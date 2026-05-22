@@ -158,6 +158,7 @@ export default function SearchScreen() {
                 ref={inputRef}
                 style={styles.input}
                 placeholder="Search foods..."
+                placeholderTextColor="#bbb"
                 value={query}
                 onChangeText={setQuery}
                 clearButtonMode="while-editing"

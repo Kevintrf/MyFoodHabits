@@ -100,6 +100,7 @@ export default function WeightScreen() {
         <TextInput
           style={styles.input}
           placeholder="Weight in kg"
+          placeholderTextColor="#bbb"
           value={input}
           onChangeText={setInput}
           keyboardType="decimal-pad" autoComplete="off" textContentType="none"
