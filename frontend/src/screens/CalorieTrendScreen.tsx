@@ -300,10 +300,9 @@ export default function CalorieTrendScreen() {
   );
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-
-      {/* Controls */}
-      <View style={styles.controlsRow}>
+    <View style={styles.container}>
+      {/* Sticky controls bar */}
+      <View style={styles.controlsBar}>
         <View style={styles.toggleGroup}>
           {([7, 30, 90] as Range[]).map((r) => (
             <TouchableOpacity key={r}
@@ -321,6 +320,8 @@ export default function CalorieTrendScreen() {
           <Text style={[styles.toggleText, showAvg && styles.toggleTextActive]}>7d avg</Text>
         </TouchableOpacity>
       </View>
+
+      <ScrollView contentContainerStyle={styles.content}>
 
       {/* Calories chart */}
       <Text style={styles.chartLabel}>CALORIES</Text>
@@ -392,14 +393,24 @@ export default function CalorieTrendScreen() {
           <Text style={styles.legendText}>Over</Text>
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9F9F9' },
   content: { padding: 16, paddingBottom: 40 },
-  controlsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+  controlsBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#F9F9F9',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5E5',
+  },
   toggleGroup: { flexDirection: 'row', gap: 6 },
   toggleBtn: {
     paddingHorizontal: 12, paddingVertical: 6,
