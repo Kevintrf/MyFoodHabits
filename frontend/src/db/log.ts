@@ -162,6 +162,24 @@ export async function getMonthSummary(year: number, month: number): Promise<DayS
   return rows;
 }
 
+export async function getDailyNutritionHistory(
+  days: number,
+): Promise<{ date: string; calories: number; protein_g: number }[]> {
+  return db.getAllAsync(
+    `SELECT dl.date,
+            ROUND(SUM(f.calories_per_100g * COALESCE(fs.grams, 1) / 100 * li.quantity)) AS calories,
+            ROUND(SUM(f.protein_per_100g  * COALESCE(fs.grams, 1) / 100 * li.quantity), 1) AS protein_g
+     FROM day_logs dl
+     JOIN log_items li ON li.day_log_id = dl.id
+     JOIN foods f ON li.food_id = f.id
+     LEFT JOIN food_servings fs ON li.serving_id = fs.id
+     WHERE dl.user_id = 1 AND dl.date >= date('now', ?)
+     GROUP BY dl.date
+     ORDER BY dl.date`,
+    [`-${days} days`],
+  );
+}
+
 export async function getCalorieHistory(days: number): Promise<{ date: string; calories: number }[]> {
   const rows = await db.getAllAsync<{ date: string; calories: number }>(
     `SELECT dl.date,

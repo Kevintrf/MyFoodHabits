@@ -8,6 +8,7 @@ import { useApp } from '../context/AppContext';
 
 import TodayScreen from '../screens/TodayScreen';
 import CalendarScreen from '../screens/CalendarScreen';
+import CalorieTrendScreen from '../screens/CalorieTrendScreen';
 import SearchScreen from '../screens/SearchScreen';
 import PortionScreen from '../screens/PortionScreen';
 import MealsScreen from '../screens/MealsScreen';
@@ -25,6 +26,7 @@ import { Food, Meal } from '../services/api';
 export type TodayStackParamList = {
   TodayHome: undefined;
   Calendar: undefined;
+  CalorieTrend: undefined;
 };
 
 export type SearchStackParamList = {
@@ -68,16 +70,25 @@ function TodayStackNavigator() {
         options={({ navigation }) => ({
           title: 'Today',
           headerRight: () => (
-            <Ionicons
-              name="calendar-outline"
-              size={24}
-              color="#2D6A4F"
-              onPress={() => navigation.navigate('Calendar')}
-            />
+            <View style={{ flexDirection: 'row', gap: 16 }}>
+              <Ionicons
+                name="bar-chart-outline"
+                size={22}
+                color="#2D6A4F"
+                onPress={() => navigation.navigate('CalorieTrend')}
+              />
+              <Ionicons
+                name="calendar-outline"
+                size={24}
+                color="#2D6A4F"
+                onPress={() => navigation.navigate('Calendar')}
+              />
+            </View>
           ),
         })}
       />
       <TodayStack.Screen name="Calendar" component={CalendarScreen} options={{ title: 'Calendar' }} />
+      <TodayStack.Screen name="CalorieTrend" component={CalorieTrendScreen} options={{ title: 'Calorie Trend' }} />
     </TodayStack.Navigator>
   );
 }
