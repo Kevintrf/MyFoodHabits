@@ -96,6 +96,7 @@ export default function MealsScreen() {
       <FlatList
         data={meals}
         keyExtractor={(item) => String(item.id)}
+        contentContainerStyle={styles.listContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         ListEmptyComponent={<Text style={styles.empty}>No saved meals yet.</Text>}
         renderItem={({ item }) => {
@@ -190,6 +191,7 @@ export default function MealsScreen() {
 const styles = StyleSheet.create({
   loader: { flex: 1, marginTop: 100 },
   container: { flex: 1, backgroundColor: '#F9F9F9' },
+  listContent: { paddingTop: 12 },
   empty: { textAlign: 'center', color: '#999', marginTop: 60, fontSize: 15 },
   mealCard: {
     flexDirection: 'row',
