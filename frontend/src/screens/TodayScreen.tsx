@@ -109,6 +109,12 @@ export default function TodayScreen() {
     day: 'numeric',
   });
 
+  function shiftDate(iso: string, days: number): string {
+    const d = new Date(iso + 'T00:00:00');
+    d.setDate(d.getDate() + days);
+    return d.toISOString().slice(0, 10);
+  }
+
   return (
     <>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -120,7 +126,19 @@ export default function TodayScreen() {
           </TouchableOpacity>
         )}
 
-        <Text style={styles.dateLabel}>{dateLabel}</Text>
+        <View style={styles.dateRow}>
+          <TouchableOpacity onPress={() => setViewingDate(shiftDate(viewingDate, -1))} style={styles.dateArrow}>
+            <Ionicons name="chevron-back" size={24} color="#2D6A4F" />
+          </TouchableOpacity>
+          <Text style={styles.dateLabel}>{dateLabel}</Text>
+          <TouchableOpacity
+            onPress={() => setViewingDate(shiftDate(viewingDate, 1))}
+            style={styles.dateArrow}
+            disabled={isViewingToday}
+          >
+            <Ionicons name="chevron-forward" size={24} color={isViewingToday ? '#ccc' : '#2D6A4F'} />
+          </TouchableOpacity>
+        </View>
 
         {/* Macro summary */}
         <View style={styles.macroRow}>
@@ -343,7 +361,15 @@ const styles = StyleSheet.create({
     borderBottomColor: '#FFE08A',
   },
   pastBannerText: { fontSize: 13, color: '#856404', textAlign: 'center', fontWeight: '500' },
-  dateLabel: { fontSize: 22, fontWeight: '700', color: '#1A1A1A', padding: 20, paddingTop: 24 },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  dateArrow: { padding: 8 },
+  dateLabel: { flex: 1, fontSize: 20, fontWeight: '700', color: '#1A1A1A', textAlign: 'center' },
   macroRow: { flexDirection: 'row', paddingHorizontal: 16, gap: 12, marginBottom: 8 },
   macroCard: {
     flex: 1,
