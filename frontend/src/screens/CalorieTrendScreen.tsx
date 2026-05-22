@@ -332,6 +332,19 @@ export default function CalorieTrendScreen() {
         </View>
       )}
 
+      {/* Calories summary */}
+      <Text style={styles.sectionHeader}>{`LAST ${range} DAYS`}</Text>
+      {daysLogged === 0 ? (
+        <View style={styles.emptyChart}>
+          <Text style={styles.emptyText}>No food logged in this period.</Text>
+        </View>
+      ) : (
+        <SummaryCard label="CALORIES" avg={avgCal} target={calTarget} unit="kcal"
+          daysLogged={daysLogged} totalDays={range}
+          daysAtGoal={daysCalAtGoal} atGoalLabel="days on target (±10%)"
+          lowerIsBetter={true} />
+      )}
+
       {/* Protein chart */}
       <Text style={styles.chartLabel}>PROTEIN</Text>
       {proPts.length < 2 ? emptyChart : (
@@ -340,6 +353,14 @@ export default function CalorieTrendScreen() {
             color="#2980B9" avgColor="#85C1E9" showAvg={showAvg}
             width={chartWidth} unit="g" lowerIsBetter={false} />
         </View>
+      )}
+
+      {/* Protein summary */}
+      {daysLogged > 0 && (
+        <SummaryCard label="PROTEIN" avg={avgPro} target={proTarget} unit="g"
+          daysLogged={daysLogged} totalDays={range}
+          daysAtGoal={daysProAtGoal} atGoalLabel="days at goal"
+          lowerIsBetter={false} />
       )}
 
       {/* Legend */}
@@ -371,26 +392,6 @@ export default function CalorieTrendScreen() {
           <Text style={styles.legendText}>Over</Text>
         </View>
       </View>
-
-      {/* Summary */}
-      <Text style={styles.sectionHeader}>{`LAST ${range} DAYS`}</Text>
-
-      {daysLogged === 0 ? (
-        <View style={styles.emptyChart}>
-          <Text style={styles.emptyText}>No food logged in this period.</Text>
-        </View>
-      ) : (
-        <>
-          <SummaryCard label="CALORIES" avg={avgCal} target={calTarget} unit="kcal"
-            daysLogged={daysLogged} totalDays={range}
-            daysAtGoal={daysCalAtGoal} atGoalLabel="days on target (±10%)"
-            lowerIsBetter={true} />
-          <SummaryCard label="PROTEIN" avg={avgPro} target={proTarget} unit="g"
-            daysLogged={daysLogged} totalDays={range}
-            daysAtGoal={daysProAtGoal} atGoalLabel="days at goal"
-            lowerIsBetter={false} />
-        </>
-      )}
     </ScrollView>
   );
 }
