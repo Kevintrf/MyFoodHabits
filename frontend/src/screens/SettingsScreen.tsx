@@ -80,8 +80,9 @@ export default function SettingsScreen() {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ScrollView contentContainerStyle={styles.content}>
+
       <Text style={styles.sectionHeading}>DAILY TARGETS</Text>
-      <View style={styles.field}>
+      <View style={styles.card}>
         <Text style={styles.label}>CALORIES (kcal)</Text>
         <TextInput
           style={styles.input}
@@ -91,9 +92,7 @@ export default function SettingsScreen() {
           placeholder="e.g. 2000"
           placeholderTextColor="#bbb"
         />
-      </View>
-
-      <View style={styles.field}>
+        <View style={styles.cardDivider} />
         <Text style={styles.label}>PROTEIN (g)</Text>
         <TextInput
           style={styles.input}
@@ -105,12 +104,16 @@ export default function SettingsScreen() {
         />
       </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>ACTIVITY LEVEL</Text>
-        {ACTIVITY_LEVELS.map((lvl) => (
+      <Text style={styles.sectionHeading}>ACTIVITY LEVEL</Text>
+      <View style={[styles.card, styles.cardNoPadding]}>
+        {ACTIVITY_LEVELS.map((lvl, i) => (
           <TouchableOpacity
             key={lvl.value}
-            style={[styles.activityOption, activityLevel === lvl.value && styles.activityOptionActive]}
+            style={[
+              styles.activityOption,
+              activityLevel === lvl.value && styles.activityOptionActive,
+              i < ACTIVITY_LEVELS.length - 1 && styles.activityOptionBorder,
+            ]}
             onPress={() => handleActivityChange(lvl.value)}
           >
             <Text style={[styles.activityLabel, activityLevel === lvl.value && styles.activityLabelActive]}>
@@ -123,8 +126,8 @@ export default function SettingsScreen() {
         ))}
       </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>TRACKING</Text>
+      <Text style={styles.sectionHeading}>TRACKING</Text>
+      <View style={[styles.card, styles.cardNoPadding]}>
         <TouchableOpacity style={styles.toggleRow} onPress={handleVitaminsToggle}>
           <Ionicons
             name={showVitamins ? 'checkbox' : 'square-outline'}
@@ -137,6 +140,7 @@ export default function SettingsScreen() {
           </View>
         </TouchableOpacity>
       </View>
+
     </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -144,12 +148,24 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9F9F9' },
-  content: { padding: 20 },
-  sectionHeading: { fontSize: 12, fontWeight: '700', color: '#999', letterSpacing: 1, marginBottom: 12, marginTop: 4 },
-  field: { marginBottom: 20 },
+  content: { padding: 20, paddingBottom: 40 },
+  sectionHeading: { fontSize: 12, fontWeight: '700', color: '#999', letterSpacing: 1, marginBottom: 8, marginTop: 8 },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    overflow: 'hidden',
+  },
+  cardNoPadding: { padding: 0 },
+  cardDivider: { height: 1, backgroundColor: '#E5E5E5', marginVertical: 14 },
   label: { fontSize: 12, fontWeight: '700', color: '#999', letterSpacing: 1, marginBottom: 6 },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: '#F9F9F9',
     borderWidth: 1,
     borderColor: '#E5E5E5',
     borderRadius: 10,
@@ -157,15 +173,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#1A1A1A',
   },
-  activityOption: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 6,
-  },
-  activityOptionActive: { borderColor: '#2D6A4F', backgroundColor: '#F0FAF4' },
+  activityOption: { padding: 14 },
+  activityOptionActive: { backgroundColor: '#F0FAF4' },
+  activityOptionBorder: { borderBottomWidth: 1, borderBottomColor: '#E5E5E5' },
   activityLabel: { fontSize: 15, fontWeight: '500', color: '#1A1A1A' },
   activityLabelActive: { color: '#2D6A4F', fontWeight: '600' },
   activityDesc: { fontSize: 12, color: '#999', marginTop: 2 },
@@ -174,11 +184,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
-    borderRadius: 10,
-    padding: 12,
+    padding: 14,
   },
   toggleText: { flex: 1 },
   toggleLabel: { fontSize: 15, fontWeight: '500', color: '#1A1A1A' },
