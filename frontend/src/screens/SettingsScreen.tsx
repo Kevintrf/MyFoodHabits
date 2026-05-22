@@ -80,8 +80,6 @@ export default function SettingsScreen() {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ScrollView contentContainerStyle={styles.content}>
-      <Text style={styles.heading}>Daily Targets</Text>
-
       <View style={styles.field}>
         <Text style={styles.label}>CALORIES (kcal)</Text>
         <TextInput
@@ -145,8 +143,7 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9F9F9' },
-  content: { padding: 20, paddingTop: 56 },
-  heading: { fontSize: 22, fontWeight: '700', color: '#1A1A1A', marginBottom: 28 },
+  content: { padding: 20 },
   field: { marginBottom: 20 },
   label: { fontSize: 12, fontWeight: '700', color: '#999', letterSpacing: 1, marginBottom: 6 },
   input: {
