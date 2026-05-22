@@ -218,7 +218,7 @@ export default function RootNavigator() {
         <Tab.Screen name="SearchTab" component={SearchStackNavigator} options={{ title: 'Search' }} />
         <Tab.Screen name="MealsTab" component={MealsStackNavigator} options={{ title: 'Meals' }} />
         <Tab.Screen name="WeightTab" component={WeightStackNavigator} options={{ title: 'Weight', headerShown: false }} />
-        <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Daily Targets', headerShown: true }} />
+        <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings', headerShown: true }} />
       </Tab.Navigator>
     </NavigationContainer>
   );

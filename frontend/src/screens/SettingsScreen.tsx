@@ -80,6 +80,7 @@ export default function SettingsScreen() {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ScrollView contentContainerStyle={styles.content}>
+      <Text style={styles.sectionHeading}>DAILY TARGETS</Text>
       <View style={styles.field}>
         <Text style={styles.label}>CALORIES (kcal)</Text>
         <TextInput
@@ -125,15 +126,15 @@ export default function SettingsScreen() {
       <View style={styles.field}>
         <Text style={styles.label}>TRACKING</Text>
         <TouchableOpacity style={styles.toggleRow} onPress={handleVitaminsToggle}>
-          <View>
-            <Text style={styles.toggleLabel}>Vitamins</Text>
-            <Text style={styles.toggleDesc}>Show a daily vitamins checkbox on the Today screen</Text>
-          </View>
           <Ionicons
             name={showVitamins ? 'checkbox' : 'square-outline'}
             size={24}
             color={showVitamins ? '#2D6A4F' : '#ccc'}
           />
+          <View style={styles.toggleText}>
+            <Text style={styles.toggleLabel}>Vitamins</Text>
+            <Text style={styles.toggleDesc}>Show a daily vitamins checkbox</Text>
+          </View>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -144,6 +145,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9F9F9' },
   content: { padding: 20 },
+  sectionHeading: { fontSize: 12, fontWeight: '700', color: '#999', letterSpacing: 1, marginBottom: 12, marginTop: 4 },
   field: { marginBottom: 20 },
   label: { fontSize: 12, fontWeight: '700', color: '#999', letterSpacing: 1, marginBottom: 6 },
   input: {
@@ -171,13 +173,14 @@ const styles = StyleSheet.create({
   toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 12,
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#E5E5E5',
     borderRadius: 10,
     padding: 12,
   },
+  toggleText: { flex: 1 },
   toggleLabel: { fontSize: 15, fontWeight: '500', color: '#1A1A1A' },
   toggleDesc: { fontSize: 12, color: '#999', marginTop: 2 },
 });
