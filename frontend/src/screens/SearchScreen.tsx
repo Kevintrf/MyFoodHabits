@@ -35,6 +35,13 @@ const SOURCE_COLOR: Record<FoodSource, string> = {
   VERIFIED: '#2563EB',
 };
 
+function foodSourceLabel(item: { source: FoodSource; ai_estimated: boolean }): string {
+  return item.ai_estimated ? 'AI Estimate' : SOURCE_LABEL[item.source];
+}
+function foodSourceColor(item: { source: FoodSource; ai_estimated: boolean }): string {
+  return item.ai_estimated ? '#8B5CF6' : SOURCE_COLOR[item.source];
+}
+
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Food[]>([]);
@@ -182,8 +189,8 @@ export default function SearchScreen() {
             <View style={styles.resultLeft}>
               <View style={styles.resultNameRow}>
                 <Text style={styles.resultName}>{item.name}</Text>
-                <Text style={[styles.sourceBadge, { color: SOURCE_COLOR[item.source] }]}>
-                  {SOURCE_LABEL[item.source]}
+                <Text style={[styles.sourceBadge, { color: foodSourceColor(item) }]}>
+                  {foodSourceLabel(item)}
                 </Text>
                 {item.locally_modified && (
                   <Text style={styles.modifiedBadge}>Modified</Text>

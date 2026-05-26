@@ -27,7 +27,7 @@ export default function PortionScreen() {
   const route = useRoute<PortionRoute>();
   const navigation = useNavigation<any>();
   const { viewingDate, refreshViewingLog } = useApp();
-  const { food } = route.params;
+  const { food, initialQuantity } = route.params;
 
   const [foodDetail, setFoodDetail] = useState<FoodWithServings | null>(null);
   const [selectedServing, setSelectedServing] = useState<FoodServing | null>(null);
@@ -42,7 +42,11 @@ export default function PortionScreen() {
         setFoodDetail(f);
         const def = f.servings.find((s) => s.is_default) ?? null;
         setSelectedServing(def);
-        setQuantity(def ? '1' : '100');
+        if (initialQuantity !== undefined) {
+          setQuantity(String(initialQuantity));
+        } else {
+          setQuantity(def ? '1' : '100');
+        }
       })
       .finally(() => setLoading(false));
   }, [food.id]);
@@ -123,7 +127,7 @@ export default function PortionScreen() {
       <View style={styles.foodHeader}>
         <Text style={styles.foodName}>{food.name}</Text>
         <Text style={styles.foodSourceLabel}>
-          {food.source === 'USER' ? 'My food' : food.source === 'OPENFOODFACTS' ? 'Open Food Facts' : 'Verified'}
+          {food.ai_estimated ? 'AI Estimate' : food.source === 'USER' ? 'My food' : food.source === 'OPENFOODFACTS' ? 'Open Food Facts' : 'Verified'}
           {food.locally_modified ? ' · Modified' : ''}
         </Text>
         <Text style={styles.foodSub}>

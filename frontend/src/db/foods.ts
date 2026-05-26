@@ -12,6 +12,7 @@ interface FoodRow {
   liquid: number;
   source: string;
   locally_modified: number;
+  ai_estimated: number;
   created_by_user_id: number | null;
   calories_per_100g: number;
   protein_per_100g: number;
@@ -41,6 +42,7 @@ function mapFood(row: FoodRow): Food {
     liquid: !!row.liquid,
     source: row.source as FoodSource,
     locally_modified: !!row.locally_modified,
+    ai_estimated: !!row.ai_estimated,
     created_by_user_id: row.created_by_user_id,
     calories_per_100g: row.calories_per_100g,
     protein_per_100g: row.protein_per_100g,
@@ -73,7 +75,7 @@ async function getServingsForFood(foodId: number): Promise<FoodServing[]> {
 
 export async function searchFoods(q: string): Promise<Food[]> {
   const rows = await db.getAllAsync<FoodRow>(
-    `SELECT id, name, barcode, liquid, source, locally_modified, created_by_user_id,
+    `SELECT id, name, barcode, liquid, source, locally_modified, ai_estimated, created_by_user_id,
             calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
      FROM foods
      WHERE name LIKE ?
@@ -86,7 +88,7 @@ export async function searchFoods(q: string): Promise<Food[]> {
 
 export async function getFoodById(id: number): Promise<FoodWithServings> {
   const row = await db.getFirstAsync<FoodRow>(
-    `SELECT id, name, barcode, liquid, source, locally_modified, created_by_user_id,
+    `SELECT id, name, barcode, liquid, source, locally_modified, ai_estimated, created_by_user_id,
             calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, created_at
      FROM foods WHERE id = ?`,
     [id],
@@ -98,7 +100,7 @@ export async function getFoodById(id: number): Promise<FoodWithServings> {
 // Check local DB first; fall back to Open Food Facts and cache the result.
 export async function getFoodByBarcode(barcode: string): Promise<Food> {
   const cached = await db.getFirstAsync<FoodRow>(
-    `SELECT id, name, barcode, liquid, source, locally_modified, created_by_user_id,
+    `SELECT id, name, barcode, liquid, source, locally_modified, ai_estimated, created_by_user_id,
             calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
      FROM foods WHERE barcode = ? ORDER BY version DESC LIMIT 1`,
     [barcode],
@@ -147,7 +149,7 @@ export async function getFoodByBarcode(barcode: string): Promise<Food> {
 
 export async function getRecentFoods(offset = 0, limit = 20): Promise<Food[]> {
   const rows = await db.getAllAsync<FoodRow>(
-    `SELECT f.id, f.name, f.barcode, f.liquid, f.source, f.locally_modified, f.created_by_user_id,
+    `SELECT f.id, f.name, f.barcode, f.liquid, f.source, f.locally_modified, f.ai_estimated, f.created_by_user_id,
             f.calories_per_100g, f.protein_per_100g, f.carbs_per_100g, f.fat_per_100g
      FROM foods f
      JOIN (
@@ -172,6 +174,7 @@ export async function createFood(data: {
   carbs_per_100g?: number;
   fat_per_100g?: number;
   liquid?: boolean;
+  ai_estimated?: boolean;
   servings?: ServingDraft[];
 }): Promise<Food> {
   let foodId = 0;
@@ -180,8 +183,8 @@ export async function createFood(data: {
     const result = await db.runAsync(
       `INSERT INTO foods
          (name, barcode, liquid, calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g,
-          created_by_user_id, source, version)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 1, 'USER', 1)`,
+          created_by_user_id, source, version, ai_estimated)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 1, 'USER', 1, ?)`,
       [
         data.name,
         data.barcode ?? null,
@@ -190,6 +193,7 @@ export async function createFood(data: {
         data.protein_per_100g ?? 0,
         data.carbs_per_100g ?? 0,
         data.fat_per_100g ?? 0,
+        data.ai_estimated ? 1 : 0,
       ],
     );
     foodId = result.lastInsertRowId;

@@ -19,6 +19,7 @@ import WeightGraphScreen from '../screens/WeightGraphScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import CreateFoodScreen from '../screens/CreateFoodScreen';
 import EditFoodScreen from '../screens/EditFoodScreen';
+import AiEstimateScreen from '../screens/AiEstimateScreen';
 import { Food, Meal } from '../services/api';
 
 // --- Param list types ---
@@ -31,9 +32,10 @@ export type TodayStackParamList = {
 
 export type SearchStackParamList = {
   Search: undefined;
-  Portion: { food: Food };
+  Portion: { food: Food; initialQuantity?: number };
   CreateFood: { initialName?: string; barcode?: string };
   EditFood: { food: Food };
+  AiEstimate: undefined;
 };
 
 export type MealsStackParamList = {
@@ -107,18 +109,27 @@ function SearchStackNavigator() {
         options={({ navigation }) => ({
           title: 'Search Foods',
           headerRight: () => (
-            <Ionicons
-              name="add"
-              size={26}
-              color="#2D6A4F"
-              onPress={() => navigation.navigate('CreateFood', {})}
-            />
+            <View style={{ flexDirection: 'row', gap: 16 }}>
+              <Ionicons
+                name="sparkles-outline"
+                size={22}
+                color="#2D6A4F"
+                onPress={() => navigation.navigate('AiEstimate')}
+              />
+              <Ionicons
+                name="add"
+                size={26}
+                color="#2D6A4F"
+                onPress={() => navigation.navigate('CreateFood', {})}
+              />
+            </View>
           ),
         })}
       />
       <SearchStack.Screen name="Portion" component={PortionScreen} options={{ title: 'Log Food' }} />
       <SearchStack.Screen name="CreateFood" component={CreateFoodScreen} options={{ title: 'New Food' }} />
       <SearchStack.Screen name="EditFood" component={EditFoodScreen} options={{ title: 'Edit Food' }} />
+      <SearchStack.Screen name="AiEstimate" component={AiEstimateScreen} options={{ title: 'AI Estimate' }} />
     </SearchStack.Navigator>
   );
 }

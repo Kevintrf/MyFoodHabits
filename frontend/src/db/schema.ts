@@ -1,7 +1,7 @@
 import { db } from './client';
 
 // Bump this when adding new tables or columns and add a migration below.
-const SCHEMA_VERSION = 4;
+const SCHEMA_VERSION = 5;
 
 // ---------------------------------------------------------------------------
 // Table definitions
@@ -167,6 +167,19 @@ export function initSchema(): void {
         db.execSync('ALTER TABLE day_logs ADD COLUMN vitamins_taken INTEGER NOT NULL DEFAULT 0;');
       } catch { /* already exists */ }
       db.runSync('UPDATE user_settings SET schema_version = 4 WHERE id = 1');
+    }
+
+    if (currentVersion < 5) {
+      try {
+        db.execSync('ALTER TABLE foods ADD COLUMN ai_estimated INTEGER NOT NULL DEFAULT 0;');
+      } catch { /* already exists */ }
+      try {
+        db.execSync('ALTER TABLE user_settings ADD COLUMN country TEXT;');
+      } catch { /* already exists */ }
+      try {
+        db.execSync('ALTER TABLE user_settings ADD COLUMN anthropic_api_key TEXT;');
+      } catch { /* already exists */ }
+      db.runSync('UPDATE user_settings SET schema_version = 5 WHERE id = 1');
     }
   });
 }

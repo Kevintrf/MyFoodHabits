@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-05-26 (35)
+
+### feat: AI meal estimation via Anthropic API
+Added AI-powered meal estimation to the Search screen (sparkles icon in header). Users describe a meal in plain text, optionally specify a country, and receive an estimated nutritional breakdown (calories/protein/carbs/fat per 100g, total meal weight). All values are editable before saving. The result is saved as a food with an AI Estimate badge and navigates to PortionScreen pre-filled with the estimated total weight. Requires an Anthropic API key configured in Settings under the new AI ESTIMATION section (also stores default country). Schema migrated to v5 adding ai_estimated, country, and anthropic_api_key columns.
+
+---
+
 ## 2026-05-22 (34)
 
 ### feat: export and import data from settings

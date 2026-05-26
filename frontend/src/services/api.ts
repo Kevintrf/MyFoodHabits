@@ -3,6 +3,16 @@
 
 export type FoodSource = 'USER' | 'VERIFIED' | 'OPENFOODFACTS';
 
+export interface AiEstimateResult {
+  meal_title: string | null;
+  liquid: boolean;
+  per_100g: { calories_kcal: number | null; protein_g: number | null; fat_g: number | null; carbs_g: number | null } | null;
+  total_meal: { weight_g: number | null; calories_kcal: number | null; protein_g: number | null; fat_g: number | null; carbs_g: number | null } | null;
+  confidence: 'low' | 'medium' | 'high' | null;
+  notes: string | null;
+  error: string | null;
+}
+
 export interface Food {
   id: number;
   name: string;
@@ -10,6 +20,7 @@ export interface Food {
   liquid: boolean;
   source: FoodSource;
   locally_modified: boolean;
+  ai_estimated: boolean;
   created_by_user_id: number | null;
   calories_per_100g: number;
   protein_per_100g: number;

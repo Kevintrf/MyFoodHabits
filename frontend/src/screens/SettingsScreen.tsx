@@ -16,6 +16,7 @@ import { useApp } from '../context/AppContext';
 import { updateTargets } from '../db/settings';
 import { ActivityLevel } from '../services/api';
 import { exportAllData, importAllData } from '../db/dataTransfer';
+import { getAiSettings, saveAiSettings } from '../db/settings';
 
 const ACTIVITY_LEVELS: { value: ActivityLevel; label: string; description: string }[] = [
   { value: 'SEDENTARY',          label: 'Sedentary',          description: 'Desk job, little or no exercise' },
@@ -34,6 +35,10 @@ export default function SettingsScreen() {
   const [showVitamins, setShowVitamins] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [country, setCountry] = useState('');
+  const [apiKey, setApiKey] = useState('');
+  const [apiKeyVisible, setApiKeyVisible] = useState(false);
+  const aiDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const initialised = useRef(false);
@@ -45,6 +50,20 @@ export default function SettingsScreen() {
     setShowVitamins(targets.show_vitamins ?? false);
     initialised.current = true;
   }, [targets]);
+
+  useEffect(() => {
+    getAiSettings().then((s) => {
+      setCountry(s.country ?? '');
+      setApiKey(s.anthropic_api_key ?? '');
+    });
+  }, []);
+
+  function scheduleAiSave(c: string, k: string) {
+    if (aiDebounceRef.current) clearTimeout(aiDebounceRef.current);
+    aiDebounceRef.current = setTimeout(() => {
+      saveAiSettings({ country: c || null, anthropic_api_key: k || null });
+    }, 600);
+  }
 
   const save = useCallback(async (cal: string, pro: string, activity: ActivityLevel, vitamins: boolean) => {
     const calNum = parseInt(cal);
@@ -185,6 +204,35 @@ export default function SettingsScreen() {
         </TouchableOpacity>
       </View>
 
+      <Text style={styles.sectionHeading}>AI ESTIMATION</Text>
+      <View style={styles.card}>
+        <Text style={styles.label}>COUNTRY</Text>
+        <TextInput
+          style={styles.input}
+          value={country}
+          onChangeText={(v) => { setCountry(v); scheduleAiSave(v, apiKey); }}
+          placeholder="e.g. Sweden"
+          placeholderTextColor="#bbb"
+          autoComplete="off" textContentType="none"
+        />
+        <View style={styles.cardDivider} />
+        <Text style={styles.label}>ANTHROPIC API KEY</Text>
+        <View style={styles.apiKeyRow}>
+          <TextInput
+            style={[styles.input, styles.apiKeyInput]}
+            value={apiKey}
+            onChangeText={(v) => { setApiKey(v); scheduleAiSave(country, v); }}
+            placeholder="sk-ant-..."
+            placeholderTextColor="#bbb"
+            secureTextEntry={!apiKeyVisible}
+            autoComplete="off" textContentType="none" autoCorrect={false}
+          />
+          <TouchableOpacity onPress={() => setApiKeyVisible((v) => !v)} style={styles.apiKeyToggle}>
+            <Ionicons name={apiKeyVisible ? 'eye-off-outline' : 'eye-outline'} size={20} color="#999" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <Text style={styles.sectionHeading}>DATA</Text>
       <View style={[styles.card, styles.cardNoPadding]}>
         <TouchableOpacity style={styles.dataRow} onPress={handleExport} disabled={exporting}>
@@ -245,6 +293,9 @@ const styles = StyleSheet.create({
   activityLabelActive: { color: '#2D6A4F', fontWeight: '600' },
   activityDesc: { fontSize: 12, color: '#999', marginTop: 2 },
   activityDescActive: { color: '#2D6A4F' },
+  apiKeyRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  apiKeyInput: { flex: 1, marginBottom: 0 },
+  apiKeyToggle: { padding: 10 },
   dataRow: {
     flexDirection: 'row',
     alignItems: 'center',
