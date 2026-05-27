@@ -333,9 +333,10 @@ export default function WeightGraphScreen() {
     actualPoints = movingAvg(actualPoints, 7);
   }
 
-  const lastActual = actualPoints.length > 0 ? actualPoints[actualPoints.length - 1] : null;
-  const currentWeight = lastActual?.weight ?? null;
-  const currentDate = lastActual ? isoToDate(lastActual.date) : today;
+  // Always derive forecast anchor from raw data so view mode doesn't affect predictions.
+  const lastRaw = recentWeights.length > 0 ? recentWeights[recentWeights.length - 1] : null;
+  const currentWeight = lastRaw?.weight_kg ?? null;
+  const currentDate = lastRaw ? isoToDate(lastRaw.logged_at) : today;
 
   // ── Predictions ──────────────────────────────────────────
 

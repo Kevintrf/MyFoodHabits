@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-05-27 (38)
+
+### fix: weight forecast no longer changes when toggling daily/7d avg view
+The forecast anchor (current weight and date) was incorrectly derived from the smoothed moving-average points, so switching to 7d avg mode changed the starting weight and shifted all prediction values. Now always reads from the last raw weight entry.
+
+---
+
 ## 2026-05-27 (37)
 
 ### feat: use calibrated TDEE from weight history on today screen
