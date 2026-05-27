@@ -14,7 +14,7 @@ import { showAlert } from '../utils/alert';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 import { FoodServing, FoodWithServings } from '../services/api';
-import { getFoodById } from '../db/foods';
+import { getFoodById, addDefaultServing } from '../db/foods';
 import { addLogItem } from '../db/log';
 import { useApp } from '../context/AppContext';
 import { fmtNum } from '../utils/format';
@@ -64,6 +64,9 @@ export default function PortionScreen() {
   async function doLog() {
     setLogging(true);
     try {
+      if (food.ai_estimated && !selectedServing && foodDetail?.servings.length === 0 && qty > 0) {
+        await addDefaultServing(food.id, 'Portion', qty);
+      }
       await addLogItem({
         date: viewingDate,
         meal_slot: mealSlot,

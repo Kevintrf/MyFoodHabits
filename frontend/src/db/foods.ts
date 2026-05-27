@@ -310,3 +310,10 @@ export async function editFood(
   const row = await db.getFirstAsync<FoodRow>('SELECT * FROM foods WHERE id = ?', [newFoodId]);
   return mapFood(row!);
 }
+
+export async function addDefaultServing(foodId: number, name: string, grams: number): Promise<void> {
+  await db.runAsync(
+    'INSERT INTO food_servings (food_id, name, grams, is_default) VALUES (?, ?, ?, 1)',
+    [foodId, name, grams],
+  );
+}
