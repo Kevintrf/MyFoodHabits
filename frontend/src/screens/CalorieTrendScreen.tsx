@@ -49,10 +49,54 @@ function addDays(d: Date, n: number): Date {
 function daysBetween(a: Date, b: Date): number {
   return Math.round((b.getTime() - a.getTime()) / 86400000);
 }
-function shortDateLabel(iso: string): string {
-  const d = isoToDate(iso);
-  return `${d.getDate()}/${d.getMonth() + 1}`;
+function dateToISO(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
+
+const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function niceYAxis(
+  values: number[],
+  padding: number,
+  intervals: number[],
+): { yMin: number; yMax: number; gridLines: number[] } {
+  const minV = Math.min(...values);
+  const maxV = Math.max(...values);
+  const lo = Math.max(0, minV - padding);
+  const hi = maxV + padding;
+  const span = hi - lo;
+  const interval = intervals.find(iv => span / iv <= 7) ?? intervals[intervals.length - 1];
+  const yMin = Math.floor(lo / interval) * interval;
+  const yMax = Math.ceil(hi / interval) * interval;
+  const count = Math.round((yMax - yMin) / interval);
+  const gridLines: number[] = [];
+  for (let i = 0; i <= count; i++) gridLines.push(yMin + i * interval);
+  return { yMin, yMax, gridLines };
+}
+
+function buildXLabels(pts: Pt[]): { date: string; label: string }[] {
+  if (pts.length === 0) return [];
+  const sorted = [...pts].sort((a, b) => a.date.localeCompare(b.date));
+  const minDate = isoToDate(sorted[0].date);
+  const maxDate = isoToDate(sorted[sorted.length - 1].date);
+  const totalDays = Math.max(1, daysBetween(minDate, maxDate));
+  const intervalDays = ([2, 3, 7, 14, 21, 30] as const).find(i => totalDays / i <= 6) ?? 30;
+  const labels: { date: string; label: string }[] = [];
+  const cursor = new Date(minDate);
+  while (cursor <= maxDate) {
+    labels.push({ date: dateToISO(cursor), label: `${cursor.getDate()} ${MONTH_SHORT[cursor.getMonth()]}` });
+    cursor.setDate(cursor.getDate() + intervalDays);
+  }
+  const lastLabelDate = labels.length > 0 ? isoToDate(labels[labels.length - 1].date) : minDate;
+  if (daysBetween(lastLabelDate, maxDate) > intervalDays / 2) {
+    labels.push({ date: dateToISO(maxDate), label: `${maxDate.getDate()} ${MONTH_SHORT[maxDate.getMonth()]}` });
+  }
+  return labels;
+}
+
 function movingAvg(pts: Pt[], window = 7): Pt[] {
   return pts.map((p, i) => {
     const half = Math.floor(window / 2);
@@ -66,7 +110,7 @@ function movingAvg(pts: Pt[], window = 7): Pt[] {
 // ─────────────────────────────────────────────────────────────
 
 function NutrientChart({
-  pts, avgPts, goalValue, color, avgColor, showAvg, width, unit, lowerIsBetter,
+  pts, avgPts, goalValue, color, avgColor, showAvg, width, unit, lowerIsBetter, yIntervals, yPadding,
 }: {
   pts: Pt[];
   avgPts: Pt[];
@@ -77,6 +121,8 @@ function NutrientChart({
   width: number;
   unit: string;
   lowerIsBetter: boolean;
+  yIntervals: number[];
+  yPadding: number;
 }) {
   if (pts.length === 0) return null;
 
@@ -86,12 +132,7 @@ function NutrientChart({
   const totalDays = Math.max(1, daysBetween(isoToDate(minDate), isoToDate(maxDate)));
 
   const allValues = [...pts.map((p) => p.value), goalValue];
-  const rawMin = Math.min(...allValues);
-  const rawMax = Math.max(...allValues);
-  const span = Math.max(rawMax - rawMin, 1);
-  const pad = span * 0.2;
-  const yMin = Math.max(0, rawMin - pad);
-  const yMax = rawMax + pad;
+  const { yMin, yMax, gridLines: yGridLines } = niceYAxis(allValues, yPadding, yIntervals);
 
   const drawW = width - CHART_PAD_LEFT - CHART_PAD_RIGHT;
   const drawH = CHART_HEIGHT - CHART_PAD_TOP - CHART_PAD_BOTTOM;
@@ -113,18 +154,8 @@ function NutrientChart({
     return (lowerIsBetter ? atOrUnder : !atOrUnder) ? GREEN : RED;
   }
 
-  const gridCount = 4;
-  const yGridLines: number[] = Array.from({ length: gridCount + 1 }, (_, i) =>
-    yMin + (i / gridCount) * (yMax - yMin)
-  );
-
   const sorted = [...pts].sort((a, b) => a.date.localeCompare(b.date));
-  const step = Math.max(1, Math.floor((sorted.length - 1) / 4));
-  const xLabels: Pt[] = [];
-  for (let i = 0; i < sorted.length; i += step) xLabels.push(sorted[i]);
-  if (xLabels[xLabels.length - 1]?.date !== sorted[sorted.length - 1]?.date) {
-    xLabels.push(sorted[sorted.length - 1]);
-  }
+  const xLabels = buildXLabels(sorted);
 
   const mainPath = toPath(sorted);
   const filledPath = `${mainPath} L${xFor(sorted[sorted.length - 1].date).toFixed(1)},${(CHART_PAD_TOP + drawH).toFixed(1)} L${xFor(sorted[0].date).toFixed(1)},${(CHART_PAD_TOP + drawH).toFixed(1)} Z`;
@@ -153,9 +184,9 @@ function NutrientChart({
       })}
 
       {/* X labels */}
-      {xLabels.map(({ date }) => (
+      {xLabels.map(({ date, label }) => (
         <SvgText key={date} x={xFor(date).toFixed(1)} y={CHART_HEIGHT - 6} fontSize="9" fill="#999" textAnchor="middle">
-          {shortDateLabel(date)}
+          {label}
         </SvgText>
       ))}
 
@@ -329,7 +360,8 @@ export default function CalorieTrendScreen() {
         <View style={styles.chartCard}>
           <NutrientChart pts={calPts} avgPts={calAvgPts} goalValue={calTarget}
             color="#2D6A4F" avgColor="#74B49B" showAvg={showAvg}
-            width={chartWidth} unit="kcal" lowerIsBetter={true} />
+            width={chartWidth} unit="kcal" lowerIsBetter={true}
+            yIntervals={[250, 500, 750, 1000, 2000]} yPadding={200} />
         </View>
       )}
 
@@ -352,7 +384,8 @@ export default function CalorieTrendScreen() {
         <View style={styles.chartCard}>
           <NutrientChart pts={proPts} avgPts={proAvgPts} goalValue={proTarget}
             color="#2980B9" avgColor="#85C1E9" showAvg={showAvg}
-            width={chartWidth} unit="g" lowerIsBetter={false} />
+            width={chartWidth} unit="g" lowerIsBetter={false}
+            yIntervals={[25, 50, 75, 100, 200]} yPadding={15} />
         </View>
       )}
 

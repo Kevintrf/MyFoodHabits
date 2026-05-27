@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-05-27 (43)
+
+### feat: improve calorie trend graph axis readability
+Y-axis for calories uses 250/500/750/1000 kcal intervals; protein uses 25/50/75/100g intervals — both auto-selected based on data range with tight padding to reduce empty space. X-axis replaced with "14 May" date format at non-overlapping intervals (2, 3, 7, 14, 21, or 30 days) covering the 7d, 30d, and 90d ranges.
+
+---
+
 ## 2026-05-27 (42)
 
 ### feat: improve weight graph axis readability
