@@ -186,7 +186,7 @@ export default function CreateFoodScreen() {
 
       <View style={styles.toggleRow}>
         <Text style={styles.toggleLabel}>Liquid (store per 100ml)</Text>
-        <Switch value={liquid} onValueChange={setLiquid} trackColor={{ true: '#2D6A4F' }} />
+        <Switch value={liquid} onValueChange={setLiquid} trackColor={{ true: '#2D6A4F', false: '#D1D1D6' }} />
       </View>
 
       {/* Servings */}

@@ -183,7 +183,7 @@ export default function AiEstimateScreen() {
 
           <View style={styles.toggleRow}>
             <Text style={styles.toggleLabel}>Liquid</Text>
-            <Switch value={editLiquid} onValueChange={setEditLiquid} trackColor={{ true: '#2D6A4F' }} />
+            <Switch value={editLiquid} onValueChange={setEditLiquid} trackColor={{ true: '#2D6A4F', false: '#D1D1D6' }} />
           </View>
 
           <Text style={styles.sectionLabel}>PER 100{editLiquid ? 'ML' : 'G'}</Text>
