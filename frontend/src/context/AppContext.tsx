@@ -1,13 +1,14 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { DayLog, UserTargets } from '../services/api';
 import { getLog } from '../db/log';
 import { getTargets } from '../db/settings';
 import { getWeights } from '../db/weight';
+import { calculateTDEE } from '../utils/tdee';
 
 // TODO: replace with real user from auth
 export const USER_ID = 1;
 
-const DEFAULT_TARGETS: UserTargets = { target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false };
+const DEFAULT_TARGETS: UserTargets = { target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false, gender: null, height_cm: null, birth_year: null };
 
 interface AppContextType {
   userId: number;
@@ -19,7 +20,9 @@ interface AppContextType {
   targets: UserTargets;
   refreshTargets: () => Promise<void>;
   loggedWeightToday: boolean;
+  latestWeightKg: number | null;
   refreshWeightToday: () => Promise<void>;
+  tdee: number | null;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -41,6 +44,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [viewingLog, setViewingLog] = useState<DayLog | null>(null);
   const [targets, setTargets] = useState<UserTargets>(DEFAULT_TARGETS);
   const [loggedWeightToday, setLoggedWeightToday] = useState(false);
+  const [latestWeightKg, setLatestWeightKg] = useState<number | null>(null);
 
   const refreshViewingLog = useCallback(async () => {
     const log = await getLog(viewingDate);
@@ -58,6 +62,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       target_protein_g: t.target_protein_g ?? DEFAULT_TARGETS.target_protein_g,
       activity_level: t.activity_level ?? DEFAULT_TARGETS.activity_level,
       show_vitamins: t.show_vitamins ?? DEFAULT_TARGETS.show_vitamins,
+      gender: t.gender ?? null,
+      height_cm: t.height_cm ?? null,
+      birth_year: t.birth_year ?? null,
     });
   }, []);
 
@@ -66,7 +73,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const latest = weights[0];
     const logged = !!latest && localDateString(new Date(latest.logged_at)) === todayDate;
     setLoggedWeightToday(logged);
+    setLatestWeightKg(latest?.weight_kg ?? null);
   }, [todayDate]);
+
+  const tdee = useMemo(() => {
+    if (!targets.gender || !targets.height_cm || !targets.birth_year || !latestWeightKg) return null;
+    return calculateTDEE({
+      weight_kg: latestWeightKg,
+      height_cm: targets.height_cm,
+      birth_year: targets.birth_year,
+      gender: targets.gender,
+      activity_level: targets.activity_level,
+    });
+  }, [targets, latestWeightKg]);
 
   // Pre-fetch everything on app open so screens have data immediately
   useEffect(() => {
@@ -85,7 +104,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       targets,
       refreshTargets,
       loggedWeightToday,
+      latestWeightKg,
       refreshWeightToday,
+      tdee,
     }}>
       {children}
     </AppContext.Provider>

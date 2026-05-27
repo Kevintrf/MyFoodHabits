@@ -22,7 +22,7 @@ import { fmtNum } from '../utils/format';
 const MEAL_SLOTS = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
 
 export default function TodayScreen() {
-  const { viewingLog, viewingDate, todayDate, setViewingDate, refreshViewingLog, targets, refreshTargets } = useApp();
+  const { viewingLog, viewingDate, todayDate, setViewingDate, refreshViewingLog, targets, refreshTargets, tdee } = useApp();
   const navigation = useNavigation<any>();
   const [editTarget, setEditTarget] = useState<{ item: LogItem; slot: string } | null>(null);
   const [editQty, setEditQty] = useState('');
@@ -150,6 +150,7 @@ export default function TodayScreen() {
             value={Math.round(totals.calories)}
             target={targets.target_calories ?? 2000}
             unit="kcal"
+            tdee={tdee ?? undefined}
           />
           <MacroCard
             label="Protein"
@@ -326,12 +327,14 @@ function MacroCard({
   target,
   unit,
   minGoal = false,
+  tdee,
 }: {
   label: string;
   value: number;
   target: number;
   unit: string;
   minGoal?: boolean;
+  tdee?: number;
 }) {
   const pct = Math.min(value / target, 1);
   const over = value > target;
@@ -351,6 +354,9 @@ function MacroCard({
           ]}
         />
       </View>
+      {tdee !== undefined && (
+        <Text style={styles.tdeeLine}>TDEE ~{tdee.toLocaleString()} kcal</Text>
+      )}
     </View>
   );
 }
@@ -392,6 +398,7 @@ const styles = StyleSheet.create({
   macroTarget: { fontSize: 12, color: '#999', marginBottom: 8 },
   progressBg: { height: 4, backgroundColor: '#E5E5E5', borderRadius: 2 },
   progressFill: { height: 4, borderRadius: 2 },
+  tdeeLine: { fontSize: 11, color: '#999', marginTop: 6 },
   section: { marginHorizontal: 16, marginTop: 20 },
   slotHeader: {
     fontSize: 12,

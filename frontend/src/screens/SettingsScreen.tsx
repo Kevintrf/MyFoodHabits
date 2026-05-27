@@ -14,9 +14,15 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../context/AppContext';
 import { updateTargets } from '../db/settings';
-import { ActivityLevel } from '../services/api';
+import { ActivityLevel, Gender } from '../services/api';
 import { exportAllData, importAllData } from '../db/dataTransfer';
 import { getAiSettings, saveAiSettings } from '../db/settings';
+
+const GENDERS: { value: Gender; label: string }[] = [
+  { value: 'MALE',   label: 'Male' },
+  { value: 'FEMALE', label: 'Female' },
+  { value: 'OTHER',  label: 'Other' },
+];
 
 const ACTIVITY_LEVELS: { value: ActivityLevel; label: string; description: string }[] = [
   { value: 'SEDENTARY',          label: 'Sedentary',          description: 'Desk job, little or no exercise' },
@@ -33,6 +39,10 @@ export default function SettingsScreen() {
   const [protein, setProtein] = useState('');
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>('SEDENTARY');
   const [showVitamins, setShowVitamins] = useState(false);
+  const [gender, setGender] = useState<Gender | null>(null);
+  const [height, setHeight] = useState('');
+  const [birthYear, setBirthYear] = useState('');
+  const profileDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
   const [country, setCountry] = useState('');
@@ -48,6 +58,9 @@ export default function SettingsScreen() {
     setProtein(String(targets.target_protein_g ?? ''));
     setActivityLevel(targets.activity_level ?? 'SEDENTARY');
     setShowVitamins(targets.show_vitamins ?? false);
+    setGender(targets.gender ?? null);
+    setHeight(targets.height_cm ? String(targets.height_cm) : '');
+    setBirthYear(targets.birth_year ? String(targets.birth_year) : '');
     initialised.current = true;
   }, [targets]);
 
@@ -92,6 +105,26 @@ export default function SettingsScreen() {
     setActivityLevel(level);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     await save(calories, protein, level, showVitamins);
+  }
+
+  async function handleGenderChange(g: Gender) {
+    setGender(g);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    await updateTargets({ gender: g });
+    await refreshTargets();
+  }
+
+  function scheduleProfileSave(h: string, by: string) {
+    if (profileDebounceRef.current) clearTimeout(profileDebounceRef.current);
+    profileDebounceRef.current = setTimeout(async () => {
+      const hNum = parseFloat(h);
+      const byNum = parseInt(by);
+      await updateTargets({
+        height_cm: !isNaN(hNum) && hNum > 0 ? hNum : null,
+        birth_year: !isNaN(byNum) && byNum > 1900 && byNum < 2100 ? byNum : null,
+      });
+      await refreshTargets();
+    }, 600);
   }
 
   async function handleExport() {
@@ -163,6 +196,44 @@ export default function SettingsScreen() {
           onChangeText={handleProteinChange}
           keyboardType="number-pad" autoComplete="off" textContentType="none"
           placeholder="e.g. 150"
+          placeholderTextColor="#bbb"
+        />
+      </View>
+
+      <Text style={styles.sectionHeading}>PROFILE</Text>
+      <View style={styles.card}>
+        <Text style={styles.label}>GENDER</Text>
+        <View style={styles.genderRow}>
+          {GENDERS.map((g) => (
+            <TouchableOpacity
+              key={g.value}
+              style={[styles.genderOption, gender === g.value && styles.genderOptionActive]}
+              onPress={() => handleGenderChange(g.value)}
+            >
+              <Text style={[styles.genderOptionText, gender === g.value && styles.genderOptionTextActive]}>
+                {g.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <View style={styles.cardDivider} />
+        <Text style={styles.label}>HEIGHT (cm)</Text>
+        <TextInput
+          style={styles.input}
+          value={height}
+          onChangeText={(v) => { setHeight(v); scheduleProfileSave(v, birthYear); }}
+          keyboardType="decimal-pad" autoComplete="off" textContentType="none"
+          placeholder="e.g. 180"
+          placeholderTextColor="#bbb"
+        />
+        <View style={styles.cardDivider} />
+        <Text style={styles.label}>BIRTH YEAR</Text>
+        <TextInput
+          style={styles.input}
+          value={birthYear}
+          onChangeText={(v) => { setBirthYear(v); scheduleProfileSave(height, v); }}
+          keyboardType="number-pad" autoComplete="off" textContentType="none"
+          placeholder="e.g. 1990"
           placeholderTextColor="#bbb"
         />
       </View>
@@ -286,6 +357,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#1A1A1A',
   },
+  genderRow: { flexDirection: 'row', gap: 8, marginBottom: 4 },
+  genderOption: {
+    flex: 1, paddingVertical: 10, borderRadius: 8,
+    borderWidth: 1, borderColor: '#E5E5E5', alignItems: 'center',
+    backgroundColor: '#F9F9F9',
+  },
+  genderOptionActive: { backgroundColor: '#F0FAF4', borderColor: '#2D6A4F' },
+  genderOptionText: { fontSize: 14, fontWeight: '500', color: '#666' },
+  genderOptionTextActive: { color: '#2D6A4F', fontWeight: '600' },
   activityOption: { padding: 14 },
   activityOptionActive: { backgroundColor: '#F0FAF4' },
   activityOptionBorder: { borderBottomWidth: 1, borderBottomColor: '#E5E5E5' },

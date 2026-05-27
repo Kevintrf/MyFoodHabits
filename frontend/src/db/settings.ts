@@ -1,11 +1,14 @@
 import { db } from './client';
-import { UserTargets, ActivityLevel } from '../services/api';
+import { UserTargets, ActivityLevel, Gender } from '../services/api';
 
 interface RawTargets {
   target_calories: number | null;
   target_protein_g: number | null;
   activity_level: ActivityLevel;
   show_vitamins: number;
+  gender: Gender | null;
+  height_cm: number | null;
+  birth_year: number | null;
 }
 
 export interface AiSettings {
@@ -15,12 +18,12 @@ export interface AiSettings {
 
 export async function getTargets(): Promise<UserTargets> {
   const row = await db.getFirstAsync<RawTargets>(
-    'SELECT target_calories, target_protein_g, activity_level, show_vitamins FROM user_settings WHERE id = 1',
+    'SELECT target_calories, target_protein_g, activity_level, show_vitamins, gender, height_cm, birth_year FROM user_settings WHERE id = 1',
     [],
   );
   return row
     ? { ...row, show_vitamins: !!row.show_vitamins }
-    : { target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false };
+    : { target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false, gender: null, height_cm: null, birth_year: null };
 }
 
 export async function getAiSettings(): Promise<AiSettings> {
@@ -42,19 +45,28 @@ export async function updateTargets(data: {
   target_protein_g?: number;
   activity_level?: ActivityLevel;
   show_vitamins?: boolean;
+  gender?: Gender | null;
+  height_cm?: number | null;
+  birth_year?: number | null;
 }): Promise<UserTargets> {
   await db.runAsync(
     `UPDATE user_settings
      SET target_calories  = COALESCE(?, target_calories),
          target_protein_g = COALESCE(?, target_protein_g),
          activity_level   = COALESCE(?, activity_level),
-         show_vitamins    = COALESCE(?, show_vitamins)
+         show_vitamins    = COALESCE(?, show_vitamins),
+         gender           = COALESCE(?, gender),
+         height_cm        = COALESCE(?, height_cm),
+         birth_year       = COALESCE(?, birth_year)
      WHERE id = 1`,
     [
       data.target_calories ?? null,
       data.target_protein_g ?? null,
       data.activity_level ?? null,
       data.show_vitamins !== undefined ? (data.show_vitamins ? 1 : 0) : null,
+      data.gender ?? null,
+      data.height_cm ?? null,
+      data.birth_year ?? null,
     ],
   );
   return getTargets();
