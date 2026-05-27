@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-05-27 (39)
+
+### fix: forecast lines connect to chart in 7d avg mode
+In 7d avg view the forecast lines were visually disconnected from the actual weight line because the predictions started from the raw weight while the chart ended on the smoothed value. Now uses the last visible chart point as the forecast line's visual start, while keeping the raw weight for TDEE so the rate of change stays stable between view modes.
+
+---
+
 ## 2026-05-27 (38)
 
 ### fix: weight forecast no longer changes when toggling daily/7d avg view
