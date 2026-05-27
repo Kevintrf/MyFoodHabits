@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-05-27 (44)
+
+### feat: always show 7d avg in calorie trend, move legend under each chart
+Removed the 7d avg toggle — the overlay is now always visible. The icon legend now appears directly beneath each chart (calories and protein get their own) with correct per-chart dot labels (At/under vs At/above, Over vs Under).
+
+---
+
 ## 2026-05-27 (43)
 
 ### feat: improve calorie trend graph axis readability

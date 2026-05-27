@@ -110,14 +110,13 @@ function movingAvg(pts: Pt[], window = 7): Pt[] {
 // ─────────────────────────────────────────────────────────────
 
 function NutrientChart({
-  pts, avgPts, goalValue, color, avgColor, showAvg, width, unit, lowerIsBetter, yIntervals, yPadding,
+  pts, avgPts, goalValue, color, avgColor, width, unit, lowerIsBetter, yIntervals, yPadding,
 }: {
   pts: Pt[];
   avgPts: Pt[];
   goalValue: number;
   color: string;
   avgColor: string;
-  showAvg: boolean;
   width: number;
   unit: string;
   lowerIsBetter: boolean;
@@ -210,7 +209,7 @@ function NutrientChart({
       ))}
 
       {/* 7d avg overlay */}
-      {showAvg && avgPts.length > 1 && (
+      {avgPts.length > 1 && (
         <Path d={toPath(avgPts)} stroke={avgColor} strokeWidth="2" fill="none" strokeDasharray="4,3" />
       )}
     </Svg>
@@ -281,6 +280,39 @@ const summaryStyles = StyleSheet.create({
 });
 
 // ─────────────────────────────────────────────────────────────
+// Chart legend
+// ─────────────────────────────────────────────────────────────
+
+function ChartLegend({ lineColor, lineLabel, avgColor, atGoalLabel, missLabel }: {
+  lineColor: string; lineLabel: string; avgColor: string; atGoalLabel: string; missLabel: string;
+}) {
+  return (
+    <View style={styles.legendRow}>
+      <View style={styles.legendItem}>
+        <View style={[styles.legendLine, { backgroundColor: lineColor }]} />
+        <Text style={styles.legendText}>{lineLabel}</Text>
+      </View>
+      <View style={styles.legendItem}>
+        <View style={[styles.legendDashed, { borderColor: avgColor }]} />
+        <Text style={styles.legendText}>7d avg</Text>
+      </View>
+      <View style={styles.legendItem}>
+        <View style={[styles.legendDashed, { borderColor: '#E67E22' }]} />
+        <Text style={styles.legendText}>Goal</Text>
+      </View>
+      <View style={styles.legendItem}>
+        <View style={[styles.legendDot, { borderColor: GREEN }]} />
+        <Text style={styles.legendText}>{atGoalLabel}</Text>
+      </View>
+      <View style={styles.legendItem}>
+        <View style={[styles.legendDot, { borderColor: RED }]} />
+        <Text style={styles.legendText}>{missLabel}</Text>
+      </View>
+    </View>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
 // Screen
 // ─────────────────────────────────────────────────────────────
 
@@ -289,7 +321,6 @@ export default function CalorieTrendScreen() {
 
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<Range>(30);
-  const [showAvg, setShowAvg] = useState(false);
 
   const [allData, setAllData] = useState<DayData[]>([]);
   const [targets, setTargets] = useState<UserTargets>({
@@ -344,12 +375,6 @@ export default function CalorieTrendScreen() {
             </TouchableOpacity>
           ))}
         </View>
-        <TouchableOpacity
-          style={[styles.toggleBtn, showAvg && styles.toggleBtnActive]}
-          onPress={() => setShowAvg((v) => !v)}
-        >
-          <Text style={[styles.toggleText, showAvg && styles.toggleTextActive]}>7d avg</Text>
-        </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -359,11 +384,12 @@ export default function CalorieTrendScreen() {
       {calPts.length < 2 ? emptyChart : (
         <View style={styles.chartCard}>
           <NutrientChart pts={calPts} avgPts={calAvgPts} goalValue={calTarget}
-            color="#2D6A4F" avgColor="#74B49B" showAvg={showAvg}
+            color="#2D6A4F" avgColor="#74B49B"
             width={chartWidth} unit="kcal" lowerIsBetter={true}
             yIntervals={[250, 500, 750, 1000, 2000]} yPadding={200} />
         </View>
       )}
+      <ChartLegend lineColor="#2D6A4F" lineLabel="Calories" avgColor="#74B49B" atGoalLabel="At/under" missLabel="Over" />
 
       {/* Calories summary */}
       <Text style={styles.sectionHeader}>{`LAST ${range} DAYS`}</Text>
@@ -383,11 +409,12 @@ export default function CalorieTrendScreen() {
       {proPts.length < 2 ? emptyChart : (
         <View style={styles.chartCard}>
           <NutrientChart pts={proPts} avgPts={proAvgPts} goalValue={proTarget}
-            color="#2980B9" avgColor="#85C1E9" showAvg={showAvg}
+            color="#2980B9" avgColor="#85C1E9"
             width={chartWidth} unit="g" lowerIsBetter={false}
             yIntervals={[25, 50, 75, 100, 200]} yPadding={15} />
         </View>
       )}
+      <ChartLegend lineColor="#2980B9" lineLabel="Protein" avgColor="#85C1E9" atGoalLabel="At/above" missLabel="Under" />
 
       {/* Protein summary */}
       {daysLogged > 0 && (
@@ -397,35 +424,6 @@ export default function CalorieTrendScreen() {
           lowerIsBetter={false} />
       )}
 
-      {/* Legend */}
-      <View style={styles.legendRow}>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendLine, { backgroundColor: '#2D6A4F' }]} />
-          <Text style={styles.legendText}>Calories</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendLine, { backgroundColor: '#2980B9' }]} />
-          <Text style={styles.legendText}>Protein</Text>
-        </View>
-        {showAvg && (
-          <View style={styles.legendItem}>
-            <View style={styles.legendDashed} />
-            <Text style={styles.legendText}>7d avg</Text>
-          </View>
-        )}
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDashed, { borderColor: '#E67E22' }]} />
-          <Text style={styles.legendText}>Goal</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { borderColor: GREEN }]} />
-          <Text style={styles.legendText}>At/under</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { borderColor: RED }]} />
-          <Text style={styles.legendText}>Over</Text>
-        </View>
-      </View>
       </ScrollView>
     </View>
   );
