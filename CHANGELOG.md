@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-05-27 (41)
+
+### fix: rename Plan/Trend TDEE labels to Estimated/Observed maintenance
+Replaced confusing "Plan TDEE" and "Trend TDEE" labels in the 30-day forecast summary with "Estimated maintenance" (formula-based) and "Observed maintenance" (calibrated from data).
+
+---
+
 ## 2026-05-27 (40)
 
 ### fix: forecast values stable and lines visually connected in all view modes

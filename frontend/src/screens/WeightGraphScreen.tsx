@@ -495,11 +495,11 @@ export default function WeightGraphScreen() {
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>30-day forecast</Text>
           <Text style={styles.summaryNote}>
-            Plan TDEE: ~{estimatedTDEE} kcal/day ({hasProfile ? 'from your profile' : 'estimated from activity level'})
+            Estimated maintenance: ~{estimatedTDEE} kcal/day ({hasProfile ? 'from your profile' : 'estimated from activity level'})
           </Text>
           {calibrated && (
             <Text style={styles.summaryNote}>
-              Trend TDEE: ~{trendTDEE} kcal/day (calibrated from your data)
+              Observed maintenance: ~{trendTDEE} kcal/day (from your data)
             </Text>
           )}
 
