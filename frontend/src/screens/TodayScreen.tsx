@@ -211,14 +211,16 @@ export default function TodayScreen() {
         {Object.keys(slots).length === 0 && (
           <Text style={styles.emptyState}>Nothing logged{isViewingToday ? ' today' : ' this day'} yet.</Text>
         )}
+      </ScrollView>
 
+      <View style={styles.addButtonContainer}>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => navigation.getParent()?.navigate('SearchTab')}
         >
           <Text style={styles.addButtonText}>+ Add Food</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
 
       {/* Edit / delete modal */}
       <Modal
@@ -355,7 +357,7 @@ function MacroCard({
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9F9F9' },
-  content: { paddingBottom: 40 },
+  content: { paddingBottom: 100 },
   pastBanner: {
     backgroundColor: '#FFF3CD',
     paddingVertical: 10,
@@ -413,9 +415,17 @@ const styles = StyleSheet.create({
   logItemCal: { fontSize: 14, fontWeight: '600', color: '#1A1A1A' },
   logItemPro: { fontSize: 12, color: '#2D6A4F', marginTop: 2 },
   emptyState: { textAlign: 'center', color: '#999', marginTop: 60, fontSize: 15 },
+  addButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    backgroundColor: '#F9F9F9',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5E5',
+  },
   addButton: {
-    margin: 16,
-    marginTop: 28,
     backgroundColor: '#2D6A4F',
     borderRadius: 12,
     padding: 16,
