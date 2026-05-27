@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-05-27 (40)
+
+### fix: forecast values stable and lines visually connected in all view modes
+Forecast math always uses the raw latest weight so summary values (delta, end weight) don't change when toggling daily/7d avg. A connector point at the last visible chart weight is prepended to each forecast series so the lines visually attach to the actual line regardless of view mode.
+
+---
+
 ## 2026-05-27 (39)
 
 ### fix: forecast lines connect to chart in 7d avg mode

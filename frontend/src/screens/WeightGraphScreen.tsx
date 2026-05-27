@@ -338,10 +338,8 @@ export default function WeightGraphScreen() {
   const currentWeight = lastRaw?.weight_kg ?? null;
   const currentDate = lastRaw ? isoToDate(lastRaw.logged_at) : today;
 
-  // Visual start weight: last actualPoints entry so forecast lines connect to the chart.
-  // In daily mode this equals currentWeight; in 7d avg mode it is the smoothed value.
+  // Last visible chart point — used as connector so forecast lines always touch the actual line.
   const lastActual = actualPoints.length > 0 ? actualPoints[actualPoints.length - 1] : null;
-  const forecastStartWeight = lastActual?.weight ?? currentWeight;
 
   // ── Predictions ──────────────────────────────────────────
 
@@ -367,8 +365,14 @@ export default function WeightGraphScreen() {
   let planPrediction: ChartPoint[] = [];
   let trendPrediction: ChartPoint[] = [];
 
-  if (forecastStartWeight !== null) {
-    planPrediction = buildPrediction(currentDate, forecastStartWeight, planNetCalories, FORECAST_DAYS);
+  // Connector point: bridges the actual line to the forecast visually in 7d avg mode.
+  // Math always uses currentWeight (raw) so summary values are stable between view modes.
+  const connectorPoint: ChartPoint[] = lastActual
+    ? [{ date: dateToISO(currentDate), weight: lastActual.weight, predicted: true }]
+    : [];
+
+  if (currentWeight !== null) {
+    planPrediction = [...connectorPoint, ...buildPrediction(currentDate, currentWeight, planNetCalories, FORECAST_DAYS)];
 
     // Historical trend: use actual avg calories from recent cal history
     const recentCals = calorieHistory.filter(
@@ -377,7 +381,7 @@ export default function WeightGraphScreen() {
     if (recentCals.length >= 5) {
       const avgCals = recentCals.reduce((s, d) => s + d.calories, 0) / recentCals.length;
       const histNetCalories = avgCals - trendTDEE;
-      trendPrediction = buildPrediction(currentDate, forecastStartWeight, histNetCalories, FORECAST_DAYS);
+      trendPrediction = [...connectorPoint, ...buildPrediction(currentDate, currentWeight, histNetCalories, FORECAST_DAYS)];
     }
   }
 
@@ -423,11 +427,11 @@ export default function WeightGraphScreen() {
 
   const planEndWeight = planPrediction[planPrediction.length - 1]?.weight;
   const trendEndWeight = trendPrediction[trendPrediction.length - 1]?.weight;
-  const planDelta = planEndWeight != null && forecastStartWeight != null
-    ? Math.round((planEndWeight - forecastStartWeight) * 10) / 10
+  const planDelta = planEndWeight != null && currentWeight != null
+    ? Math.round((planEndWeight - currentWeight) * 10) / 10
     : null;
-  const trendDelta = trendEndWeight != null && forecastStartWeight != null
-    ? Math.round((trendEndWeight - forecastStartWeight) * 10) / 10
+  const trendDelta = trendEndWeight != null && currentWeight != null
+    ? Math.round((trendEndWeight - currentWeight) * 10) / 10
     : null;
 
   function deltaLabel(delta: number) {
