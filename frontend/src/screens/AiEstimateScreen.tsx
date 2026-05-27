@@ -181,6 +181,11 @@ export default function AiEstimateScreen() {
             placeholder="Meal name"
           />
 
+          <View style={styles.toggleRow}>
+            <Text style={styles.toggleLabel}>Liquid</Text>
+            <Switch value={editLiquid} onValueChange={setEditLiquid} trackColor={{ true: '#2D6A4F' }} />
+          </View>
+
           <Text style={styles.sectionLabel}>PER 100{editLiquid ? 'ML' : 'G'}</Text>
           <View style={styles.row}>
             <View style={styles.fieldHalf}>
@@ -244,11 +249,6 @@ export default function AiEstimateScreen() {
             weight={editWeight}
             liquid={editLiquid}
           />
-
-          <View style={styles.toggleRow}>
-            <Text style={styles.toggleLabel}>Liquid</Text>
-            <Switch value={editLiquid} onValueChange={setEditLiquid} trackColor={{ true: '#2D6A4F' }} />
-          </View>
 
           {result.notes && (
             <View style={styles.notesCard}>
