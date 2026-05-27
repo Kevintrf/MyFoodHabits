@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
-import { DayLog, UserTargets } from '../services/api';
-import { getLog } from '../db/log';
+import { DayLog, UserTargets, WeightEntry } from '../services/api';
+import { getLog, getCalorieHistory } from '../db/log';
 import { getTargets } from '../db/settings';
 import { getWeights } from '../db/weight';
-import { calculateTDEE } from '../utils/tdee';
+import { calculateTDEE, calibrateTDEE } from '../utils/tdee';
 
 // TODO: replace with real user from auth
 export const USER_ID = 1;
@@ -45,6 +45,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [targets, setTargets] = useState<UserTargets>(DEFAULT_TARGETS);
   const [loggedWeightToday, setLoggedWeightToday] = useState(false);
   const [latestWeightKg, setLatestWeightKg] = useState<number | null>(null);
+  const [weightEntries, setWeightEntries] = useState<WeightEntry[]>([]);
+  const [calorieHistory, setCalorieHistory] = useState<{ date: string; calories: number }[]>([]);
 
   const refreshViewingLog = useCallback(async () => {
     const log = await getLog(viewingDate);
@@ -69,14 +71,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const refreshWeightToday = useCallback(async () => {
-    const weights = await getWeights();
+    const [weights, calHistory] = await Promise.all([getWeights(), getCalorieHistory(90)]);
     const latest = weights[0];
     const logged = !!latest && localDateString(new Date(latest.logged_at)) === todayDate;
     setLoggedWeightToday(logged);
     setLatestWeightKg(latest?.weight_kg ?? null);
+    setWeightEntries(weights);
+    setCalorieHistory(calHistory);
   }, [todayDate]);
 
   const tdee = useMemo(() => {
+    const calibrated = calibrateTDEE(weightEntries, calorieHistory);
+    if (calibrated !== null) return calibrated;
     if (!targets.gender || !targets.height_cm || !targets.birth_year || !latestWeightKg) return null;
     return calculateTDEE({
       weight_kg: latestWeightKg,
@@ -85,7 +91,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       gender: targets.gender,
       activity_level: targets.activity_level,
     });
-  }, [targets, latestWeightKg]);
+  }, [targets, latestWeightKg, weightEntries, calorieHistory]);
 
   // Pre-fetch everything on app open so screens have data immediately
   useEffect(() => {

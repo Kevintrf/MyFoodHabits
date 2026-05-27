@@ -4,6 +4,20 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-05-27 (37)
+
+### feat: use calibrated TDEE from weight history on today screen
+The TDEE displayed on the Today screen now uses the same data-driven calibration as the weight forecast's Trend line (avgCalories − Δweight/day × 7700), falling back to Mifflin-St Jeor when fewer than 3 weight entries or 7 calorie log days exist. calibrateTDEE moved to utils/tdee.ts and shared by both screens. AppContext now fetches 90 days of calorie history alongside weights.
+
+---
+
+## 2026-05-27 (36)
+
+### feat: use Mifflin-St Jeor for weight forecast Plan TDEE
+The weight forecast Plan prediction now uses the proper Mifflin-St Jeor formula (via utils/tdee.ts) when gender, height, and birth year are set in the profile, replacing the rough weight×22×multiplier approximation. Falls back to the rough estimate when profile is incomplete. Removed duplicate estimateTDEE function and ACTIVITY_MULTIPLIER from WeightGraphScreen.
+
+---
+
 ## 2026-05-26 (35)
 
 ### feat: AI meal estimation via Anthropic API

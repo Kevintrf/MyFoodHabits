@@ -14,6 +14,7 @@ import { getWeights } from '../db/weight';
 import { getCalorieHistory } from '../db/log';
 import { getTargets } from '../db/settings';
 import { WeightEntry, UserTargets, ActivityLevel } from '../services/api';
+import { calculateTDEE, calibrateTDEE } from '../utils/tdee';
 
 // ─────────────────────────────────────────────────────────────
 // Constants
@@ -79,33 +80,6 @@ function movingAvg(points: ChartPoint[], window = 7): ChartPoint[] {
     const avg = slice.reduce((s, x) => s + x.weight, 0) / slice.length;
     return { ...p, weight: Math.round(avg * 100) / 100 };
   });
-}
-
-// Estimated TDEE using weight × base metabolic factor × activity multiplier
-function estimateTDEE(weightKg: number, activity: ActivityLevel): number {
-  return Math.round(weightKg * 22 * ACTIVITY_MULTIPLIER[activity]);
-}
-
-// Calibrated TDEE from actual data: TDEE = avgCalories - (Δweight × 7700 / Δdays)
-function calibrateTDEE(
-  weightEntries: WeightEntry[],
-  calorieHistory: { date: string; calories: number }[],
-): number | null {
-  if (weightEntries.length < 3 || calorieHistory.length < 7) return null;
-
-  const sorted = [...weightEntries].sort((a, b) =>
-    new Date(a.logged_at).getTime() - new Date(b.logged_at).getTime(),
-  );
-  const oldest = sorted[0];
-  const newest = sorted[sorted.length - 1];
-  const deltaWeight = newest.weight_kg - oldest.weight_kg;
-  const deltaDays = Math.max(1, daysBetween(isoToDate(oldest.logged_at), isoToDate(newest.logged_at)));
-  const avgCalories = calorieHistory.reduce((s, d) => s + d.calories, 0) / calorieHistory.length;
-
-  const tdee = avgCalories - (deltaWeight * KCAL_PER_KG) / deltaDays;
-  // Sanity check: TDEE should be between 1000 and 6000
-  if (tdee < 1000 || tdee > 6000) return null;
-  return Math.round(tdee);
 }
 
 // Build prediction points starting from startWeight, for forecastDays days forward
@@ -367,8 +341,17 @@ export default function WeightGraphScreen() {
 
   const FORECAST_DAYS = 30;
 
-  // Plan prediction always uses activity-level estimate so the setting has a visible effect.
-  const estimatedTDEE = estimateTDEE(currentWeight ?? 75, targets.activity_level ?? 'SEDENTARY');
+  // Plan prediction uses Mifflin-St Jeor when profile is complete, rough estimate otherwise.
+  const hasProfile = !!(targets.gender && targets.height_cm && targets.birth_year && currentWeight);
+  const estimatedTDEE = hasProfile
+    ? calculateTDEE({
+        weight_kg: currentWeight!,
+        height_cm: targets.height_cm!,
+        birth_year: targets.birth_year!,
+        gender: targets.gender!,
+        activity_level: targets.activity_level ?? 'SEDENTARY',
+      })
+    : Math.round((currentWeight ?? 75) * 22 * ACTIVITY_MULTIPLIER[targets.activity_level ?? 'SEDENTARY']);
   // Trend prediction uses calibrated TDEE when enough data exists; falls back to estimate.
   const calibratedTDEE = calibrateTDEE(weights, calorieHistory);
   const trendTDEE = calibratedTDEE ?? estimatedTDEE;
@@ -502,7 +485,7 @@ export default function WeightGraphScreen() {
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>30-day forecast</Text>
           <Text style={styles.summaryNote}>
-            Plan TDEE: ~{estimatedTDEE} kcal/day (from activity level)
+            Plan TDEE: ~{estimatedTDEE} kcal/day ({hasProfile ? 'from your profile' : 'estimated from activity level'})
           </Text>
           {calibrated && (
             <Text style={styles.summaryNote}>
