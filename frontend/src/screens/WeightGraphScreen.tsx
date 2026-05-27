@@ -67,9 +67,46 @@ function daysBetween(a: Date, b: Date): number {
   return Math.round((b.getTime() - a.getTime()) / 86400000);
 }
 
-function shortDateLabel(iso: string): string {
-  const d = isoToDate(iso);
-  return `${d.getDate()}/${d.getMonth() + 1}`;
+const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// Computes nice round Y-axis grid lines (1kg, 0.5kg, or 0.25kg intervals).
+function niceYAxis(allWeights: number[]): { yMin: number; yMax: number; gridLines: number[]; interval: number } {
+  const minW = Math.min(...allWeights);
+  const maxW = Math.max(...allWeights);
+  const lo = minW - 0.5;
+  const hi = maxW + 0.5;
+  const span = hi - lo;
+  const interval = ([0.25, 0.5, 1, 2, 5, 10] as const).find(iv => span / iv <= 7) ?? 10;
+  const yMin = Math.floor(lo / interval) * interval;
+  const yMax = Math.ceil(hi / interval) * interval;
+  const count = Math.round((yMax - yMin) / interval);
+  const gridLines: number[] = [];
+  for (let i = 0; i <= count; i++) {
+    gridLines.push(Math.round((yMin + i * interval) * 1000) / 1000);
+  }
+  return { yMin, yMax, gridLines, interval };
+}
+
+// Builds X-axis labels at regular date intervals with "14 May" formatting.
+function buildXLabels(allPoints: ChartPoint[]): { date: string; label: string }[] {
+  if (allPoints.length === 0) return [];
+  const sorted = [...allPoints].sort((a, b) => a.date.localeCompare(b.date));
+  const minDate = isoToDate(sorted[0].date);
+  const maxDate = isoToDate(sorted[sorted.length - 1].date);
+  const totalDays = Math.max(1, daysBetween(minDate, maxDate));
+  const intervalDays = ([7, 14, 30] as const).find(i => totalDays / i <= 6) ?? 30;
+  const labels: { date: string; label: string }[] = [];
+  const cursor = new Date(minDate);
+  while (cursor <= maxDate) {
+    labels.push({ date: dateToISO(cursor), label: `${cursor.getDate()} ${MONTH_SHORT[cursor.getMonth()]}` });
+    cursor.setDate(cursor.getDate() + intervalDays);
+  }
+  // Add the last date if it is far enough from the last generated label to avoid overlap.
+  const lastLabelDate = labels.length > 0 ? isoToDate(labels[labels.length - 1].date) : minDate;
+  if (daysBetween(lastLabelDate, maxDate) > intervalDays / 2) {
+    labels.push({ date: dateToISO(maxDate), label: `${maxDate.getDate()} ${MONTH_SHORT[maxDate.getMonth()]}` });
+  }
+  return labels;
 }
 
 // 7-day moving average (centred or trailing)
@@ -131,12 +168,7 @@ function WeightChart({
   const maxDate = allDates[allDates.length - 1];
   const totalDays = Math.max(1, daysBetween(isoToDate(minDate), isoToDate(maxDate)));
 
-  const minW = Math.min(...allWeights);
-  const maxW = Math.max(...allWeights);
-  const range = Math.max(maxW - minW, 1);
-  const padW = range * 0.2;
-  const yMin = minW - padW;
-  const yMax = maxW + padW;
+  const { yMin, yMax, gridLines: yGridLines, interval: yInterval } = niceYAxis(allWeights);
 
   const drawW = width - CHART_PADDING_LEFT - CHART_PADDING_RIGHT;
   const drawH = CHART_HEIGHT - CHART_PADDING_TOP - CHART_PADDING_BOTTOM;
@@ -157,13 +189,6 @@ function WeightChart({
     return sorted
       .map((p, i) => `${i === 0 ? 'M' : 'L'}${xForDate(p.date).toFixed(1)},${yForWeight(p.weight).toFixed(1)}`)
       .join(' ');
-  }
-
-  // Y grid lines
-  const gridCount = 4;
-  const yGridLines: number[] = [];
-  for (let i = 0; i <= gridCount; i++) {
-    yGridLines.push(yMin + (i / gridCount) * (yMax - yMin));
   }
 
   return (
@@ -195,7 +220,7 @@ function WeightChart({
               fill="#999"
               textAnchor="end"
             >
-              {w.toFixed(1)}
+              {yInterval >= 1 ? w.toFixed(0) : w.toFixed(1)}
             </SvgText>
           </React.Fragment>
         );
@@ -404,24 +429,13 @@ export default function WeightGraphScreen() {
       : []),
   ];
 
-  // ── X-axis labels (evenly spaced) ────────────────────────
+  // ── X-axis labels ─────────────────────────────────────────
 
   const allPoints = [...actualPoints, ...planPrediction, ...trendPrediction].sort(
     (a, b) => a.date.localeCompare(b.date),
   );
 
-  const labelCount = 5;
-  const xLabels: { date: string; label: string }[] = [];
-  if (allPoints.length > 0) {
-    const step = Math.max(1, Math.floor((allPoints.length - 1) / (labelCount - 1)));
-    for (let i = 0; i < allPoints.length; i += step) {
-      xLabels.push({ date: allPoints[i].date, label: shortDateLabel(allPoints[i].date) });
-    }
-    const last = allPoints[allPoints.length - 1];
-    if (xLabels[xLabels.length - 1]?.date !== last.date) {
-      xLabels.push({ date: last.date, label: shortDateLabel(last.date) });
-    }
-  }
+  const xLabels = buildXLabels(allPoints);
 
   // ── Prediction summary text ───────────────────────────────
 

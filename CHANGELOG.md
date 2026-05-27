@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-05-27 (42)
+
+### feat: improve weight graph axis readability
+Y-axis now uses nice round intervals (1kg, 0.5kg, or 0.25kg) selected automatically based on the data range, with tight 0.5kg padding instead of 20% padding to eliminate excess empty space. Labels show whole numbers at 1kg+ intervals and one decimal at finer intervals. X-axis labels replaced with date-based "14 May" format at 7, 14, or 30-day intervals (chosen to avoid overlap), replacing the jumbled day/month numbers.
+
+---
+
 ## 2026-05-27 (41)
 
 ### fix: rename Plan/Trend TDEE labels to Estimated/Observed maintenance
