@@ -236,6 +236,15 @@ export default function AiEstimateScreen() {
             placeholderTextColor="#bbb" placeholder="0"
           />
 
+          <NutritionPreview
+            calories={editCalories}
+            protein={editProtein}
+            carbs={editCarbs}
+            fat={editFat}
+            weight={editWeight}
+            liquid={editLiquid}
+          />
+
           <View style={styles.toggleRow}>
             <Text style={styles.toggleLabel}>Liquid</Text>
             <Switch value={editLiquid} onValueChange={setEditLiquid} trackColor={{ true: '#2D6A4F' }} />
@@ -256,6 +265,41 @@ export default function AiEstimateScreen() {
 
     </ScrollView>
     </KeyboardAvoidingView>
+  );
+}
+
+function fmt(n: number): string {
+  return Number.isInteger(n) ? String(n) : n.toFixed(1);
+}
+
+function NutritionPreview({ calories, protein, carbs, fat, weight, liquid }: {
+  calories: string; protein: string; carbs: string; fat: string; weight: string; liquid: boolean;
+}) {
+  const cal100 = parseFloat(calories) || 0;
+  const pro100 = parseFloat(protein) || 0;
+  const carb100 = parseFloat(carbs) || 0;
+  const fat100 = parseFloat(fat) || 0;
+  const w = parseFloat(weight) || 0;
+  const m = w / 100;
+  const unit = liquid ? 'ml' : 'g';
+
+  return (
+    <View style={styles.preview}>
+      <View style={styles.previewRow}>
+        <Text style={styles.previewHeading}>Per 100{unit}</Text>
+        <Text style={styles.previewValues}>
+          {fmt(cal100)} kcal · {fmt(pro100)}g P · {fmt(carb100)}g C · {fmt(fat100)}g F
+        </Text>
+      </View>
+      {w > 0 && (
+        <View style={[styles.previewRow, styles.previewRowTop]}>
+          <Text style={styles.previewHeading}>Total ({fmt(w)}{unit})</Text>
+          <Text style={[styles.previewValues, styles.previewTotal]}>
+            {fmt(Math.round(cal100 * m))} kcal · {fmt(Math.round(pro100 * m * 10) / 10)}g P · {fmt(Math.round(carb100 * m * 10) / 10)}g C · {fmt(Math.round(fat100 * m * 10) / 10)}g F
+          </Text>
+        </View>
+      )}
+    </View>
   );
 }
 
@@ -303,6 +347,17 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 12 },
   fieldHalf: { flex: 1 },
   fieldLabel: { fontSize: 11, fontWeight: '700', color: '#999', letterSpacing: 1, marginBottom: 4 },
+  preview: {
+    backgroundColor: '#F0FAF4',
+    borderRadius: 10,
+    padding: 14,
+    marginTop: 12,
+  },
+  previewRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 },
+  previewRowTop: { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#C8E6D4' },
+  previewHeading: { fontSize: 11, fontWeight: '700', color: '#2D6A4F', letterSpacing: 1 },
+  previewValues: { fontSize: 13, color: '#2D6A4F' },
+  previewTotal: { fontWeight: '600' },
   toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',
