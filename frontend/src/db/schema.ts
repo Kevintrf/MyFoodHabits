@@ -1,7 +1,7 @@
 import { db } from './client';
 
 // Bump this when adding new tables or columns and add a migration below.
-const SCHEMA_VERSION = 6;
+const SCHEMA_VERSION = 7;
 
 // ---------------------------------------------------------------------------
 // Table definitions
@@ -90,6 +90,14 @@ const CREATE_TABLES = `
     user_id    INTEGER NOT NULL DEFAULT 1,
     weight_kg  REAL NOT NULL,
     logged_at  TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS food_log_prefs (
+    food_id    INTEGER PRIMARY KEY NOT NULL REFERENCES foods(id),
+    serving_id INTEGER REFERENCES food_servings(id),
+    quantity   REAL NOT NULL,
+    meal_slot  TEXT NOT NULL
+                 CHECK (meal_slot IN ('BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'))
   );
 `;
 
@@ -187,6 +195,19 @@ export function initSchema(): void {
       try { db.execSync('ALTER TABLE user_settings ADD COLUMN height_cm REAL;'); } catch { /* already exists */ }
       try { db.execSync('ALTER TABLE user_settings ADD COLUMN birth_year INTEGER;'); } catch { /* already exists */ }
       db.runSync('UPDATE user_settings SET schema_version = 6 WHERE id = 1');
+    }
+
+    if (currentVersion < 7) {
+      db.execSync(`
+        CREATE TABLE IF NOT EXISTS food_log_prefs (
+          food_id    INTEGER PRIMARY KEY NOT NULL REFERENCES foods(id),
+          serving_id INTEGER REFERENCES food_servings(id),
+          quantity   REAL NOT NULL,
+          meal_slot  TEXT NOT NULL
+                       CHECK (meal_slot IN ('BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'))
+        );
+      `);
+      db.runSync('UPDATE user_settings SET schema_version = 7 WHERE id = 1');
     }
   });
 }

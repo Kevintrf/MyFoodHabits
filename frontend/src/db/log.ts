@@ -226,6 +226,32 @@ export async function addLogItem(item: {
   return fetchLogItem(logItemId);
 }
 
+export async function getLogPref(
+  foodId: number,
+): Promise<{ serving_id: number | null; quantity: number; meal_slot: string } | null> {
+  return db.getFirstAsync<{ serving_id: number | null; quantity: number; meal_slot: string }>(
+    'SELECT serving_id, quantity, meal_slot FROM food_log_prefs WHERE food_id = ?',
+    [foodId],
+  );
+}
+
+export async function upsertLogPref(
+  foodId: number,
+  servingId: number | null,
+  quantity: number,
+  mealSlot: string,
+): Promise<void> {
+  await db.runAsync(
+    `INSERT INTO food_log_prefs (food_id, serving_id, quantity, meal_slot)
+     VALUES (?, ?, ?, ?)
+     ON CONFLICT(food_id) DO UPDATE SET
+       serving_id = excluded.serving_id,
+       quantity   = excluded.quantity,
+       meal_slot  = excluded.meal_slot`,
+    [foodId, servingId ?? null, quantity, mealSlot],
+  );
+}
+
 export async function deleteLogItem(id: number): Promise<{ deleted: boolean }> {
   const result = await db.runAsync(
     `DELETE FROM log_items

@@ -15,7 +15,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 import { FoodServing, FoodWithServings } from '../services/api';
 import { getFoodById, addDefaultServing } from '../db/foods';
-import { addLogItem } from '../db/log';
+import { addLogItem, getLogPref, upsertLogPref } from '../db/log';
 import { useApp } from '../context/AppContext';
 import { fmtNum } from '../utils/format';
 
@@ -37,15 +37,21 @@ export default function PortionScreen() {
   const [logging, setLogging] = useState(false);
 
   useEffect(() => {
-    getFoodById(food.id)
-      .then((f) => {
+    Promise.all([getFoodById(food.id), getLogPref(food.id)])
+      .then(([f, pref]) => {
         setFoodDetail(f);
-        const def = f.servings.find((s) => s.is_default) ?? null;
-        setSelectedServing(def);
-        if (initialQuantity !== undefined) {
-          setQuantity(String(initialQuantity));
+        if (pref && initialQuantity === undefined) {
+          const savedServing =
+            pref.serving_id != null
+              ? (f.servings.find((s) => s.id === pref.serving_id) ?? null)
+              : null;
+          setSelectedServing(savedServing);
+          setQuantity(String(pref.quantity));
+          setMealSlot(pref.meal_slot);
         } else {
-          setQuantity(def ? '1' : '100');
+          const def = f.servings.find((s) => s.is_default) ?? null;
+          setSelectedServing(def);
+          setQuantity(initialQuantity !== undefined ? String(initialQuantity) : def ? '1' : '100');
         }
       })
       .finally(() => setLoading(false));
@@ -74,6 +80,7 @@ export default function PortionScreen() {
         serving_id: selectedServing?.id,
         quantity: qty,
       });
+      await upsertLogPref(food.id, selectedServing?.id ?? null, qty, mealSlot);
       await refreshViewingLog();
       navigation.reset({ index: 0, routes: [{ name: 'Search' }] });
       navigation.getParent()?.navigate('Today');

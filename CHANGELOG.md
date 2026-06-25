@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-06-25 (46)
+
+### feat: remember last serving, quantity, and meal slot per food
+PortionScreen now pre-selects the serving type, quantity, and meal (breakfast/lunch/dinner/snack) from the last time that food was logged. Stored in a new food_log_prefs table (schema v7). Pre-fills are skipped when a quantity is passed in (e.g. from AI estimate flow).
+
+---
+
 ## 2026-06-25 (45)
 
 ### feat: upgrade AI nutrition estimation model to claude-opus-4-8
