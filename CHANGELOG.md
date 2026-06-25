@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-06-25 (45)
+
+### feat: upgrade AI nutrition estimation model to claude-opus-4-8
+Switched aiEstimate.ts from claude-sonnet-4-6 to claude-opus-4-8 for better nutrition estimation accuracy.
+
+---
+
 ## 2026-05-27 (44)
 
 ### feat: always show 7d avg in calorie trend, move legend under each chart
