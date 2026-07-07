@@ -15,7 +15,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 import { FoodServing, FoodWithServings } from '../services/api';
 import { getFoodById, addDefaultServing } from '../db/foods';
-import { addLogItem, getLogPref, upsertLogPref } from '../db/log';
+import { addLogItem, getLogPref, upsertLogPref, getSmartMealSlot } from '../db/log';
 import { useApp } from '../context/AppContext';
 import { fmtNum } from '../utils/format';
 
@@ -26,7 +26,7 @@ type PortionRoute = RouteProp<SearchStackParamList, 'Portion'>;
 export default function PortionScreen() {
   const route = useRoute<PortionRoute>();
   const navigation = useNavigation<any>();
-  const { viewingDate, refreshViewingLog } = useApp();
+  const { viewingDate, refreshViewingLog, targets } = useApp();
   const { food, initialQuantity } = route.params;
 
   const [foodDetail, setFoodDetail] = useState<FoodWithServings | null>(null);
@@ -37,8 +37,8 @@ export default function PortionScreen() {
   const [logging, setLogging] = useState(false);
 
   useEffect(() => {
-    Promise.all([getFoodById(food.id), getLogPref(food.id)])
-      .then(([f, pref]) => {
+    Promise.all([getFoodById(food.id), getLogPref(food.id), getSmartMealSlot()])
+      .then(([f, pref, smartSlot]) => {
         setFoodDetail(f);
         if (pref && initialQuantity === undefined) {
           const savedServing =
@@ -52,6 +52,7 @@ export default function PortionScreen() {
           const def = f.servings.find((s) => s.is_default) ?? null;
           setSelectedServing(def);
           setQuantity(initialQuantity !== undefined ? String(initialQuantity) : def ? '1' : '100');
+          setMealSlot(targets.smart_meal_slot ? smartSlot : 'BREAKFAST');
         }
       })
       .finally(() => setLoading(false));

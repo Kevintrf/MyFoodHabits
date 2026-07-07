@@ -14,6 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Meal, MealItem } from '../services/api';
 import { getMeals, logMeal } from '../db/meals';
+import { getSmartMealSlot } from '../db/log';
 import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
 import { MealsStackParamList } from '../navigation/RootNavigator';
@@ -42,7 +43,7 @@ function calcMealMacros(items: MealItem[], scale: number) {
 
 export default function MealsScreen() {
   const navigation = useNavigation<NavProp>();
-  const { todayDate, refreshViewingLog } = useApp();
+  const { todayDate, refreshViewingLog, targets } = useApp();
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -69,8 +70,12 @@ export default function MealsScreen() {
 
   function openLogModal(meal: Meal) {
     setLogTarget(meal);
-    setSlot('BREAKFAST');
     setScale(1);
+    if (targets.smart_meal_slot) {
+      getSmartMealSlot().then(setSlot);
+    } else {
+      setSlot('BREAKFAST');
+    }
   }
 
   async function handleLog() {

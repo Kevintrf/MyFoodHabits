@@ -1,7 +1,7 @@
 import { db } from './client';
 
 // Bump this when adding new tables or columns and add a migration below.
-const SCHEMA_VERSION = 7;
+const SCHEMA_VERSION = 8;
 
 // ---------------------------------------------------------------------------
 // Table definitions
@@ -208,6 +208,11 @@ export function initSchema(): void {
         );
       `);
       db.runSync('UPDATE user_settings SET schema_version = 7 WHERE id = 1');
+    }
+
+    if (currentVersion < 8) {
+      try { db.execSync('ALTER TABLE user_settings ADD COLUMN smart_meal_slot INTEGER NOT NULL DEFAULT 1;'); } catch { /* already exists */ }
+      db.runSync('UPDATE user_settings SET schema_version = 8 WHERE id = 1');
     }
   });
 }

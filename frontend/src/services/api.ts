@@ -116,6 +116,7 @@ export interface UserTargets {
   target_protein_g: number | null;
   activity_level: ActivityLevel;
   show_vitamins: boolean;
+  smart_meal_slot: boolean;
   gender: Gender | null;
   height_cm: number | null;
   birth_year: number | null;

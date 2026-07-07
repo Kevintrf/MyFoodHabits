@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-07-07 (47)
+
+### feat: smart meal slot auto-selection based on logging history
+Added a toggleable "Smart meal slot" setting (on by default, under Settings → Tracking). When enabled, opening the portion or meal log screen automatically pre-selects the meal slot (breakfast/lunch/dinner/snack) based on which slot the user most commonly logs at the current hour of day. Uses a per-hour frequency count over all past log_items. Falls back to time-of-day heuristics (5–10 → Breakfast, 11–14 → Lunch, 17–21 → Dinner, otherwise → Snack) when no history exists. Per-food preferences still take priority over the smart selection. Schema bumped to v8.
+
+---
+
 ## 2026-06-25 (46)
 
 ### feat: remember last serving, quantity, and meal slot per food

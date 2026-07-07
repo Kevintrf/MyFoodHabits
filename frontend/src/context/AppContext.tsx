@@ -8,7 +8,7 @@ import { calculateTDEE, calibrateTDEE } from '../utils/tdee';
 // TODO: replace with real user from auth
 export const USER_ID = 1;
 
-const DEFAULT_TARGETS: UserTargets = { target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false, gender: null, height_cm: null, birth_year: null };
+const DEFAULT_TARGETS: UserTargets = { target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false, smart_meal_slot: true, gender: null, height_cm: null, birth_year: null };
 
 interface AppContextType {
   userId: number;
@@ -64,6 +64,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       target_protein_g: t.target_protein_g ?? DEFAULT_TARGETS.target_protein_g,
       activity_level: t.activity_level ?? DEFAULT_TARGETS.activity_level,
       show_vitamins: t.show_vitamins ?? DEFAULT_TARGETS.show_vitamins,
+      smart_meal_slot: t.smart_meal_slot ?? DEFAULT_TARGETS.smart_meal_slot,
       gender: t.gender ?? null,
       height_cm: t.height_cm ?? null,
       birth_year: t.birth_year ?? null,

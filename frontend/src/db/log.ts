@@ -262,6 +262,51 @@ export async function deleteLogItem(id: number): Promise<{ deleted: boolean }> {
   return { deleted: result.changes > 0 };
 }
 
+type MealSlot = 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK';
+
+function defaultSlotForHour(hour: number): MealSlot {
+  if (hour >= 5 && hour <= 10) return 'BREAKFAST';
+  if (hour >= 11 && hour <= 14) return 'LUNCH';
+  if (hour >= 17 && hour <= 21) return 'DINNER';
+  return 'SNACK';
+}
+
+export async function getSmartMealSlot(): Promise<MealSlot> {
+  const hour = new Date().getHours();
+
+  const rows = await db.getAllAsync<{ meal_slot: MealSlot; hour: number; cnt: number }>(
+    `SELECT meal_slot,
+            CAST(strftime('%H', logged_at, 'localtime') AS INTEGER) AS hour,
+            COUNT(*) AS cnt
+     FROM log_items
+     GROUP BY meal_slot, hour`,
+  );
+
+  if (rows.length === 0) return defaultSlotForHour(hour);
+
+  // Build hour -> best slot map
+  const hourMap = new Map<number, MealSlot>();
+  const hourBest = new Map<number, number>();
+  for (const row of rows) {
+    const prev = hourBest.get(row.hour) ?? 0;
+    if (row.cnt > prev) {
+      hourMap.set(row.hour, row.meal_slot);
+      hourBest.set(row.hour, row.cnt);
+    }
+  }
+
+  // Expand search radius from current hour until a match is found
+  for (let radius = 0; radius <= 12; radius++) {
+    for (const delta of radius === 0 ? [0] : [-radius, radius]) {
+      const h = ((hour + delta) % 24 + 24) % 24;
+      const slot = hourMap.get(h);
+      if (slot) return slot;
+    }
+  }
+
+  return defaultSlotForHour(hour);
+}
+
 export async function updateLogItem(
   id: number,
   data: { quantity?: number; meal_slot?: string; serving_id?: number | null },

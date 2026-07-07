@@ -39,6 +39,7 @@ export default function SettingsScreen() {
   const [protein, setProtein] = useState('');
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>('SEDENTARY');
   const [showVitamins, setShowVitamins] = useState(false);
+  const [smartMealSlot, setSmartMealSlot] = useState(true);
   const [gender, setGender] = useState<Gender | null>(null);
   const [height, setHeight] = useState('');
   const [birthYear, setBirthYear] = useState('');
@@ -58,6 +59,7 @@ export default function SettingsScreen() {
     setProtein(String(targets.target_protein_g ?? ''));
     setActivityLevel(targets.activity_level ?? 'SEDENTARY');
     setShowVitamins(targets.show_vitamins ?? false);
+    setSmartMealSlot(targets.smart_meal_slot ?? true);
     setGender(targets.gender ?? null);
     setHeight(targets.height_cm ? String(targets.height_cm) : '');
     setBirthYear(targets.birth_year ? String(targets.birth_year) : '');
@@ -173,6 +175,13 @@ export default function SettingsScreen() {
     await save(calories, protein, activityLevel, next);
   }
 
+  async function handleSmartMealSlotToggle() {
+    const next = !smartMealSlot;
+    setSmartMealSlot(next);
+    await updateTargets({ smart_meal_slot: next });
+    await refreshTargets();
+  }
+
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ScrollView contentContainerStyle={styles.content}>
@@ -271,6 +280,18 @@ export default function SettingsScreen() {
           <View style={styles.toggleText}>
             <Text style={styles.toggleLabel}>Vitamins</Text>
             <Text style={styles.toggleDesc}>Show a daily vitamins checkbox</Text>
+          </View>
+        </TouchableOpacity>
+        <View style={styles.activityOptionBorder} />
+        <TouchableOpacity style={styles.toggleRow} onPress={handleSmartMealSlotToggle}>
+          <Ionicons
+            name={smartMealSlot ? 'checkbox' : 'square-outline'}
+            size={24}
+            color={smartMealSlot ? '#2D6A4F' : '#ccc'}
+          />
+          <View style={styles.toggleText}>
+            <Text style={styles.toggleLabel}>Smart meal slot</Text>
+            <Text style={styles.toggleDesc}>Auto-select meal based on your logging history</Text>
           </View>
         </TouchableOpacity>
       </View>
