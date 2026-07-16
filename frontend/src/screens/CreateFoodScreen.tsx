@@ -128,6 +128,7 @@ export default function CreateFoodScreen() {
           onChangeText={setName}
           placeholder="e.g. Greek Yogurt"
           placeholderTextColor="#bbb"
+          autoComplete="off" textContentType="none"
           autoFocus
         />
       </View>
@@ -217,6 +218,7 @@ export default function CreateFoodScreen() {
           onChangeText={setServingName}
           placeholder="e.g. slice"
           placeholderTextColor="#bbb"
+          autoComplete="off" textContentType="none"
         />
         <TextInput
           style={[styles.input, styles.fieldHalf]}

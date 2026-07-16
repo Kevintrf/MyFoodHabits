@@ -170,6 +170,7 @@ export default function SearchScreen() {
                 onChangeText={setQuery}
                 clearButtonMode="while-editing"
                 returnKeyType="search"
+                autoComplete="off" textContentType="none"
               />
               <TouchableOpacity style={styles.cameraBtn} onPress={openScanner}>
                 <Ionicons name="barcode-outline" size={26} color="#2D6A4F" />

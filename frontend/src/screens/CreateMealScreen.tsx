@@ -214,6 +214,7 @@ export default function CreateMealScreen() {
             value={mealName}
             onChangeText={setMealName}
             returnKeyType="next"
+            autoComplete="off" textContentType="none"
           />
           <View style={styles.searchSection}>
             <TextInput
@@ -223,6 +224,7 @@ export default function CreateMealScreen() {
               value={searchQuery}
               onChangeText={handleSearchChange}
               returnKeyType="search"
+              autoComplete="off" textContentType="none"
             />
             <TouchableOpacity style={styles.cameraBtn} onPress={openScanner}>
               <Ionicons name="barcode-outline" size={24} color="#2D6A4F" />

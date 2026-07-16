@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-07-16 (48)
+
+### fix: suppress keyboard autofill suggestions on all text inputs
+Added autoComplete="off" textContentType="none" to every TextInput that was missing them (food name, serving name, search bars, meal name, AI description, and AI food name fields). Prevents Android/iOS from suggesting phone numbers or other autofill values in numeric and free-text inputs.
+
+---
+
 ## 2026-07-07 (47)
 
 ### feat: smart meal slot auto-selection based on logging history

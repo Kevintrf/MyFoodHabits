@@ -124,6 +124,7 @@ export default function AiEstimateScreen() {
         multiline
         numberOfLines={3}
         textAlignVertical="top"
+        autoComplete="off" textContentType="none"
         autoFocus
       />
 
@@ -179,6 +180,7 @@ export default function AiEstimateScreen() {
             onChangeText={setEditTitle}
             placeholderTextColor="#bbb"
             placeholder="Meal name"
+            autoComplete="off" textContentType="none"
           />
 
           <View style={styles.toggleRow}>

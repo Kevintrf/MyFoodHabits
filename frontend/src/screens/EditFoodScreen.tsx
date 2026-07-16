@@ -144,6 +144,7 @@ export default function EditFoodScreen() {
           value={name}
           onChangeText={setName}
           placeholderTextColor="#bbb"
+          autoComplete="off" textContentType="none"
           autoFocus
         />
       </View>
@@ -245,6 +246,7 @@ export default function EditFoodScreen() {
               onChangeText={setServingName}
               placeholder="e.g. slice"
               placeholderTextColor="#bbb"
+              autoComplete="off" textContentType="none"
             />
             <TextInput
               style={[styles.input, styles.fieldHalf]}
