@@ -18,7 +18,7 @@ The app should follow the SLC model "Simple, Loveable, Complete" and focus on do
 ### Running on a physical phone (Expo Go)
 
 ```bash
-cd frontend && npx expo start --clear
+cd app && npx expo start --clear
 ```
 
 Scan the QR code with the Expo Go app on your phone.
@@ -38,7 +38,7 @@ Scan the QR code with the Expo Go app on your phone.
 2. Start the emulator from Device Manager (or via the AVD Manager)
 3. Start Metro:
    ```bash
-   cd frontend && npx expo start --clear
+   cd app && npx expo start --clear
    ```
 4. Press `a` in the Metro terminal to open the app in the running emulator
 
@@ -49,7 +49,7 @@ The first launch installs the Expo Go app automatically into the emulator.
 A release build bundles the JavaScript directly into the APK so the app runs fully standalone — no computer, no Metro needed. Requires a connected physical device or a running emulator.
 
 ```bash
-cd frontend
+cd app
 npx expo run:android --variant release
 ```
 
@@ -59,13 +59,7 @@ The APK is built and installed directly on the connected device. The first build
 
 ## Technology stack
 
-### Frontend
-
-Needs to be an app and work on phones. Needs to be able to use the camera and scan barcodes.
-
-### Backend
-
-Mostly just CRUD. Saves and collects data stored in the database.
+Expo (React Native) + TypeScript app with on-device SQLite storage. No backend server required — all data lives locally. Barcode lookups hit Open Food Facts directly from the app; AI estimation calls the Anthropic API directly.
 
 ### Database
 

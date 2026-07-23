@@ -1,5 +1,5 @@
 // Pure macro calculation helpers — no DB dependency.
-// Mirrors backend/src/lib/macros.ts exactly.
+// Pure macro calculation helpers — no DB dependency.
 
 export interface MacroResult {
   calories: number;
