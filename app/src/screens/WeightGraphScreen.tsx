@@ -323,7 +323,7 @@ export default function WeightGraphScreen() {
 
   const [weights, setWeights] = useState<WeightEntry[]>([]);
   const [calorieHistory, setCalorieHistory] = useState<{ date: string; calories: number }[]>([]);
-  const [targets, setTargets] = useState<UserTargets>({ target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false, gender: null, height_cm: null, birth_year: null });
+  const [targets, setTargets] = useState<UserTargets>({ target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false, smart_meal_slot: true, gender: null, height_cm: null, birth_year: null });
 
   const load = useCallback(async () => {
     const [w, c, t] = await Promise.all([

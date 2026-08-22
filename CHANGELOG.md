@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-08-22 (50)
+
+### fix: add missing smart_meal_slot field to default targets state
+CalorieTrendScreen and WeightGraphScreen initialized their `targets` state with a UserTargets literal predating the `smart_meal_slot` field (added in change 47), causing a type error. Added `smart_meal_slot: true` to match the real defaults in AppContext and db/settings.ts. Placeholder-only; getTargets() overwrites it immediately, so no runtime behavior change.
+
+---
+
 ## 2026-08-22 (49)
 
 ### feat: hide foods from search and recent foods
