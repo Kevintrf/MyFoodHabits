@@ -49,10 +49,9 @@ The app learns from user habits and builds an increasingly accurate model of the
 
 ## Tech Stack
 
-| Layer    | Technology                        |
-|----------|-----------------------------------|
-| Frontend | Expo (React Native)               |
-| Backend  | Express (Node.js)                 |
-| Database | PostgreSQL                        |
-| Food API | Open Food Facts (barcode lookups) |
-| Hosting  | Single VPS (initially)            |
+| Layer    | Technology                                    |
+|----------|-------------------------------------------------|
+| App      | Expo (React Native), TypeScript                  |
+| Storage  | On-device SQLite (`expo-sqlite`) — no backend server |
+| Food API | Open Food Facts (barcode lookups, direct from app) |
+| AI       | Anthropic API (meal nutrition estimation, direct from app) |

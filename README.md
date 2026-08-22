@@ -29,7 +29,7 @@ Scan the QR code with the Expo Go app on your phone.
 > ```
 > As a fallback, tunnel mode also works:
 > ```bash
-> cd frontend && npx expo start --tunnel --clear
+> cd app && npx expo start --tunnel --clear
 > ```
 
 ### Running on an Android emulator
@@ -63,4 +63,8 @@ Expo (React Native) + TypeScript app with on-device SQLite storage. No backend s
 
 ### Database
 
-Database containing user info as well as a list of 
+SQLite (`expo-sqlite`), local to the device. Holds the user's settings/targets plus foods, servings, saved meals, day logs, and weight history. See [database/schema.md](database/schema.md) for the full schema and ER diagram.
+
+## Documentation
+
+See [docs/README.md](docs/README.md) for the full documentation index (architecture, roadmap, decisions, changelog).

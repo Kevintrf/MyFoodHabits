@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-08-22 (51)
+
+### docs: sync all docs with the current serverless/SQLite architecture
+Full documentation audit. architecture.md and overview.md rewritten — they still described the original Express/PostgreSQL backend, which was fully removed. database/schema.md rewritten to match schema.ts exactly (was missing food_log_prefs, several foods/user_settings columns, and still had a `users` table that no longer exists). features/barcode-scanning.md replaced a "coming later" placeholder with the actual implemented behavior. README.md fixed a truncated sentence and a stale `cd frontend` reference. docs/README.md fixed a broken link and brought the index up to date. claude-context.md was missing 3 screens from the project structure listing. decisions/stack-choice.md and decisions/database-choice.md marked superseded (kept as historical ADRs, not rewritten). next-steps.md marked archived — its Phase 4 plan is complete and its phase numbers never matched roadmap.md's. roadmap.md reconciled against next-steps.md and the CHANGELOG: checked off items that were already done (performance pass, weight dot timezone fix, data export, offline-first storage, TDEE) and fixed a reference to a `users.email` column that no longer exists. issues.md updated to reflect the food-deletion design question being resolved (change 49).
+
+---
+
 ## 2026-08-22 (50)
 
 ### fix: add missing smart_meal_slot field to default targets state

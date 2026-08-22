@@ -1,5 +1,7 @@
 # Decision: Database — PostgreSQL
 
+> **Superseded.** The app was later migrated to on-device SQLite (`expo-sqlite`) and the backend was removed entirely — see [architecture.md](../architecture.md) and [../database/schema.md](../database/schema.md) for the current design, and `docs/next-steps.md` ("Phase 4 — Offline-first") for why. Kept for historical context; the reasoning below applied when a server-backed multi-tenant model was still the plan.
+
 ## Decision
 
 Use **PostgreSQL** as the primary database.

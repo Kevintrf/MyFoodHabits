@@ -1,5 +1,7 @@
 # Next Steps
 
+> **ARCHIVED — superseded by [roadmap.md](roadmap.md).** Everything in "Phase 4 — Offline-first" below shipped (the backend and PostgreSQL were removed entirely; the app is now on-device SQLite only — see [architecture.md](architecture.md)). This doc's phase numbers were never reconciled with roadmap.md's, so treat roadmap.md as the canonical phase plan going forward. Kept for the implementation notes and the "Decisions already made" record. Still-open items from "Phase 5 — Options" have been folded into roadmap.md Phase 4/5 or `docs/issues.md`.
+
 Last updated: 2026-04-16
 
 ---

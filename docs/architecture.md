@@ -2,107 +2,108 @@
 
 ## System Design
 
-The system is a standard client-server architecture. The Expo mobile app communicates with an Express REST API, which reads and writes to a PostgreSQL database. External food data is fetched from Open Food Facts for barcode lookups and cached locally.
+MyFoodHabits is a single Expo (React Native) app with **no backend server** — all data lives on-device in a local SQLite database (`expo-sqlite`). Two external APIs are called directly from the app, never through a server:
 
 ```text
-[Expo App]  <-->  [Express API]  <-->  [PostgreSQL]
-                       |
-                [Open Food Facts API]
+[Expo App]
+    |-- reads/writes -->  [expo-sqlite local DB]
+    |-- barcode lookups -->  [Open Food Facts API]   (cached locally on first hit)
+    '-- meal estimation -->  [Anthropic API]          (user-supplied API key)
 ```
+
+This wasn't the original design — the app started as Expo + Express + PostgreSQL (see [decisions/stack-choice.md](decisions/stack-choice.md), now superseded) and was migrated to fully local/serverless storage to remove the friction of running a server before the app was usable. There is one implicit local user (`user_id` hardcoded to `1`); no authentication.
 
 ## Frontend
 
-**Technology:** Expo (React Native)
+**Technology:** Expo (React Native), TypeScript
+
+### Navigation
+
+Bottom tab bar with five tabs, each its own stack:
+
+| Tab       | Stack screens                                                       |
+|-----------|----------------------------------------------------------------------|
+| Today     | TodayScreen → CalendarScreen, CalorieTrendScreen                     |
+| Search    | SearchScreen → PortionScreen, CreateFoodScreen, EditFoodScreen, AiEstimateScreen |
+| Meals     | MealsScreen → CreateMealScreen, EditMealScreen                       |
+| Weight    | WeightScreen → WeightGraphScreen                                     |
+| Settings  | SettingsScreen                                                       |
 
 ### Screens
 
-| Screen            | Purpose                                                            |
-|-------------------|--------------------------------------------------------------------|
-| TodayScreen       | Main dashboard — calories, macros, today's log                     |
-| SearchScreen      | Food search with recent foods, barcode scanner                     |
-| PortionScreen     | Portion selection after choosing a food                            |
-| MealsScreen       | Saved meals — view and log whole meals with scale picker           |
-| CreateMealScreen  | Create a new saved meal with food search and ±quantity draft list  |
-| WeightScreen      | Log and view body weight history                                   |
-| SettingsScreen    | Set calorie and protein targets                                    |
-| CreateFoodScreen  | Create a custom food (name, macros per 100g, liquid flag, servings)|
-| EditFoodScreen    | Edit a user-created food (new versioned row) or hide it from search/recent |
+| Screen             | Purpose                                                                    |
+|--------------------|------------------------------------------------------------------------------|
+| TodayScreen        | Main dashboard — calories/macros for the viewing date, TDEE, log by meal slot |
+| CalendarScreen     | Month view; tap a day to set it as the active viewing date on Today          |
+| CalorieTrendScreen | Calorie and protein trend charts (7d/30d/90d) vs. target                      |
+| SearchScreen       | Debounced food search, recent foods, barcode scanner, entry to AI estimate    |
+| PortionScreen      | Serving/quantity/meal-slot picker with live macro preview; pre-fills from last use |
+| CreateFoodScreen   | Create a custom food (name, macros per 100g, liquid flag, servings)           |
+| EditFoodScreen     | Edit a user-created food (new versioned row) or hide it from search/recent    |
+| AiEstimateScreen   | Describe a meal in text; Anthropic API returns estimated macros               |
+| MealsScreen        | Saved meals — view and log whole meals with a scale picker (0.5×/1×/2×)       |
+| CreateMealScreen   | Create a new saved meal with food search and ±quantity draft list             |
+| EditMealScreen     | Edit or delete a saved meal                                                   |
+| WeightScreen       | Log body weight; reminder dot when nothing logged today                       |
+| WeightGraphScreen  | Weight trend chart with TDEE-based forecast                                   |
+| SettingsScreen     | Calorie/protein targets, activity level, profile (for TDEE), AI key, data export/import |
 
 ### State Management
 
-- React Context API for global state (current user, today's log, macro targets, weight logged today)
+- React Context (`AppContext`) for global state — today's date/log, viewing date, macro targets, weight status, calibrated TDEE, recent foods
 - Local component state for everything else
 - No Redux — keep it simple until complexity demands otherwise
 
 ### Key Principles
 
-- Debounce search input at 250ms to avoid hammering the backend
-- Pre-load today's log and recent foods on app open
+- Debounce search input at 250ms
+- Pre-load today's log, targets, and recent foods on app open (`AppContext`)
 - Keep components under ~200 lines; extract a component before it grows past that
-- Separate API calls into a `/services` layer — no `fetch()` calls inside components
+- All DB access goes through `app/src/db/*.ts` — no inline SQL in components or screens
 
-## Backend
+## Local Data Layer
 
-**Technology:** Express (Node.js)
+**Technology:** `expo-sqlite`, raw SQL (no ORM)
 
-### API Structure
+`app/src/db/client.ts` opens a single shared `expo-sqlite` connection with `PRAGMA foreign_keys = ON`. `app/src/db/schema.ts` defines all tables and runs migrations on startup (see [../database/schema.md](../database/schema.md) for the current schema).
+
+Query modules, one per domain, each exposing plain async functions the screens call directly:
 
 ```text
-/foods
-  GET  /search?q=        Search foods by name
-  GET  /recent           Top 10 most recently logged distinct foods for the user
-  GET  /barcode/:barcode Look up food by barcode (checks DB first, then Open Food Facts)
-  GET  /:id              Get a single food with its servings
-  POST /                 Create a new food (with optional custom servings)
-  PATCH /:id             Edit a food — inserts a new versioned row (immutability)
-
-/log
-  GET  /:date            Get all log items for a given date (YYYY-MM-DD)
-  POST /                 Add a food to today's log
-  DELETE /items/:id      Delete a log item
-  PATCH /items/:id       Update a log item's quantity or meal slot
-
-/meals
-  GET  /                 List all saved meals for the user
-  POST /                 Create a new meal (items included in body)
-  POST /:id/log          Log an entire meal; accepts optional scale param (0.5, 1, 2)
-
-/users
-  GET  /me               Get the current user's macro targets
-  PATCH /me              Update macro targets (partial update supported)
-
-/weight
-  GET  /                 Get weight history
-  POST /                 Log a weight entry
+db/
+  client.ts     expo-sqlite connection singleton
+  schema.ts     CREATE TABLE statements + versioned migrations
+  foods.ts      search, barcode lookup/caching, create/edit (versioned), hide
+  log.ts        day logs and log items — CRUD, day/month summaries
+  meals.ts      saved meals — CRUD, log a meal at a given scale
+  settings.ts   user_settings — targets, profile, AI key
+  weight.ts     weight entries — CRUD, history
+  macros.ts     calcMacros() / sumMacros() pure calculation helpers
+  dataTransfer.ts   full-DB JSON export/import (Settings → Data)
 ```
 
-### Backend Principles
-
-- Thin API layer over the database — business logic lives in the DB schema and service functions, not in route handlers
-- Store all nutrition values per 100g, convert to servings at read time
-- Foods are immutable once created — changes create a new version
-
-## Database
-
-**Technology:** PostgreSQL
-
-See [../database/schema.md](../database/schema.md) for the full schema and ER diagram.
+Types are still centralized in `app/src/services/api.ts`, but that file is **types only** — there are no `fetch()` calls to a backend anywhere in the app.
 
 ### Key Design Decisions
 
-- All nutrition values stored per 100g for consistency
-- `food_servings` table allows custom units (slice, piece, tbsp) per food
+- All nutrition values stored per 100g, converted to servings at read time
+- `foods` are immutable — editing inserts a new versioned row; hiding (`hidden` flag) is the only "delete", so `log_items`/`meal_items` referencing an older or hidden food never break
+- `food_servings` allows custom units (slice, piece, tbsp) per food
 - `foods.source` enum distinguishes user-created vs. verified vs. Open Food Facts data
-- `log_items` links to both a food and optionally a serving unit for flexible portion tracking
+- `food_log_prefs` remembers each food's last serving/quantity/meal-slot to pre-fill PortionScreen
 
 ## External APIs
 
 **Open Food Facts** — free, open food database
 
-- Used for barcode scanning lookups
-- Results are cached in the local `foods` table on first lookup to avoid repeated API calls
-- Marked with `source = 'OPENFOODFACTS'`
+- Called directly from `db/foods.ts` for barcode scanning lookups
+- Results are cached in the local `foods` table on first lookup (`source = 'OPENFOODFACTS'`) to avoid repeated calls
+
+**Anthropic API** — meal nutrition estimation
+
+- Called directly from `services/aiEstimate.ts` using a user-supplied API key (stored in `user_settings.anthropic_api_key`)
+- User describes a meal in plain text; result is saved as a food with `ai_estimated = true`
 
 ## Deployment
 
-Initially: single VPS running both the Express API and PostgreSQL. Simple, cheap, easy to reason about. Scale when there's a reason to.
+No server to deploy — the app ships as a standalone Android/iOS build (`npx expo run:android --variant release` produces an installable APK with the JS bundle embedded). See the root [README.md](../README.md) for build instructions.

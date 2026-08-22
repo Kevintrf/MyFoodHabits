@@ -1,5 +1,7 @@
 # Decision: Tech Stack — Express + Expo + PostgreSQL
 
+> **Superseded.** The Express backend and PostgreSQL were removed; the app is now Expo + TypeScript only, storing everything on-device in SQLite. See [architecture.md](../architecture.md) for the current stack. Kept for historical context on why Express/Postgres were picked in the first place.
+
 ## Decision
 
 - **Backend:** Express (Node.js, TypeScript)

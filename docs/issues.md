@@ -42,14 +42,11 @@ Found during Phase 3.5 walkthrough. Work through these before moving to Phase 4.
 
 ---
 
+- [x] **Food deletion strategy decided and shipped (2026-08-22)** — went with soft-delete: a `hidden` column on `foods` (schema v9), set via a "Hide Food" button on EditFoodScreen. Hidden foods are excluded from search and recent foods; `log_items`/`meal_items` referencing them are untouched, consistent with food immutability.
+
 ## Deferred / Needs Design
 
-- [ ] **Food management screen** — a list of all user-created foods with the ability to delete them
-  - **Design consideration:** foods are immutable by design — old log entries reference their original food row, so deleting a food would orphan those log entries. Options to consider:
-    - Soft-delete: mark the food as deleted so it no longer appears in search, but log entries still resolve correctly
-    - Block delete if the food is referenced by any log entry or meal item; show which logs use it
-    - Allow delete only if the food has never been logged
-  - Hold until the approach is decided
+- [ ] **Food management screen** — a list of all user-created foods (including hidden ones) with the ability to unhide them. Not yet built — currently the only way to hide a food is via EditFoodScreen, and there's no UI to reverse it.
 
 ---
 

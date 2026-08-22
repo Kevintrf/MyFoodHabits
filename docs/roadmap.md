@@ -11,6 +11,8 @@
 
 ## Phase 1 — Foundation (Backend + Database) ✅ COMPLETE
 
+> Historical record — this Express/PostgreSQL backend was later removed entirely in favor of on-device SQLite (see the "Offline-first storage" item in Phase 5, and [architecture.md](architecture.md) for the current design).
+
 Goal: A working API with a real database that can store and retrieve food logs.
 
 - [x] Initialize Express project (TypeScript, ESLint, Prettier)
@@ -66,12 +68,12 @@ Goal: Make logging fast enough that users actually want to use it daily.
 Goal: Before touching the UI, make sure everything that exists actually works correctly and is properly documented.
 
 - [x] End-to-end walkthrough on a real device — test every feature in every screen, note anything broken or awkward (see docs/issues.md)
-- [ ] Bug fixes and UX rough edges found during walkthrough (tracked in docs/issues.md)
-- [ ] Performance pass — pre-load today's log and recent foods on app open; optimise anything that felt slow during walkthrough
+- [x] Bug fixes and UX rough edges found during walkthrough — all fixed except two deferred design questions, still tracked in docs/issues.md (duplicate search results from food versioning; food management/unhide screen)
+- [x] Performance pass — `AppContext` pre-fetches targets, weight status, and recent foods on mount (see docs/next-steps.md)
 - [x] Review all docs against the codebase — anything in the docs that wasn't implemented, anything in the code that isn't documented
 - [x] Audit CHANGELOG, roadmap, and claude-context for gaps or stale entries
-- [ ] Remove or flag any features that didn't work as intended
-- [ ] Fix weight dot timezone edge case — `logged_at.startsWith(todayDate)` compares UTC strings; for users in UTC+ timezones, a weight logged late at night may have tomorrow's UTC date and the dot won't clear until midnight UTC
+- [x] Remove or flag any features that didn't work as intended — none found; all Phase 3 features work as designed
+- [x] Fix weight dot timezone edge case — `getTodayDate()` now uses local date methods instead of `.toISOString()` (UTC); see docs/next-steps.md
 
 **Milestone:** Every existing feature works correctly on device. Docs and code are fully in sync.
 
@@ -98,19 +100,20 @@ Goal: Replace the functional-but-rough Phase 2 UI with a polished, opinionated d
 
 Goal: Features that make this app meaningfully better than alternatives.
 
-- [ ] Authentication — replace hardcoded `user_id=1` with real sign-up/login; schema already has `email` on users table
+- [ ] Authentication — replace hardcoded `user_id=1` with real sign-up/login; would need an `email`/credentials column added to `user_settings` (no `users` table exists anymore — see database/schema.md)
 - [ ] Onboarding flow — first-run screen to set name, calorie target, protein target before anything is meaningful
 - [ ] Copy a previous day's log — "log same as yesterday" or pick any past date to repeat
 - [ ] Nested meal collections — meals can contain other meals, not just food items (see schema note); enables composing "Weekend brunch" = "Usual breakfast" + extras
-- [ ] Data export — CSV download of the full food log
+- [x] Data export — JSON export/import of the full local DB from Settings → Data (not CSV as originally scoped); shipped 2026-05-22, see CHANGELOG (34)
 - [ ] Remaining macros view — "You still need 77g protein, here are some options"
 - [ ] Quick add command input — `+2 eggs +coffee with milk`
 - [ ] Day summary — calories, protein, consistency streak
 - [ ] Weekly summary — trend view, weight progress
-- [ ] Habit detection v1 — detect repeated morning patterns, prompt "Log your usual breakfast?"
+- [x] TDEE estimation and forecast — Mifflin-St Jeor + data-calibrated TDEE shown on Today; weight forecast on WeightGraphScreen; not originally scoped in this phase but shipped 2026-05-27, see CHANGELOG (36, 37, 39–41)
+- [ ] Habit detection v1 — detect repeated morning patterns, prompt "Log your usual breakfast?" (smart meal-slot auto-selection, CHANGELOG 47, is a lighter version of this — it pre-selects the slot but doesn't yet prompt a one-tap full log)
 - [ ] Habit detection v2 — full day pattern, "Log your usual day?"
 - [ ] Calorie budget mode — plan remaining meals around a target
-- [ ] Offline-first storage — local SQLite mirrors server data; writes are instant locally and sync in background; requires auth to be meaningful
+- [x] Offline-first storage — went further than originally scoped: the backend and PostgreSQL were removed entirely rather than kept as a sync target. All data lives in on-device SQLite only; no server, no sync. See architecture.md.
 
 **Milestone:** App has a clear reason to exist over MyFitnessPal. Users actively recommend it.
 

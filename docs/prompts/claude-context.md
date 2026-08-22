@@ -34,7 +34,8 @@ No backend server. All data lives in a local SQLite database managed by `app/src
 | `docs/overview.md`                           | What the app is, core features, philosophy                   |
 | `docs/architecture.md`                       | System design and screen list                                |
 | `docs/roadmap.md`                            | Phased development plan with completion status               |
-| `docs/decisions/`                            | ADRs — why we chose what we chose                            |
+| `docs/decisions/`                            | ADRs — why we chose what we chose (Express/Postgres ones are superseded) |
+| `database/schema.md`                         | Full DB schema and ER diagram                                |
 | `CHANGELOG.md`                               | Full history of every change made                            |
 
 ---
@@ -47,27 +48,31 @@ app/
   src/
     services/api.ts     Shared TypeScript types (no HTTP calls)
     context/AppContext  userId, todayDate, viewingLog, targets, weights, tdee
-    navigation/RootNavigator.tsx  Bottom tabs + SearchStack + MealsStack
+    navigation/RootNavigator.tsx  Bottom tabs (Today/Search/Meals/Weight/Settings), each its own stack
     db/
       client.ts         expo-sqlite database instance
       schema.ts         CREATE TABLE statements + migrations (current: v9)
       log.ts            Day log and log item CRUD
-      foods.ts          Food search, barcode lookup, create/edit
+      foods.ts          Food search, barcode lookup, create/edit, hide
       meals.ts          Saved meals CRUD and logging
       settings.ts       User targets (calories, protein, activity, etc.)
       weight.ts         Weight log
       macros.ts         calcMacros() and sumMacros() utilities
+      dataTransfer.ts   Full-DB JSON export/import
     screens/
-      TodayScreen         Date, macro progress bars, log items by slot
-      SearchScreen        Debounced search (250ms), navigates to Portion
+      TodayScreen         Date, macro progress bars, TDEE, log items by slot
+      CalendarScreen      Month view; tap a day to view/edit that date on Today
+      CalorieTrendScreen  Calorie and protein trend charts (7d/30d/90d)
+      SearchScreen        Debounced search (250ms), recent foods, barcode scanner
       PortionScreen       Serving picker, quantity, meal slot, live preview
       MealsScreen         Lists saved meals, log whole meal with slot picker
       CreateMealScreen    Name input, food search, ±quantity draft list
-      EditMealScreen      Edit a saved meal
-      WeightScreen        Log weight, view history
-      SettingsScreen      Calorie/protein targets, activity, profile, tracking toggles
+      EditMealScreen      Edit or delete a saved meal
+      WeightScreen        Log weight, view history, reminder dot
+      WeightGraphScreen   Weight trend chart with TDEE-based forecast
+      SettingsScreen      Calorie/protein targets, activity, profile, tracking toggles, AI key, data export/import
       CreateFoodScreen    Form to create a custom food (name, macros, liquid flag)
-      EditFoodScreen      Pre-filled form to edit a user-created food
+      EditFoodScreen      Pre-filled form to edit a user-created food, or hide it
       AiEstimateScreen    Describe a meal in text, AI returns estimated macros
 ```
 
@@ -114,7 +119,7 @@ cd app && npx expo run:android --variant release
 
 **Store nutrition per 100g.** Convert to serving sizes at read time. Never store per-serving values as the canonical source of truth.
 
-**Foods are immutable.** Changes to a food create a new version — old log entries must never silently change their calorie values.
+**Foods are immutable and never hard-deleted.** Changes to a food create a new version — old log entries must never silently change their calorie values. "Deleting" a food actually sets a `hidden` flag (excludes it from search/recent) so log/meal entries referencing it keep resolving correctly.
 
 **Liquid foods** use `liquid: true` flag. All values still stored per 100g; the UI displays "per 100ml" instead of "per 100g" for liquid foods.
 
