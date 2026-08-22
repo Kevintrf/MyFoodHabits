@@ -50,7 +50,7 @@ app/
     navigation/RootNavigator.tsx  Bottom tabs + SearchStack + MealsStack
     db/
       client.ts         expo-sqlite database instance
-      schema.ts         CREATE TABLE statements + migrations (current: v8)
+      schema.ts         CREATE TABLE statements + migrations (current: v9)
       log.ts            Day log and log item CRUD
       foods.ts          Food search, barcode lookup, create/edit
       meals.ts          Saved meals CRUD and logging

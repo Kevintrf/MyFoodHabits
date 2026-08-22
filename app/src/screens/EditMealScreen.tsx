@@ -72,6 +72,7 @@ export default function EditMealScreen() {
         source: 'USER' as FoodSource,
         locally_modified: false,
         ai_estimated: false,
+        hidden: false,
         calories_per_100g: mi.calories_per_100g,
         protein_per_100g: mi.protein_per_100g,
         carbs_per_100g: mi.carbs_per_100g,

@@ -25,6 +25,7 @@ erDiagram
         float protein_per_100g
         float carbs_per_100g
         float fat_per_100g
+        boolean hidden
         timestamp created_at
     }
 
@@ -124,9 +125,12 @@ The canonical food item. All nutrition values are stored **per 100g**.
 | protein_per_100g   | float     |                                                              |
 | carbs_per_100g     | float     |                                                              |
 | fat_per_100g       | float     |                                                              |
+| hidden             | boolean   | soft-deleted; excluded from search and recent foods         |
 | created_at         | timestamp |                                                              |
 
 **Foods are immutable.** Editing a food creates a new row with an incremented version. Old log entries reference their original food row and will never silently change calorie values.
+
+**Foods are never hard-deleted.** Hiding a food (`hidden = 1`) only removes it from search and recent foods — log_items and meal_items that reference it are unaffected.
 
 ---
 

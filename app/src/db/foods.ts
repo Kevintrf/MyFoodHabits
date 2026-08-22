@@ -13,6 +13,7 @@ interface FoodRow {
   source: string;
   locally_modified: number;
   ai_estimated: number;
+  hidden: number;
   created_by_user_id: number | null;
   calories_per_100g: number;
   protein_per_100g: number;
@@ -43,6 +44,7 @@ function mapFood(row: FoodRow): Food {
     source: row.source as FoodSource,
     locally_modified: !!row.locally_modified,
     ai_estimated: !!row.ai_estimated,
+    hidden: !!row.hidden,
     created_by_user_id: row.created_by_user_id,
     calories_per_100g: row.calories_per_100g,
     protein_per_100g: row.protein_per_100g,
@@ -75,10 +77,10 @@ async function getServingsForFood(foodId: number): Promise<FoodServing[]> {
 
 export async function searchFoods(q: string): Promise<Food[]> {
   const rows = await db.getAllAsync<FoodRow>(
-    `SELECT id, name, barcode, liquid, source, locally_modified, ai_estimated, created_by_user_id,
+    `SELECT id, name, barcode, liquid, source, locally_modified, ai_estimated, hidden, created_by_user_id,
             calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
      FROM foods
-     WHERE name LIKE ?
+     WHERE name LIKE ? AND hidden = 0
      ORDER BY name
      LIMIT 20`,
     [`%${q}%`],
@@ -88,7 +90,7 @@ export async function searchFoods(q: string): Promise<Food[]> {
 
 export async function getFoodById(id: number): Promise<FoodWithServings> {
   const row = await db.getFirstAsync<FoodRow>(
-    `SELECT id, name, barcode, liquid, source, locally_modified, ai_estimated, created_by_user_id,
+    `SELECT id, name, barcode, liquid, source, locally_modified, ai_estimated, hidden, created_by_user_id,
             calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g, created_at
      FROM foods WHERE id = ?`,
     [id],
@@ -100,7 +102,7 @@ export async function getFoodById(id: number): Promise<FoodWithServings> {
 // Check local DB first; fall back to Open Food Facts and cache the result.
 export async function getFoodByBarcode(barcode: string): Promise<Food> {
   const cached = await db.getFirstAsync<FoodRow>(
-    `SELECT id, name, barcode, liquid, source, locally_modified, ai_estimated, created_by_user_id,
+    `SELECT id, name, barcode, liquid, source, locally_modified, ai_estimated, hidden, created_by_user_id,
             calories_per_100g, protein_per_100g, carbs_per_100g, fat_per_100g
      FROM foods WHERE barcode = ? ORDER BY version DESC LIMIT 1`,
     [barcode],
@@ -149,7 +151,7 @@ export async function getFoodByBarcode(barcode: string): Promise<Food> {
 
 export async function getRecentFoods(offset = 0, limit = 20): Promise<Food[]> {
   const rows = await db.getAllAsync<FoodRow>(
-    `SELECT f.id, f.name, f.barcode, f.liquid, f.source, f.locally_modified, f.ai_estimated, f.created_by_user_id,
+    `SELECT f.id, f.name, f.barcode, f.liquid, f.source, f.locally_modified, f.ai_estimated, f.hidden, f.created_by_user_id,
             f.calories_per_100g, f.protein_per_100g, f.carbs_per_100g, f.fat_per_100g
      FROM foods f
      JOIN (
@@ -159,6 +161,7 @@ export async function getRecentFoods(offset = 0, limit = 20): Promise<Food[]> {
        WHERE dl.user_id = 1
        GROUP BY li.food_id
      ) recent ON recent.food_id = f.id
+     WHERE f.hidden = 0
      ORDER BY recent.last_logged DESC
      LIMIT ? OFFSET ?`,
     [limit, offset],
@@ -309,6 +312,12 @@ export async function editFood(
 
   const row = await db.getFirstAsync<FoodRow>('SELECT * FROM foods WHERE id = ?', [newFoodId]);
   return mapFood(row!);
+}
+
+// Soft-delete: hides the food from search and recent foods without touching
+// log_items/meal_items that reference it, so past entries keep their values.
+export async function hideFood(id: number): Promise<void> {
+  await db.runAsync('UPDATE foods SET hidden = 1 WHERE id = ?', [id]);
 }
 
 export async function addDefaultServing(foodId: number, name: string, grams: number): Promise<void> {

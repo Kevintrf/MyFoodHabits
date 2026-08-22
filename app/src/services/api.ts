@@ -21,6 +21,7 @@ export interface Food {
   source: FoodSource;
   locally_modified: boolean;
   ai_estimated: boolean;
+  hidden: boolean;
   created_by_user_id: number | null;
   calories_per_100g: number;
   protein_per_100g: number;

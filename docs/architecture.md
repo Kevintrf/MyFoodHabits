@@ -26,7 +26,7 @@ The system is a standard client-server architecture. The Expo mobile app communi
 | WeightScreen      | Log and view body weight history                                   |
 | SettingsScreen    | Set calorie and protein targets                                    |
 | CreateFoodScreen  | Create a custom food (name, macros per 100g, liquid flag, servings)|
-| EditFoodScreen    | Edit a user-created food; saves as a new versioned row             |
+| EditFoodScreen    | Edit a user-created food (new versioned row) or hide it from search/recent |
 
 ### State Management
 

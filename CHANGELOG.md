@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-08-22 (49)
+
+### feat: hide foods from search and recent foods
+Added a "Hide Food" button to EditFoodScreen, with a confirmation dialog. Hidden foods are soft-deleted via a new `hidden` column on foods (schema v9) rather than actually removed — searchFoods and getRecentFoods now filter them out, but existing log_items and meal_items that reference a hidden food are untouched and still display correctly, consistent with foods being immutable/never hard-deleted.
+
+---
+
 ## 2026-07-16 (48)
 
 ### fix: suppress keyboard autofill suggestions on all text inputs

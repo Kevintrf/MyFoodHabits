@@ -14,7 +14,7 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ServingDraft } from '../services/api';
-import { editFood, patchExternalFood, getFoodById } from '../db/foods';
+import { editFood, patchExternalFood, getFoodById, hideFood } from '../db/foods';
 import { showAlert } from '../utils/alert';
 import { SearchStackParamList } from '../navigation/RootNavigator';
 
@@ -37,6 +37,7 @@ export default function EditFoodScreen() {
   const [servingGrams, setServingGrams] = useState('');
   const [loadingServings, setLoadingServings] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [hiding, setHiding] = useState(false);
 
   useEffect(() => {
     getFoodById(food.id)
@@ -131,6 +132,29 @@ export default function EditFoodScreen() {
       showAlert('Error', 'Could not save changes. Please try again.');
     } finally {
       setSaving(false);
+    }
+  }
+
+  function handleHide() {
+    showAlert(
+      'Hide this food?',
+      `"${food.name}" won't appear in search or recent foods anymore. Past log entries and meals that use it are unaffected.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Hide', style: 'destructive', onPress: doHide },
+      ],
+    );
+  }
+
+  async function doHide() {
+    setHiding(true);
+    try {
+      await hideFood(food.id);
+      navigation.reset({ index: 0, routes: [{ name: 'Search' }] });
+    } catch {
+      showAlert('Error', 'Could not hide this food. Please try again.');
+    } finally {
+      setHiding(false);
     }
   }
 
@@ -263,11 +287,19 @@ export default function EditFoodScreen() {
         </>
       )}
 
-      <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={saving}>
+      <TouchableOpacity style={styles.saveBtn} onPress={handleSave} disabled={saving || hiding}>
         {saving ? (
           <ActivityIndicator color="#fff" />
         ) : (
           <Text style={styles.saveBtnText}>Save Changes</Text>
+        )}
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.hideBtn} onPress={handleHide} disabled={saving || hiding}>
+        {hiding ? (
+          <ActivityIndicator color="#e74c3c" />
+        ) : (
+          <Text style={styles.hideBtnText}>Hide Food</Text>
         )}
       </TouchableOpacity>
     </ScrollView>
@@ -331,4 +363,6 @@ const styles = StyleSheet.create({
   addServingBtnText: { color: '#2D6A4F', fontSize: 15, fontWeight: '600' },
   saveBtn: { backgroundColor: '#2D6A4F', borderRadius: 12, padding: 16, alignItems: 'center' },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  hideBtn: { padding: 16, alignItems: 'center', marginTop: 8 },
+  hideBtnText: { color: '#e74c3c', fontSize: 15, fontWeight: '600' },
 });

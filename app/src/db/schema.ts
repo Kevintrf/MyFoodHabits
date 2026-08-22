@@ -1,7 +1,7 @@
 import { db } from './client';
 
 // Bump this when adding new tables or columns and add a migration below.
-const SCHEMA_VERSION = 8;
+const SCHEMA_VERSION = 9;
 
 // ---------------------------------------------------------------------------
 // Table definitions
@@ -39,6 +39,7 @@ const CREATE_TABLES = `
     carbs_per_100g       REAL NOT NULL DEFAULT 0,
     fat_per_100g         REAL NOT NULL DEFAULT 0,
     locally_modified     INTEGER NOT NULL DEFAULT 0,
+    hidden               INTEGER NOT NULL DEFAULT 0,
     created_at           TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -213,6 +214,11 @@ export function initSchema(): void {
     if (currentVersion < 8) {
       try { db.execSync('ALTER TABLE user_settings ADD COLUMN smart_meal_slot INTEGER NOT NULL DEFAULT 1;'); } catch { /* already exists */ }
       db.runSync('UPDATE user_settings SET schema_version = 8 WHERE id = 1');
+    }
+
+    if (currentVersion < 9) {
+      try { db.execSync('ALTER TABLE foods ADD COLUMN hidden INTEGER NOT NULL DEFAULT 0;'); } catch { /* already exists */ }
+      db.runSync('UPDATE user_settings SET schema_version = 9 WHERE id = 1');
     }
   });
 }
