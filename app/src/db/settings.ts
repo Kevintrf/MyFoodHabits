@@ -6,6 +6,7 @@ interface RawTargets {
   target_protein_g: number | null;
   activity_level: ActivityLevel;
   show_vitamins: number;
+  show_creatine: number;
   smart_meal_slot: number;
   gender: Gender | null;
   height_cm: number | null;
@@ -19,12 +20,12 @@ export interface AiSettings {
 
 export async function getTargets(): Promise<UserTargets> {
   const row = await db.getFirstAsync<RawTargets>(
-    'SELECT target_calories, target_protein_g, activity_level, show_vitamins, smart_meal_slot, gender, height_cm, birth_year FROM user_settings WHERE id = 1',
+    'SELECT target_calories, target_protein_g, activity_level, show_vitamins, show_creatine, smart_meal_slot, gender, height_cm, birth_year FROM user_settings WHERE id = 1',
     [],
   );
   return row
-    ? { ...row, show_vitamins: !!row.show_vitamins, smart_meal_slot: !!row.smart_meal_slot }
-    : { target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false, smart_meal_slot: true, gender: null, height_cm: null, birth_year: null };
+    ? { ...row, show_vitamins: !!row.show_vitamins, show_creatine: !!row.show_creatine, smart_meal_slot: !!row.smart_meal_slot }
+    : { target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false, show_creatine: false, smart_meal_slot: true, gender: null, height_cm: null, birth_year: null };
 }
 
 export async function getAiSettings(): Promise<AiSettings> {
@@ -46,6 +47,7 @@ export async function updateTargets(data: {
   target_protein_g?: number;
   activity_level?: ActivityLevel;
   show_vitamins?: boolean;
+  show_creatine?: boolean;
   smart_meal_slot?: boolean;
   gender?: Gender | null;
   height_cm?: number | null;
@@ -57,6 +59,7 @@ export async function updateTargets(data: {
          target_protein_g = COALESCE(?, target_protein_g),
          activity_level   = COALESCE(?, activity_level),
          show_vitamins    = COALESCE(?, show_vitamins),
+         show_creatine    = COALESCE(?, show_creatine),
          smart_meal_slot  = COALESCE(?, smart_meal_slot),
          gender           = COALESCE(?, gender),
          height_cm        = COALESCE(?, height_cm),
@@ -67,6 +70,7 @@ export async function updateTargets(data: {
       data.target_protein_g ?? null,
       data.activity_level ?? null,
       data.show_vitamins !== undefined ? (data.show_vitamins ? 1 : 0) : null,
+      data.show_creatine !== undefined ? (data.show_creatine ? 1 : 0) : null,
       data.smart_meal_slot !== undefined ? (data.smart_meal_slot ? 1 : 0) : null,
       data.gender ?? null,
       data.height_cm ?? null,

@@ -15,6 +15,7 @@ erDiagram
         int target_protein_g
         string activity_level
         boolean show_vitamins
+        boolean show_creatine
         boolean smart_meal_slot
         string gender
         float height_cm
@@ -71,6 +72,7 @@ erDiagram
         int user_id
         date date
         boolean vitamins_taken
+        boolean creatine_taken
     }
 
     log_items {
@@ -123,6 +125,7 @@ Single-row table (`id = 1`) — this app has one implicit local user, no `users`
 | target_protein_g   | int     | daily protein goal in grams, default 150                        |
 | activity_level     | text    | `SEDENTARY` \| `LIGHTLY_ACTIVE` \| `MODERATELY_ACTIVE` \| `VERY_ACTIVE` \| `EXTREMELY_ACTIVE` |
 | show_vitamins      | boolean | shows a daily vitamins-taken toggle on Today when on            |
+| show_creatine      | boolean | shows a daily creatine-taken toggle on Today when on            |
 | smart_meal_slot    | boolean | auto-selects meal slot from logging history, default on         |
 | gender             | text    | `MALE` \| `FEMALE` \| `OTHER`, nullable — used for Mifflin-St Jeor TDEE |
 | height_cm          | float   | nullable — used for TDEE                                        |
@@ -221,6 +224,7 @@ One row per user per day. The parent record for all log items on that day.
 | user_id        | int     | hardcoded `1`              |
 | date           | date    | unique per user            |
 | vitamins_taken | boolean | daily vitamins checkbox    |
+| creatine_taken | boolean | daily creatine checkbox    |
 
 ---
 

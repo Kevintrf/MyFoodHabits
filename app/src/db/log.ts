@@ -93,10 +93,11 @@ export async function getLog(date: string): Promise<DayLog> {
     totals: { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
     slots: {},
     vitamins_taken: false,
+    creatine_taken: false,
   };
 
-  const dayLog = await db.getFirstAsync<{ id: number; vitamins_taken: number }>(
-    'SELECT id, vitamins_taken FROM day_logs WHERE user_id = 1 AND date = ?',
+  const dayLog = await db.getFirstAsync<{ id: number; vitamins_taken: number; creatine_taken: number }>(
+    'SELECT id, vitamins_taken, creatine_taken FROM day_logs WHERE user_id = 1 AND date = ?',
     [date],
   );
   if (!dayLog) return empty;
@@ -124,13 +125,21 @@ export async function getLog(date: string): Promise<DayLog> {
     slots[row.meal_slot].push(item);
   }
 
-  return { date, totals: sumMacros(allMacros), slots, vitamins_taken: !!dayLog.vitamins_taken };
+  return { date, totals: sumMacros(allMacros), slots, vitamins_taken: !!dayLog.vitamins_taken, creatine_taken: !!dayLog.creatine_taken };
 }
 
 export async function setVitaminsTaken(date: string, taken: boolean): Promise<void> {
   const dayLogId = await getOrCreateDayLog(date);
   await db.runAsync(
     'UPDATE day_logs SET vitamins_taken = ? WHERE id = ?',
+    [taken ? 1 : 0, dayLogId],
+  );
+}
+
+export async function setCreatineTaken(date: string, taken: boolean): Promise<void> {
+  const dayLogId = await getOrCreateDayLog(date);
+  await db.runAsync(
+    'UPDATE day_logs SET creatine_taken = ? WHERE id = ?',
     [taken ? 1 : 0, dayLogId],
   );
 }

@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { showAlert } from '../utils/alert';
 import { useApp } from '../context/AppContext';
 import { LogItem, FoodServing, FoodWithServings } from '../services/api';
-import { deleteLogItem, updateLogItem, setVitaminsTaken } from '../db/log';
+import { deleteLogItem, updateLogItem, setVitaminsTaken, setCreatineTaken } from '../db/log';
 import { getFoodById } from '../db/foods';
 import { fmtNum } from '../utils/format';
 
@@ -103,6 +103,13 @@ export default function TodayScreen() {
     await refreshViewingLog();
   }
 
+  const creatineTaken = viewingLog?.creatine_taken ?? false;
+
+  async function handleCreatineToggle() {
+    await setCreatineTaken(viewingDate, !creatineTaken);
+    await refreshViewingLog();
+  }
+
   const dateLabel = new Date(viewingDate + 'T00:00:00').toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
@@ -171,6 +178,20 @@ export default function TodayScreen() {
             />
             <Text style={[styles.vitaminsLabel, vitaminsTaken && styles.vitaminsLabelDone]}>
               Vitamins
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Creatine checkbox */}
+        {targets.show_creatine && (
+          <TouchableOpacity style={styles.vitaminsRow} onPress={handleCreatineToggle}>
+            <Ionicons
+              name={creatineTaken ? 'checkbox' : 'square-outline'}
+              size={22}
+              color={creatineTaken ? '#2D6A4F' : '#ccc'}
+            />
+            <Text style={[styles.vitaminsLabel, creatineTaken && styles.vitaminsLabelDone]}>
+              Creatine
             </Text>
           </TouchableOpacity>
         )}

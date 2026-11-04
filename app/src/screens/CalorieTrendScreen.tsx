@@ -324,7 +324,7 @@ export default function CalorieTrendScreen() {
 
   const [allData, setAllData] = useState<DayData[]>([]);
   const [targets, setTargets] = useState<UserTargets>({
-    target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false, smart_meal_slot: true, gender: null, height_cm: null, birth_year: null,
+    target_calories: 2000, target_protein_g: 150, activity_level: 'SEDENTARY', show_vitamins: false, show_creatine: false, smart_meal_slot: true, gender: null, height_cm: null, birth_year: null,
   });
 
   const load = useCallback(async () => {

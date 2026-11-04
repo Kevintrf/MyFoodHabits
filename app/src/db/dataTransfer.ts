@@ -128,9 +128,9 @@ export async function importAllData(): Promise<{ success: boolean; error?: strin
         db.runSync(
           `UPDATE user_settings SET
             name = ?, target_calories = ?, target_protein_g = ?,
-            activity_level = ?, show_vitamins = ?
+            activity_level = ?, show_vitamins = ?, show_creatine = ?
           WHERE id = 1`,
-          [s.name ?? null, s.target_calories, s.target_protein_g, s.activity_level, s.show_vitamins] as any[],
+          [s.name ?? null, s.target_calories, s.target_protein_g, s.activity_level, s.show_vitamins, s.show_creatine ?? 0] as any[],
         );
       }
     });

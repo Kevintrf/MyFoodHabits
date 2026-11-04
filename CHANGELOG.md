@@ -4,6 +4,13 @@ All changes to the project are documented here. Descriptions are written to be u
 
 ---
 
+## 2026-11-04 (52)
+
+### feat: add daily creatine checkbox with settings toggle
+Added a Creatine checkbox on Today, mirroring the Vitamins one, shown when the new "Creatine" toggle under Settings → Tracking is on. Schema v10 adds `user_settings.show_creatine` (default off) and `day_logs.creatine_taken`. Data import restores `show_creatine`, defaulting to off for older exports.
+
+---
+
 ## 2026-08-22 (51)
 
 ### docs: sync all docs with the current serverless/SQLite architecture

@@ -39,6 +39,7 @@ export default function SettingsScreen() {
   const [protein, setProtein] = useState('');
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>('SEDENTARY');
   const [showVitamins, setShowVitamins] = useState(false);
+  const [showCreatine, setShowCreatine] = useState(false);
   const [smartMealSlot, setSmartMealSlot] = useState(true);
   const [gender, setGender] = useState<Gender | null>(null);
   const [height, setHeight] = useState('');
@@ -59,6 +60,7 @@ export default function SettingsScreen() {
     setProtein(String(targets.target_protein_g ?? ''));
     setActivityLevel(targets.activity_level ?? 'SEDENTARY');
     setShowVitamins(targets.show_vitamins ?? false);
+    setShowCreatine(targets.show_creatine ?? false);
     setSmartMealSlot(targets.smart_meal_slot ?? true);
     setGender(targets.gender ?? null);
     setHeight(targets.height_cm ? String(targets.height_cm) : '');
@@ -175,6 +177,13 @@ export default function SettingsScreen() {
     await save(calories, protein, activityLevel, next);
   }
 
+  async function handleCreatineToggle() {
+    const next = !showCreatine;
+    setShowCreatine(next);
+    await updateTargets({ show_creatine: next });
+    await refreshTargets();
+  }
+
   async function handleSmartMealSlotToggle() {
     const next = !smartMealSlot;
     setSmartMealSlot(next);
@@ -280,6 +289,18 @@ export default function SettingsScreen() {
           <View style={styles.toggleText}>
             <Text style={styles.toggleLabel}>Vitamins</Text>
             <Text style={styles.toggleDesc}>Show a daily vitamins checkbox</Text>
+          </View>
+        </TouchableOpacity>
+        <View style={styles.activityOptionBorder} />
+        <TouchableOpacity style={styles.toggleRow} onPress={handleCreatineToggle}>
+          <Ionicons
+            name={showCreatine ? 'checkbox' : 'square-outline'}
+            size={24}
+            color={showCreatine ? '#2D6A4F' : '#ccc'}
+          />
+          <View style={styles.toggleText}>
+            <Text style={styles.toggleLabel}>Creatine</Text>
+            <Text style={styles.toggleDesc}>Show a daily creatine checkbox</Text>
           </View>
         </TouchableOpacity>
         <View style={styles.activityOptionBorder} />

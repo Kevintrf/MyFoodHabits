@@ -220,5 +220,11 @@ export function initSchema(): void {
       try { db.execSync('ALTER TABLE foods ADD COLUMN hidden INTEGER NOT NULL DEFAULT 0;'); } catch { /* already exists */ }
       db.runSync('UPDATE user_settings SET schema_version = 9 WHERE id = 1');
     }
+
+    if (currentVersion < 10) {
+      try { db.execSync('ALTER TABLE user_settings ADD COLUMN show_creatine INTEGER NOT NULL DEFAULT 0;'); } catch { /* already exists */ }
+      try { db.execSync('ALTER TABLE day_logs ADD COLUMN creatine_taken INTEGER NOT NULL DEFAULT 0;'); } catch { /* already exists */ }
+      db.runSync('UPDATE user_settings SET schema_version = 10 WHERE id = 1');
+    }
   });
 }
